@@ -184,11 +184,13 @@ Structure rules:
 ## Commands
 Use the actual repo commands if they exist. Typical commands may include:
 
-- Run app: `go run ./cmd/web`
-- Test: `go test ./...`
-- Vet: `go vet ./...`
-- Lint: `golangci-lint run`
-- Build: `go build ./cmd/web`
+- Run app: `make run` or `go run ./cmd/web`
+- Test: `make test` or `go test ./...`
+- Test with filtered coverage report: `make test-coverage`
+- Vet: `make vet` or `go vet ./...`
+- Lint: `make lint` or `golangci-lint run`
+- Build: `make build` or `go build ./cmd/web`
+- Clean coverage artifacts: `make clean`
 
 If a command is unavailable in this repo, do not invent it; use the closest existing project command.
 
@@ -198,7 +200,11 @@ Before finishing changes, always do the relevant checks:
 - Run tests using `go test ./...`.
 - Keep `_test.go` files in the same directory/package as the code being tested.
 - **Mocks**: Define mock implementations in the same package that uses them, and ensure the filename ends with `_test.go` (e.g., `mock_vehicle_color_repository_test.go`). This prevents them from being compiled into the production binary and automatically excludes them from code coverage reports.
-- Aim for at least **80% code coverage** for service and logic layers.
+- **Coverage priority**:
+  - `internal/service/` — **High (80%+)**. Business logic and error paths must be tested.
+  - `internal/repository/` — **High (80%+)**. SQL correctness and error handling must be tested.
+  - `internal/http/handlers/` — **Medium**. Input parsing, response codes, and routing.
+  - `internal/view/`, `internal/config/`, `internal/db/`, `cmd/` — **Low / Skip**. These are infrastructure wiring and bootstrap code. They are filesystem- or network-dependent, and failures are immediately visible at startup. Do not force unit tests onto them.
 - Use **Mock Repositories** to test services in isolation without a real database.
 - Run linting with `golangci-lint run` if available.
 - Verify the app builds.

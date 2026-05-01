@@ -25,15 +25,41 @@ A full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
 
 ## Testing & Coverage
 
-To run tests and view the coverage summary:
+Run all tests:
 ```bash
-go test -v ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
+make test
+# or
+go test ./...
 ```
 
-To view the detailed HTML coverage report:
+Run tests with a **filtered coverage report** (excludes infrastructure/wiring packages like `cmd/`, `internal/view/`, `internal/config/`, `internal/db/`, `internal/http/routes/`):
 ```bash
-go tool cover -html=coverage.out
+make test-coverage
 ```
+
+Run tests with the **full coverage report** (all packages):
+```bash
+go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
+```
+
+Open the **interactive HTML coverage report** in your browser:
+```bash
+go test ./... -coverprofile=coverage.out && go tool cover -html=coverage.out
+```
+
+Clean up coverage artifacts:
+```bash
+make clean
+```
+
+### Coverage priorities
+
+| Package | Target |
+|---|---|
+| `internal/service/` | 80%+ |
+| `internal/repository/` | 80%+ |
+| `internal/http/handlers/web/` | Medium |
+| `internal/view/`, `internal/config/`, `internal/db/`, `cmd/` | Skip (infrastructure/wiring) |
 
 ## Technology Stack
 
