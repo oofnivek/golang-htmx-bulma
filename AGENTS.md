@@ -132,6 +132,7 @@ Structure rules:
 - MySQL is the only supported database.
 - All schema design, queries, migrations, and repository code should target MySQL.
 - Use MySQL-compatible SQL syntax and features.
+- **Timestamps**: Always store timestamps in UTC in the database.
 - Keep SQL organized in repository/store layers.
 - Document any MySQL-specific assumptions when they affect schema, indexing, transactions, or query behavior.
 - Avoid raw SQL duplication across multiple files when a shared repository method is more maintainable.
@@ -237,3 +238,4 @@ When implementing a feature or fix:
 - Bulma-first styling
 - MySQL-only data model and migrations
 - `cmd/` for entrypoints and `internal/` for app code
+- **Time Handling**: UTC in database, local/selected timezone in UI

@@ -1,0 +1,34 @@
+{{ define "partials/modals/delete_confirm.html" }}
+<div class="modal is-active">
+    <div class="modal-background" onclick="closeModal()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Confirm Deletion</p>
+            <button class="delete" aria-label="close" onclick="closeModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>Are you sure you want to delete <strong>{{ .Name }}</strong>?</p>
+            <p class="mt-4">This action cannot be undone. Please type <span class="has-text-weight-bold">delete</span> to confirm:</p>
+            <div class="field mt-2">
+                <div class="control">
+                    <input class="input" type="text" id="confirm-input" placeholder="Type 'delete' here..." oninput="checkDeleteInput(this)" autocomplete="off">
+                </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <div class="buttons is-right">
+                <button class="button is-danger" 
+                        id="confirm-delete-btn" 
+                        disabled 
+                        hx-delete="{{ .DeleteURL }}"
+                        hx-target="#{{ .RowID }}"
+                        hx-swap="outerHTML"
+                        onclick="closeModal()">
+                    Delete
+                </button>
+                <button class="button" onclick="closeModal()">Cancel</button>
+            </div>
+        </footer>
+    </div>
+</div>
+{{ end }}

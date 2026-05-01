@@ -20,6 +20,13 @@
                     <strong>Go-HTMX-Bulma</strong>
                 </a>
             </div>
+            <div class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="navbar-item" href="/vehicle-colors">
+                        Vehicle Colors
+                    </a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -36,6 +43,37 @@
             </p>
         </div>
     </footer>
+
+    <!-- Modal Container -->
+    <div id="modal-container"></div>
+
+    <script>
+        function closeModal() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.classList.remove('is-active');
+                setTimeout(() => {
+                    document.getElementById('modal-container').innerHTML = '';
+                }, 200);
+            }
+        }
+
+        function checkDeleteInput(input) {
+            const btn = document.getElementById('confirm-delete-btn');
+            if (input.value.toLowerCase() === 'delete') {
+                btn.removeAttribute('disabled');
+            } else {
+                btn.setAttribute('disabled', 'true');
+            }
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>
 {{ end }}

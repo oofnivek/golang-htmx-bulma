@@ -1,0 +1,25 @@
+{{ define "vehicle_colors/table_row.html" }}
+<tr id="color-row-{{ .Color.ID }}">
+    <td>{{ .Color.ID }}</td>
+    <td>{{ .Color.Name }}</td>
+    <td>
+        {{ if .Color.Status }}
+            <span class="tag is-success">Active</span>
+        {{ else }}
+            <span class="tag is-danger">Inactive</span>
+        {{ end }}
+    </td>
+    <td>{{ .Color.CreatedBy }}</td>
+    <td>{{ in_timezone .Color.CreatedAt .Timezone }}</td>
+    <td>
+        <div class="buttons are-small">
+            <a href="/vehicle-colors/{{ .Color.ID }}/edit" class="button is-info">Edit</a>
+            <button class="button is-danger" 
+                    hx-get="/vehicle-colors/{{ .Color.ID }}/delete" 
+                    hx-target="#modal-container">
+                Delete
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

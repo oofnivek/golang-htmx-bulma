@@ -1,0 +1,71 @@
+{{ define "content" }}
+<div class="level">
+    <div class="level-left">
+        <h1 class="title">Vehicle Colors</h1>
+    </div>
+    <div class="level-right">
+        <div class="field has-addons mr-3">
+            <div class="control">
+                <span class="button is-static">Timezone</span>
+            </div>
+            <div class="control">
+                <div class="select">
+                    <select name="tz" 
+                            hx-get="/vehicle-colors" 
+                            hx-target="body" 
+                            hx-push-url="true"
+                            id="tz-select">
+                        {{ $currentTz := .timezone }}
+                        {{ range .timezones }}
+                            <option value="{{ . }}" {{ if eq . $currentTz }}selected{{ end }}>{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <a href="/vehicle-colors/new" class="button is-primary">Add New Color</a>
+    </div>
+</div>
+
+<script>
+    // If no timezone is in the URL, try to detect and redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('tz')) {
+        const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const select = document.getElementById('tz-select');
+        // Check if the detected timezone is in our list
+        let found = false;
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === browserTz) {
+                found = true;
+                break;
+            }
+        }
+        
+        if (found) {
+            window.location.search = `?tz=${browserTz}`;
+        }
+    }
+</script>
+
+<div class="box">
+    <table class="table is-fullwidth is-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Created By</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ $tz := .timezone }}
+            {{ range .colors }}
+                {{ template "vehicle_colors/table_row.html" (dict "Color" . "Timezone" $tz) }}
+            {{ end }}
+        </tbody>
+    </table>
+</div>
+{{ end }}
