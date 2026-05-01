@@ -42,5 +42,5 @@ Thumbs.db
 *.log
 
 # App specific
-web
+/web
 bin/

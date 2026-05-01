@@ -1,0 +1,33 @@
+package service
+
+import (
+	"golang-htmx-bulma/internal/model"
+)
+
+type MockVehicleColorService struct {
+	ListAllFn      func() ([]model.VehicleColor, error)
+	FindByIDFn     func(id int64) (*model.VehicleColor, error)
+	CreateColorFn  func(name string, status bool, user string) (*model.VehicleColor, error)
+	UpdateColorFn  func(id int64, name string, status bool, user string) (*model.VehicleColor, error)
+	DeleteColorFn  func(id int64) error
+}
+
+func (m *MockVehicleColorService) ListAll() ([]model.VehicleColor, error) {
+	return m.ListAllFn()
+}
+
+func (m *MockVehicleColorService) FindByID(id int64) (*model.VehicleColor, error) {
+	return m.FindByIDFn(id)
+}
+
+func (m *MockVehicleColorService) CreateColor(name string, status bool, user string) (*model.VehicleColor, error) {
+	return m.CreateColorFn(name, status, user)
+}
+
+func (m *MockVehicleColorService) UpdateColor(id int64, name string, status bool, user string) (*model.VehicleColor, error) {
+	return m.UpdateColorFn(id, name, status, user)
+}
+
+func (m *MockVehicleColorService) DeleteColor(id int64) error {
+	return m.DeleteColorFn(id)
+}
