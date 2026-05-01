@@ -1,0 +1,23 @@
+{{ define "index.html" }}
+{{ template "layout" . }}
+{{ end }}
+
+{{ define "content" }}
+<div class="content">
+    <h1 class="title">{{ .title }}</h1>
+    <p class="subtitle">Welcome to your new Go + HTMX + Bulma application!</p>
+    
+    <div class="box">
+        <h2 class="subtitle">Interactive Example</h2>
+        <button class="button is-link" 
+                hx-get="/api/hello" 
+                hx-target="#response" 
+                hx-swap="innerHTML">
+            Click Me (HTMX)
+        </button>
+        <div id="response" class="mt-4">
+            <!-- HTMX response will appear here -->
+        </div>
+    </div>
+</div>
+{{ end }}
