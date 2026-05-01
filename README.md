@@ -20,6 +20,8 @@ A full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
     ```
 3.  **Run the Application**:
     ```bash
+    make run
+    # or
     go run ./cmd/web
     ```
 
@@ -60,6 +62,18 @@ make clean
 | `internal/repository/` | 80%+ |
 | `internal/http/handlers/web/` | Medium |
 | `internal/view/`, `internal/config/`, `internal/db/`, `cmd/` | Skip (infrastructure/wiring) |
+
+## Available Commands
+
+| Command | Description |
+|---|---|
+| `make run` | Run the application |
+| `make build` | Compile the binary |
+| `make test` | Run all tests |
+| `make test-coverage` | Run tests with filtered coverage report |
+| `make vet` | Run `go vet` |
+| `make lint` | Run `golangci-lint` |
+| `make clean` | Remove coverage artifacts |
 
 ## Technology Stack
 
