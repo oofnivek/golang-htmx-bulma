@@ -142,7 +142,7 @@ Structure rules:
 - All environment-specific behavior should be controlled through config.
 - Do not hardcode DSN, ports, secrets, or file paths.
 - Prefer environment variables or config files for:
-  - MySQL DSN
+  - VEHICLE_DB_DSN
   - server port
   - app environment
   - auth settings

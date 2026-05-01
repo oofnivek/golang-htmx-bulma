@@ -8,9 +8,9 @@ import (
 )
 
 type Config struct {
-	Port   string
-	DBDSN  string
-	AppEnv string
+	Port         string
+	VehicleDBDSN string
+	AppEnv       string
 }
 
 func Load() *Config {
@@ -20,9 +20,9 @@ func Load() *Config {
 	}
 
 	return &Config{
-		Port:   getEnv("PORT", "8080"),
-		DBDSN:  getEnv("DB_DSN", ""),
-		AppEnv: getEnv("APP_ENV", "development"),
+		Port:         getEnv("PORT", "8080"),
+		VehicleDBDSN: getEnv("VEHICLE_DB_DSN", ""),
+		AppEnv:       getEnv("APP_ENV", "development"),
 	}
 }
 
