@@ -197,6 +197,7 @@ Before finishing changes, always do the relevant checks:
 
 - Run tests using `go test ./...`.
 - Keep `_test.go` files in the same directory/package as the code being tested.
+- **Mocks**: Define mock implementations in the same package that uses them, and ensure the filename ends with `_test.go` (e.g., `mock_vehicle_color_repository_test.go`). This prevents them from being compiled into the production binary and automatically excludes them from code coverage reports.
 - Aim for at least **80% code coverage** for service and logic layers.
 - Use **Mock Repositories** to test services in isolation without a real database.
 - Run linting with `golangci-lint run` if available.

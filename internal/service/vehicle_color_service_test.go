@@ -3,12 +3,11 @@ package service
 import (
 	"errors"
 	"golang-htmx-bulma/internal/model"
-	"golang-htmx-bulma/internal/repository"
 	"testing"
 )
 
 func TestCreateColor(t *testing.T) {
-	mockRepo := &repository.MockVehicleColorRepository{
+	mockRepo := &MockVehicleColorRepository{
 		CreateFn: func(color *model.VehicleColor) error {
 			color.ID = 1
 			return nil
@@ -33,7 +32,7 @@ func TestCreateColor(t *testing.T) {
 }
 
 func TestFindByID(t *testing.T) {
-	mockRepo := &repository.MockVehicleColorRepository{
+	mockRepo := &MockVehicleColorRepository{
 		GetByIDFn: func(id int64) (*model.VehicleColor, error) {
 			if id == 1 {
 				return &model.VehicleColor{ID: 1, Name: "Blue"}, nil
@@ -66,7 +65,7 @@ func TestFindByID(t *testing.T) {
 }
 
 func TestListAll(t *testing.T) {
-	mockRepo := &repository.MockVehicleColorRepository{
+	mockRepo := &MockVehicleColorRepository{
 		GetAllFn: func() ([]model.VehicleColor, error) {
 			return []model.VehicleColor{
 				{ID: 1, Name: "Red"},
@@ -88,7 +87,7 @@ func TestListAll(t *testing.T) {
 }
 
 func TestUpdateColor(t *testing.T) {
-	mockRepo := &repository.MockVehicleColorRepository{
+	mockRepo := &MockVehicleColorRepository{
 		GetByIDFn: func(id int64) (*model.VehicleColor, error) {
 			if id == 1 {
 				return &model.VehicleColor{ID: 1, Name: "Old Name"}, nil
@@ -124,7 +123,7 @@ func TestUpdateColor(t *testing.T) {
 }
 
 func TestDeleteColor(t *testing.T) {
-	mockRepo := &repository.MockVehicleColorRepository{
+	mockRepo := &MockVehicleColorRepository{
 		DeleteFn: func(id int64) error {
 			return nil
 		},
@@ -139,7 +138,7 @@ func TestDeleteColor(t *testing.T) {
 }
 
 func TestServiceErrors(t *testing.T) {
-	errRepo := &repository.MockVehicleColorRepository{
+	errRepo := &MockVehicleColorRepository{
 		GetAllFn: func() ([]model.VehicleColor, error) {
 			return nil, errors.New("db error")
 		},
@@ -189,7 +188,7 @@ func TestServiceErrors(t *testing.T) {
 
 	t.Run("UpdateColorExecError", func(t *testing.T) {
 		// Mock where GetByID succeeds but Update fails
-		failRepo := &repository.MockVehicleColorRepository{
+		failRepo := &MockVehicleColorRepository{
 			GetByIDFn: func(id int64) (*model.VehicleColor, error) {
 				return &model.VehicleColor{ID: 1}, nil
 			},

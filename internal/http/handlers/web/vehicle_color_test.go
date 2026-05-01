@@ -23,7 +23,7 @@ func setupTestRouter(svc service.VehicleColorService) *gin.Engine {
 }
 
 func TestList(t *testing.T) {
-	mockSvc := &service.MockVehicleColorService{
+	mockSvc := &MockVehicleColorService{
 		ListAllFn: func() ([]model.VehicleColor, error) {
 			return []model.VehicleColor{{ID: 1, Name: "Red"}}, nil
 		},
@@ -43,7 +43,7 @@ func TestList(t *testing.T) {
 }
 
 func TestCreateForm(t *testing.T) {
-	mockSvc := &service.MockVehicleColorService{}
+	mockSvc := &MockVehicleColorService{}
 	h := NewVehicleColorHandler(mockSvc)
 	r := setupTestRouter(mockSvc)
 	r.GET("/vehicle-colors/new", h.CreateForm)
@@ -58,7 +58,7 @@ func TestCreateForm(t *testing.T) {
 }
 
 func TestDeleteConfirm(t *testing.T) {
-	mockSvc := &service.MockVehicleColorService{
+	mockSvc := &MockVehicleColorService{
 		FindByIDFn: func(id int64) (*model.VehicleColor, error) {
 			return &model.VehicleColor{ID: id, Name: "Red"}, nil
 		},
@@ -77,7 +77,7 @@ func TestDeleteConfirm(t *testing.T) {
 }
 
 func TestCreate(t *testing.T) {
-	mockSvc := &service.MockVehicleColorService{
+	mockSvc := &MockVehicleColorService{
 		CreateColorFn: func(name string, status bool, user string) (*model.VehicleColor, error) {
 			return &model.VehicleColor{ID: 1, Name: name}, nil
 		},
@@ -96,7 +96,7 @@ func TestCreate(t *testing.T) {
 }
 
 func TestEditForm(t *testing.T) {
-	mockSvc := &service.MockVehicleColorService{
+	mockSvc := &MockVehicleColorService{
 		FindByIDFn: func(id int64) (*model.VehicleColor, error) {
 			return &model.VehicleColor{ID: id, Name: "Red"}, nil
 		},
@@ -115,7 +115,7 @@ func TestEditForm(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	mockSvc := &service.MockVehicleColorService{
+	mockSvc := &MockVehicleColorService{
 		UpdateColorFn: func(id int64, name string, status bool, user string) (*model.VehicleColor, error) {
 			return &model.VehicleColor{ID: id, Name: name}, nil
 		},
@@ -134,7 +134,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	mockSvc := &service.MockVehicleColorService{
+	mockSvc := &MockVehicleColorService{
 		DeleteColorFn: func(id int64) error {
 			return nil
 		},
@@ -154,7 +154,7 @@ func TestDelete(t *testing.T) {
 
 func TestHandlerErrors(t *testing.T) {
 	// A service that always returns errors
-	errSvc := &service.MockVehicleColorService{
+	errSvc := &MockVehicleColorService{
 		ListAllFn: func() ([]model.VehicleColor, error) {
 			return nil, errors.New("fail")
 		},
@@ -238,7 +238,7 @@ func TestHandlerErrors(t *testing.T) {
 
 	t.Run("NotFoundErrors", func(t *testing.T) {
 		// A service that returns nil (not found)
-		nilSvc := &service.MockVehicleColorService{
+		nilSvc := &MockVehicleColorService{
 			FindByIDFn: func(id int64) (*model.VehicleColor, error) {
 				return nil, nil
 			},
