@@ -23,6 +23,18 @@ A full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
     go run ./cmd/web
     ```
 
+## Testing & Coverage
+
+To run tests and view the coverage summary:
+```bash
+go test -v ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
+```
+
+To view the detailed HTML coverage report:
+```bash
+go tool cover -html=coverage.out
+```
+
 ## Technology Stack
 
 - **Backend**: [Gin](https://github.com/gin-gonic/gin)

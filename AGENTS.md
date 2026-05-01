@@ -195,8 +195,11 @@ If a command is unavailable in this repo, do not invent it; use the closest exis
 ## Testing and validation
 Before finishing changes, always do the relevant checks:
 
-- Run tests.
-- Run linting.
+- Run tests using `go test ./...`.
+- Keep `_test.go` files in the same directory/package as the code being tested.
+- Aim for at least **80% code coverage** for service and logic layers.
+- Use **Mock Repositories** to test services in isolation without a real database.
+- Run linting with `golangci-lint run` if available.
 - Verify the app builds.
 - Verify affected flows for both normal full-page requests and HTMX requests.
 - Verify protected routes still enforce auth correctly.

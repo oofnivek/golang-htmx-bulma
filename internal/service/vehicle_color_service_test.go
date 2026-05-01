@@ -1,0 +1,206 @@
+package service
+
+import (
+	"errors"
+	"golang-htmx-bulma/internal/model"
+	"golang-htmx-bulma/internal/repository"
+	"testing"
+)
+
+func TestCreateColor(t *testing.T) {
+	mockRepo := &repository.MockVehicleColorRepository{
+		CreateFn: func(color *model.VehicleColor) error {
+			color.ID = 1
+			return nil
+		},
+	}
+
+	svc := NewVehicleColorService(mockRepo)
+
+	color, err := svc.CreateColor("Red", true, "test-user")
+
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	if color.ID != 1 {
+		t.Errorf("Expected ID 1, got %d", color.ID)
+	}
+
+	if color.Name != "Red" {
+		t.Errorf("Expected name 'Red', got %s", color.Name)
+	}
+}
+
+func TestFindByID(t *testing.T) {
+	mockRepo := &repository.MockVehicleColorRepository{
+		GetByIDFn: func(id int64) (*model.VehicleColor, error) {
+			if id == 1 {
+				return &model.VehicleColor{ID: 1, Name: "Blue"}, nil
+			}
+			return nil, nil
+		},
+	}
+
+	svc := NewVehicleColorService(mockRepo)
+
+	t.Run("Found", func(t *testing.T) {
+		color, err := svc.FindByID(1)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if color == nil || color.Name != "Blue" {
+			t.Errorf("Expected 'Blue', got %v", color)
+		}
+	})
+
+	t.Run("NotFound", func(t *testing.T) {
+		color, err := svc.FindByID(99)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if color != nil {
+			t.Errorf("Expected nil, got %v", color)
+		}
+	})
+}
+
+func TestListAll(t *testing.T) {
+	mockRepo := &repository.MockVehicleColorRepository{
+		GetAllFn: func() ([]model.VehicleColor, error) {
+			return []model.VehicleColor{
+				{ID: 1, Name: "Red"},
+				{ID: 2, Name: "Blue"},
+			}, nil
+		},
+	}
+
+	svc := NewVehicleColorService(mockRepo)
+	colors, err := svc.ListAll()
+
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	if len(colors) != 2 {
+		t.Errorf("Expected 2 colors, got %d", len(colors))
+	}
+}
+
+func TestUpdateColor(t *testing.T) {
+	mockRepo := &repository.MockVehicleColorRepository{
+		GetByIDFn: func(id int64) (*model.VehicleColor, error) {
+			if id == 1 {
+				return &model.VehicleColor{ID: 1, Name: "Old Name"}, nil
+			}
+			return nil, nil
+		},
+		UpdateFn: func(color *model.VehicleColor) error {
+			return nil
+		},
+	}
+
+	svc := NewVehicleColorService(mockRepo)
+
+	t.Run("Success", func(t *testing.T) {
+		color, err := svc.UpdateColor(1, "New Name", false, "admin")
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if color.Name != "New Name" {
+			t.Errorf("Expected 'New Name', got %s", color.Name)
+		}
+	})
+
+	t.Run("NotFound", func(t *testing.T) {
+		color, err := svc.UpdateColor(99, "New Name", false, "admin")
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if color != nil {
+			t.Errorf("Expected nil for non-existent color")
+		}
+	})
+}
+
+func TestDeleteColor(t *testing.T) {
+	mockRepo := &repository.MockVehicleColorRepository{
+		DeleteFn: func(id int64) error {
+			return nil
+		},
+	}
+
+	svc := NewVehicleColorService(mockRepo)
+	err := svc.DeleteColor(1)
+
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+}
+
+func TestServiceErrors(t *testing.T) {
+	errRepo := &repository.MockVehicleColorRepository{
+		GetAllFn: func() ([]model.VehicleColor, error) {
+			return nil, errors.New("db error")
+		},
+		CreateFn: func(color *model.VehicleColor) error {
+			return errors.New("db error")
+		},
+		UpdateFn: func(color *model.VehicleColor) error {
+			return errors.New("db error")
+		},
+		GetByIDFn: func(id int64) (*model.VehicleColor, error) {
+			return nil, errors.New("db error")
+		},
+		DeleteFn: func(id int64) error {
+			return errors.New("db error")
+		},
+	}
+
+	svc := NewVehicleColorService(errRepo)
+
+	t.Run("ListAllError", func(t *testing.T) {
+		_, err := svc.ListAll()
+		if err == nil {
+			t.Error("Expected error from ListAll")
+		}
+	})
+
+	t.Run("CreateColorError", func(t *testing.T) {
+		_, err := svc.CreateColor("Fail", true, "user")
+		if err == nil {
+			t.Error("Expected error from CreateColor")
+		}
+	})
+
+	t.Run("UpdateColorError", func(t *testing.T) {
+		_, err := svc.UpdateColor(1, "Fail", true, "user")
+		if err == nil {
+			t.Error("Expected error from UpdateColor")
+		}
+	})
+
+	t.Run("DeleteColorError", func(t *testing.T) {
+		err := svc.DeleteColor(1)
+		if err == nil {
+			t.Error("Expected error from DeleteColor")
+		}
+	})
+
+	t.Run("UpdateColorExecError", func(t *testing.T) {
+		// Mock where GetByID succeeds but Update fails
+		failRepo := &repository.MockVehicleColorRepository{
+			GetByIDFn: func(id int64) (*model.VehicleColor, error) {
+				return &model.VehicleColor{ID: 1}, nil
+			},
+			UpdateFn: func(color *model.VehicleColor) error {
+				return errors.New("update failed")
+			},
+		}
+		failSvc := NewVehicleColorService(failRepo)
+		_, err := failSvc.UpdateColor(1, "Name", true, "user")
+		if err == nil {
+			t.Error("Expected error from UpdateColor when Update fails")
+		}
+	})
+}
