@@ -150,6 +150,7 @@ Structure rules:
 
 ## Code style
 - Write idiomatic Go.
+- **Language**: Always use US English for variable names, database fields, and UI text (e.g., "color" instead of "colour").
 - Keep packages focused and cohesive.
 - Keep functions small and focused.
 - Prefer descriptive names over short clever names.
