@@ -38,14 +38,15 @@ func (h *VehicleMakeHandler) List(c *gin.Context) {
 	totalPages := (total + pageSize - 1) / pageSize
 
 	c.HTML(http.StatusOK, "pages/vehicle_makes/index.html", gin.H{
-		"title":       "Vehicle Makes",
-		"makes":       makes,
-		"timezone":    tz,
-		"timezones":   timezones,
-		"currentPage": page,
-		"pageSize":    pageSize,
-		"totalPages":  totalPages,
-		"total":       total,
+		"title":           "Vehicle Makes",
+		"makes":           makes,
+		"timezone":        tz,
+		"timezones":       timezones,
+		"currentPage":     page,
+		"pageSize":        pageSize,
+		"pageSizeOptions": []int{5, 10, 20, 50},
+		"totalPages":      totalPages,
+		"total":           total,
 	})
 }
 

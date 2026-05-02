@@ -38,14 +38,15 @@ func (h *VehicleColorHandler) List(c *gin.Context) {
 	totalPages := (total + pageSize - 1) / pageSize
 
 	c.HTML(http.StatusOK, "pages/vehicle_colors/index.html", gin.H{
-		"title":       "Vehicle Colors",
-		"colors":      colors,
-		"timezone":    tz,
-		"timezones":   timezones,
-		"currentPage": page,
-		"pageSize":    pageSize,
-		"totalPages":  totalPages,
-		"total":       total,
+		"title":           "Vehicle Colors",
+		"colors":          colors,
+		"timezone":        tz,
+		"timezones":       timezones,
+		"currentPage":     page,
+		"pageSize":        pageSize,
+		"pageSizeOptions": []int{5, 10, 20, 50},
+		"totalPages":      totalPages,
+		"total":           total,
 	})
 }
 

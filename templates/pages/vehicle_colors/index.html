@@ -6,12 +6,32 @@
     <div class="level-right">
         <div class="field has-addons mr-3">
             <div class="control">
+                <span class="button is-static">Rows</span>
+            </div>
+            <div class="control">
+                <div class="select">
+                    <select name="pageSize" 
+                            hx-get="/vehicle-colors" 
+                            hx-include="[name='tz']"
+                            hx-target="body" 
+                            hx-push-url="true">
+                        {{ $currentSize := .pageSize }}
+                        {{ range .pageSizeOptions }}
+                            <option value="{{ . }}" {{ if eq . $currentSize }}selected{{ end }}>{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="field has-addons mr-3">
+            <div class="control">
                 <span class="button is-static">Timezone</span>
             </div>
             <div class="control">
                 <div class="select">
                     <select name="tz" 
                             hx-get="/vehicle-colors" 
+                            hx-include="[name='pageSize']"
                             hx-target="body" 
                             hx-push-url="true"
                             id="tz-select">
@@ -73,7 +93,7 @@
     <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
         {{ if gt .currentPage 1 }}
         <a class="pagination-previous" 
-           hx-get="/vehicle-colors?page={{ sub .currentPage 1 }}&tz={{ .timezone }}" 
+           hx-get="/vehicle-colors?page={{ sub .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}" 
            hx-target="body" 
            hx-push-url="true">Previous</a>
         {{ else }}
@@ -82,7 +102,7 @@
         
         {{ if lt .currentPage .totalPages }}
         <a class="pagination-next" 
-           hx-get="/vehicle-colors?page={{ add .currentPage 1 }}&tz={{ .timezone }}" 
+           hx-get="/vehicle-colors?page={{ add .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}" 
            hx-target="body" 
            hx-push-url="true">Next page</a>
         {{ else }}
@@ -93,11 +113,12 @@
             {{ $current := .currentPage }}
             {{ $total := .totalPages }}
             {{ $tz := .timezone }}
+            {{ $size := .pageSize }}
             
             {{ range $p := (seq 1 .totalPages) }}
             <li>
                 <a class="pagination-link {{ if eq $p $current }}is-current{{ end }}" 
-                   hx-get="/vehicle-colors?page={{ $p }}&tz={{ $tz }}" 
+                   hx-get="/vehicle-colors?page={{ $p }}&tz={{ $tz }}&pageSize={{ $size }}" 
                    hx-target="body" 
                    hx-push-url="true"
                    aria-label="Goto page {{ $p }}">{{ $p }}</a>
@@ -106,7 +127,7 @@
         </ul>
     </nav>
     <div class="has-text-centered is-size-7 has-text-grey mt-2">
-        Showing page {{ .currentPage }} of {{ .totalPages }} (Total: {{ .total }} items)
+        Showing page {{ .currentPage }} of {{ .totalPages }} (Total: {{ .total }} items, {{ .pageSize }} rows per page)
     </div>
     {{ end }}
 </div>
