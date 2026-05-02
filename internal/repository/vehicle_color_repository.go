@@ -61,7 +61,7 @@ func (r *mysqlVehicleColorRepository) GetPaged(limit, offset int, sortBy, sortOr
 	query := "SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color"
 	var args []interface{}
 
-	if search != "" {
+	if len(search) >= 2 {
 		// Use FULLTEXT MATCH...AGAINST with n-gram index for fast partial matching.
 		// Requires: ALTER TABLE vehicle_color ADD FULLTEXT INDEX idx_color_name_ngram (name) WITH PARSER ngram;
 		query += " WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE)"

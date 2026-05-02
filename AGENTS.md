@@ -137,6 +137,7 @@ Structure rules:
 - MySQL is the only supported database.
 - All schema design, queries, migrations, and repository code should target MySQL.
 - Use MySQL-compatible SQL syntax and features.
+- **Search Inefficiency**: Avoid using `LIKE '%keyword%'` for searching as it performs a full table scan and is extremely inefficient on large datasets. Use `MATCH() AGAINST()` with a `FULLTEXT` index (preferably with the `ngram` parser for partial matches) instead.
 - **Timestamps**: Always store timestamps in UTC in the database.
 - **Row Creation**: Upon row creation, set `created_at` and `updated_at` to the same value, and set `created_by` and `updated_by` to the same value.
 - Keep SQL organized in repository/store layers.
