@@ -111,6 +111,11 @@ Structure rules:
 - For browser interactions, prefer returning HTML fragments from Gin handlers instead of JSON when the client is HTMX.
 - Preserve progressive enhancement where practical so core flows still work without HTMX.
 - For validation errors, return user-friendly HTML fragments or page responses suitable for the request type.
+- **Index Pages**: 
+  - Results must always be paginated.
+  - The number of rows per page must be customizable by the user.
+  - Every column must be sortable (ascending/descending), except for the "Actions" column.
+  - Sorting and pagination state (including timezone) must be preserved across interactions using HTMX.
 
 ## Auth conventions
 - Auth is enforced through Gin middleware and route groups, not by folder names.

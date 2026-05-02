@@ -8,7 +8,7 @@ import (
 
 type VehicleMakeService interface {
 	ListAll() ([]model.VehicleMake, error)
-	ListPaged(page, pageSize int) ([]model.VehicleMake, int, error)
+	ListPaged(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleMake, int, error)
 	FindByID(id int64) (*model.VehicleMake, error)
 	CreateMake(name string, status bool, user string) (*model.VehicleMake, error)
 	UpdateMake(id int64, name string, status bool, user string) (*model.VehicleMake, error)
@@ -27,7 +27,7 @@ func (s *vehicleMakeService) ListAll() ([]model.VehicleMake, error) {
 	return s.repo.GetAll()
 }
 
-func (s *vehicleMakeService) ListPaged(page, pageSize int) ([]model.VehicleMake, int, error) {
+func (s *vehicleMakeService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleMake, int, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -36,7 +36,7 @@ func (s *vehicleMakeService) ListPaged(page, pageSize int) ([]model.VehicleMake,
 	}
 	offset := (page - 1) * pageSize
 
-	makes, err := s.repo.GetPaged(pageSize, offset)
+	makes, err := s.repo.GetPaged(pageSize, offset, sortBy, sortOrder)
 	if err != nil {
 		return nil, 0, err
 	}

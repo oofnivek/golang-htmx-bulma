@@ -25,8 +25,10 @@ func (h *VehicleColorHandler) List(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	sortBy := c.DefaultQuery("sortBy", "id")
+	sortOrder := c.DefaultQuery("sortOrder", "desc")
 
-	colors, total, err := h.svc.ListPaged(page, pageSize)
+	colors, total, err := h.svc.ListPaged(page, pageSize, sortBy, sortOrder)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -47,6 +49,8 @@ func (h *VehicleColorHandler) List(c *gin.Context) {
 		"pageSizeOptions": []int{5, 10, 20, 50},
 		"totalPages":      totalPages,
 		"total":           total,
+		"sortBy":          sortBy,
+		"sortOrder":       sortOrder,
 	})
 }
 

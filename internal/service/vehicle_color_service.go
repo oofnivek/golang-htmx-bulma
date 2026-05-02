@@ -8,7 +8,7 @@ import (
 
 type VehicleColorService interface {
 	ListAll() ([]model.VehicleColor, error)
-	ListPaged(page, pageSize int) ([]model.VehicleColor, int, error)
+	ListPaged(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleColor, int, error)
 	FindByID(id int64) (*model.VehicleColor, error)
 	CreateColor(name string, status bool, user string) (*model.VehicleColor, error)
 	UpdateColor(id int64, name string, status bool, user string) (*model.VehicleColor, error)
@@ -27,7 +27,7 @@ func (s *vehicleColorService) ListAll() ([]model.VehicleColor, error) {
 	return s.repo.GetAll()
 }
 
-func (s *vehicleColorService) ListPaged(page, pageSize int) ([]model.VehicleColor, int, error) {
+func (s *vehicleColorService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleColor, int, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -36,7 +36,7 @@ func (s *vehicleColorService) ListPaged(page, pageSize int) ([]model.VehicleColo
 	}
 	offset := (page - 1) * pageSize
 
-	colors, err := s.repo.GetPaged(pageSize, offset)
+	colors, err := s.repo.GetPaged(pageSize, offset, sortBy, sortOrder)
 	if err != nil {
 		return nil, 0, err
 	}

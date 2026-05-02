@@ -7,7 +7,7 @@ import (
 
 type VehicleMakeRepository interface {
 	GetAll() ([]model.VehicleMake, error)
-	GetPaged(limit, offset int) ([]model.VehicleMake, error)
+	GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error)
 	Count() (int, error)
 	GetByID(id int64) (*model.VehicleMake, error)
 	Create(make *model.VehicleMake) error
@@ -42,8 +42,23 @@ func (r *mysqlVehicleMakeRepository) GetAll() ([]model.VehicleMake, error) {
 	return makes, nil
 }
 
-func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int) ([]model.VehicleMake, error) {
-	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY id DESC LIMIT ? OFFSET ?", limit, offset)
+func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+	// Whitelist sorting columns to prevent SQL injection
+	validColumns := map[string]bool{
+		"id":         true,
+		"name":       true,
+		"status":     true,
+		"updated_by": true,
+		"updated_at": true,
+	}
+	if !validColumns[sortBy] {
+		sortBy = "id"
+	}
+	if sortOrder != "asc" && sortOrder != "desc" {
+		sortOrder = "desc"
+	}
+
+	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY "+sortBy+" "+sortOrder+" LIMIT ? OFFSET ?", limit, offset)
 	if err != nil {
 		return nil, err
 	}

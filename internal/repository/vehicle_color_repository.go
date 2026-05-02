@@ -7,7 +7,7 @@ import (
 
 type VehicleColorRepository interface {
 	GetAll() ([]model.VehicleColor, error)
-	GetPaged(limit, offset int) ([]model.VehicleColor, error)
+	GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleColor, error)
 	Count() (int, error)
 	GetByID(id int64) (*model.VehicleColor, error)
 	Create(color *model.VehicleColor) error
@@ -42,8 +42,23 @@ func (r *mysqlVehicleColorRepository) GetAll() ([]model.VehicleColor, error) {
 	return colors, nil
 }
 
-func (r *mysqlVehicleColorRepository) GetPaged(limit, offset int) ([]model.VehicleColor, error) {
-	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color ORDER BY id DESC LIMIT ? OFFSET ?", limit, offset)
+func (r *mysqlVehicleColorRepository) GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleColor, error) {
+	// Whitelist sorting columns to prevent SQL injection
+	validColumns := map[string]bool{
+		"id":         true,
+		"name":       true,
+		"status":     true,
+		"updated_by": true,
+		"updated_at": true,
+	}
+	if !validColumns[sortBy] {
+		sortBy = "id"
+	}
+	if sortOrder != "asc" && sortOrder != "desc" {
+		sortOrder = "desc"
+	}
+
+	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color ORDER BY "+sortBy+" "+sortOrder+" LIMIT ? OFFSET ?", limit, offset)
 	if err != nil {
 		return nil, err
 	}
