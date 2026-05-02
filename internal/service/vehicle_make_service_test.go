@@ -207,3 +207,66 @@ func TestServiceErrorsMake(t *testing.T) {
 		}
 	})
 }
+
+func TestListPagedMake(t *testing.T) {
+	mockRepo := &MockVehicleMakeRepository{
+		GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+			return []model.VehicleMake{{ID: 1, Name: "Toyota"}}, nil
+		},
+		CountFn: func() (int, error) {
+			return 1, nil
+		},
+	}
+
+	svc := NewVehicleMakeService(mockRepo)
+
+	t.Run("Success", func(t *testing.T) {
+		makes, total, err := svc.ListPaged(1, 10, "id", "desc")
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		if total != 1 || len(makes) != 1 {
+			t.Errorf("Expected total 1 and 1 make, got %d and %d", total, len(makes))
+		}
+	})
+
+	t.Run("Defaults", func(t *testing.T) {
+		// Test negative page/pageSize
+		makes, _, err := svc.ListPaged(-1, -1, "id", "desc")
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		if len(makes) != 1 {
+			t.Errorf("Expected 1 make, got %d", len(makes))
+		}
+	})
+
+	t.Run("RepoError", func(t *testing.T) {
+		failRepo := &MockVehicleMakeRepository{
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+				return nil, errors.New("fail")
+			},
+		}
+		failSvc := NewVehicleMakeService(failRepo)
+		_, _, err := failSvc.ListPaged(1, 10, "id", "desc")
+		if err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+
+	t.Run("CountError", func(t *testing.T) {
+		failRepo := &MockVehicleMakeRepository{
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+				return []model.VehicleMake{}, nil
+			},
+			CountFn: func() (int, error) {
+				return 0, errors.New("fail")
+			},
+		}
+		failSvc := NewVehicleMakeService(failRepo)
+		_, _, err := failSvc.ListPaged(1, 10, "id", "desc")
+		if err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+}

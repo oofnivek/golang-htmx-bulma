@@ -203,3 +203,66 @@ func TestServiceErrors(t *testing.T) {
 		}
 	})
 }
+
+func TestListPaged(t *testing.T) {
+	mockRepo := &MockVehicleColorRepository{
+		GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleColor, error) {
+			return []model.VehicleColor{{ID: 1, Name: "Red"}}, nil
+		},
+		CountFn: func(search string) (int, error) {
+			return 1, nil
+		},
+	}
+
+	svc := NewVehicleColorService(mockRepo)
+
+	t.Run("Success", func(t *testing.T) {
+		colors, total, err := svc.ListPaged(1, 10, "id", "desc", "")
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		if total != 1 || len(colors) != 1 {
+			t.Errorf("Expected total 1 and 1 color, got %d and %d", total, len(colors))
+		}
+	})
+
+	t.Run("Defaults", func(t *testing.T) {
+		// Test negative page/pageSize
+		colors, _, err := svc.ListPaged(-1, -1, "id", "desc", "")
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		if len(colors) != 1 {
+			t.Errorf("Expected 1 color, got %d", len(colors))
+		}
+	})
+
+	t.Run("RepoError", func(t *testing.T) {
+		failRepo := &MockVehicleColorRepository{
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleColor, error) {
+				return nil, errors.New("fail")
+			},
+		}
+		failSvc := NewVehicleColorService(failRepo)
+		_, _, err := failSvc.ListPaged(1, 10, "id", "desc", "")
+		if err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+
+	t.Run("CountError", func(t *testing.T) {
+		failRepo := &MockVehicleColorRepository{
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleColor, error) {
+				return []model.VehicleColor{}, nil
+			},
+			CountFn: func(search string) (int, error) {
+				return 0, errors.New("fail")
+			},
+		}
+		failSvc := NewVehicleColorService(failRepo)
+		_, _, err := failSvc.ListPaged(1, 10, "id", "desc", "")
+		if err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+}

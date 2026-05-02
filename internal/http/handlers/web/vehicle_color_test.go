@@ -24,7 +24,7 @@ func setupTestRouter(svc service.VehicleColorService) *gin.Engine {
 
 func TestList(t *testing.T) {
 	mockSvc := &MockVehicleColorService{
-		ListPagedFn: func(page, pageSize int) ([]model.VehicleColor, int, error) {
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]model.VehicleColor, int, error) {
 			return []model.VehicleColor{{ID: 1, Name: "Red"}}, 1, nil
 		},
 	}
@@ -155,7 +155,7 @@ func TestDelete(t *testing.T) {
 func TestHandlerErrors(t *testing.T) {
 	// A service that always returns errors
 	errSvc := &MockVehicleColorService{
-		ListPagedFn: func(page, pageSize int) ([]model.VehicleColor, int, error) {
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]model.VehicleColor, int, error) {
 			return nil, 0, errors.New("fail")
 		},
 		FindByIDFn: func(id int64) (*model.VehicleColor, error) {

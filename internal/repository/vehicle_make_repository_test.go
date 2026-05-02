@@ -231,3 +231,108 @@ func TestDeleteMakeRepo(t *testing.T) {
 		}
 	})
 }
+
+func TestGetPagedMake(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to open mock database: %v", err)
+	}
+	defer db.Close()
+
+	repo := NewVehicleMakeRepository(db)
+	now := time.Now()
+
+	t.Run("Success", func(t *testing.T) {
+		rows := sqlmock.NewRows([]string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at"}).
+			AddRow(1, "Toyota", true, "user1", now, "user1", now)
+
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY name asc LIMIT ? OFFSET ?")).
+			WithArgs(10, 0).
+			WillReturnRows(rows)
+
+		makes, err := repo.GetPaged(10, 0, "name", "asc")
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		if len(makes) != 1 {
+			t.Errorf("Expected 1 make, got %d", len(makes))
+		}
+	})
+
+	t.Run("InvalidSortBy", func(t *testing.T) {
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY id desc LIMIT ? OFFSET ?")).
+			WithArgs(10, 0).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at"}))
+
+		_, err := repo.GetPaged(10, 0, "invalid", "desc")
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	})
+
+	t.Run("InvalidSortOrder", func(t *testing.T) {
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY id desc LIMIT ? OFFSET ?")).
+			WithArgs(10, 0).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at"}))
+
+		_, err := repo.GetPaged(10, 0, "id", "invalid")
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	})
+
+	t.Run("ScanError", func(t *testing.T) {
+		rows := sqlmock.NewRows([]string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at"}).
+			AddRow("not-an-int", "Toyota", true, "user1", now, "user1", now)
+
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY id desc LIMIT ? OFFSET ?")).
+			WithArgs(10, 0).
+			WillReturnRows(rows)
+
+		_, err := repo.GetPaged(10, 0, "id", "desc")
+		if err == nil {
+			t.Error("Expected scan error, got nil")
+		}
+	})
+
+	t.Run("QueryError", func(t *testing.T) {
+		mock.ExpectQuery("SELECT").WillReturnError(errors.New("db error"))
+
+		_, err := repo.GetPaged(10, 0, "id", "desc")
+		if err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+}
+
+func TestCountMake(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to open mock database: %v", err)
+	}
+	defer db.Close()
+
+	repo := NewVehicleMakeRepository(db)
+
+	t.Run("Success", func(t *testing.T) {
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT COUNT(*) FROM vehicle_make")).
+			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(5))
+
+		count, err := repo.Count()
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		if count != 5 {
+			t.Errorf("Expected count 5, got %d", count)
+		}
+	})
+
+	t.Run("DBError", func(t *testing.T) {
+		mock.ExpectQuery("SELECT COUNT").WillReturnError(errors.New("db error"))
+
+		_, err := repo.Count()
+		if err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+}

@@ -21,7 +21,7 @@ func setupMakeTestRouter(svc *MockVehicleMakeService) *gin.Engine {
 
 func TestListMake(t *testing.T) {
 	mockSvc := &MockVehicleMakeService{
-		ListPagedFn: func(page, pageSize int) ([]model.VehicleMake, int, error) {
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleMake, int, error) {
 			return []model.VehicleMake{{ID: 1, Name: "Toyota"}}, 1, nil
 		},
 	}
@@ -132,7 +132,7 @@ func TestDeleteMakeHandler(t *testing.T) {
 
 func TestHandlerErrorsMake(t *testing.T) {
 	errSvc := &MockVehicleMakeService{
-		ListPagedFn: func(page, pageSize int) ([]model.VehicleMake, int, error) {
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleMake, int, error) {
 			return nil, 0, errors.New("fail")
 		},
 		FindByIDFn: func(id int64) (*model.VehicleMake, error) {

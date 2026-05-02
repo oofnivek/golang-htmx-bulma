@@ -8,7 +8,7 @@ import (
 
 type MockVehicleColorService struct {
 	ListAllFn      func() ([]model.VehicleColor, error)
-	ListPagedFn    func(page, pageSize int) ([]model.VehicleColor, int, error)
+	ListPagedFn    func(page, pageSize int, sortBy, sortOrder, search string) ([]model.VehicleColor, int, error)
 	FindByIDFn     func(id int64) (*model.VehicleColor, error)
 	CreateColorFn  func(name string, status bool, user string) (*model.VehicleColor, error)
 	UpdateColorFn  func(id int64, name string, status bool, user string) (*model.VehicleColor, error)
@@ -19,8 +19,8 @@ func (m *MockVehicleColorService) ListAll() ([]model.VehicleColor, error) {
 	return m.ListAllFn()
 }
 
-func (m *MockVehicleColorService) ListPaged(page, pageSize int) ([]model.VehicleColor, int, error) {
-	return m.ListPagedFn(page, pageSize)
+func (m *MockVehicleColorService) ListPaged(page, pageSize int, sortBy, sortOrder, search string) ([]model.VehicleColor, int, error) {
+	return m.ListPagedFn(page, pageSize, sortBy, sortOrder, search)
 }
 
 func (m *MockVehicleColorService) FindByID(id int64) (*model.VehicleColor, error) {
