@@ -7,8 +7,8 @@ import (
 
 type VehicleColorRepository interface {
 	GetAll() ([]model.VehicleColor, error)
-	GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleColor, error)
-	Count() (int, error)
+	GetPaged(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleColor, error)
+	Count(search string) (int, error)
 	GetByID(id int64) (*model.VehicleColor, error)
 	Create(color *model.VehicleColor) error
 	Update(color *model.VehicleColor) error
@@ -42,7 +42,7 @@ func (r *mysqlVehicleColorRepository) GetAll() ([]model.VehicleColor, error) {
 	return colors, nil
 }
 
-func (r *mysqlVehicleColorRepository) GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleColor, error) {
+func (r *mysqlVehicleColorRepository) GetPaged(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleColor, error) {
 	// Whitelist sorting columns to prevent SQL injection
 	validColumns := map[string]bool{
 		"id":         true,
@@ -58,7 +58,20 @@ func (r *mysqlVehicleColorRepository) GetPaged(limit, offset int, sortBy, sortOr
 		sortOrder = "desc"
 	}
 
-	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color ORDER BY "+sortBy+" "+sortOrder+" LIMIT ? OFFSET ?", limit, offset)
+	query := "SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color"
+	var args []interface{}
+
+	if search != "" {
+		// Use FULLTEXT MATCH...AGAINST with n-gram index for fast partial matching.
+		// Requires: ALTER TABLE vehicle_color ADD FULLTEXT INDEX idx_color_name_ngram (name) WITH PARSER ngram;
+		query += " WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE)"
+		args = append(args, search)
+	}
+
+	query += " ORDER BY " + sortBy + " " + sortOrder + " LIMIT ? OFFSET ?"
+	args = append(args, limit, offset)
+
+	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +89,18 @@ func (r *mysqlVehicleColorRepository) GetPaged(limit, offset int, sortBy, sortOr
 	return colors, nil
 }
 
-func (r *mysqlVehicleColorRepository) Count() (int, error) {
+func (r *mysqlVehicleColorRepository) Count(search string) (int, error) {
+	query := "SELECT COUNT(*) FROM vehicle_color"
+	var args []interface{}
+	if search != "" {
+		// Use FULLTEXT MATCH...AGAINST with n-gram index for fast partial matching.
+		// Requires: ALTER TABLE vehicle_color ADD FULLTEXT INDEX idx_color_name_ngram (name) WITH PARSER ngram;
+		query += " WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE)"
+		args = append(args, search)
+	}
+
 	var count int
-	err := r.db.QueryRow("SELECT COUNT(*) FROM vehicle_color").Scan(&count)
+	err := r.db.QueryRow(query, args...).Scan(&count)
 	return count, err
 }
 
