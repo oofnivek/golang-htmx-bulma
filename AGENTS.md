@@ -133,6 +133,7 @@ Structure rules:
 - All schema design, queries, migrations, and repository code should target MySQL.
 - Use MySQL-compatible SQL syntax and features.
 - **Timestamps**: Always store timestamps in UTC in the database.
+- **Row Creation**: Upon row creation, set `created_at` and `updated_at` to the same value, and set `created_by` and `updated_by` to the same value.
 - Keep SQL organized in repository/store layers.
 - Document any MySQL-specific assumptions when they affect schema, indexing, transactions, or query behavior.
 - Avoid raw SQL duplication across multiple files when a shared repository method is more maintainable.

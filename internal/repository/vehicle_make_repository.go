@@ -54,8 +54,8 @@ func (r *mysqlVehicleMakeRepository) GetByID(id int64) (*model.VehicleMake, erro
 }
 
 func (r *mysqlVehicleMakeRepository) Create(m *model.VehicleMake) error {
-	res, err := r.db.Exec("INSERT INTO vehicle_make (name, status, created_by, created_at) VALUES (?, ?, ?, ?)",
-		m.Name, m.Status, m.CreatedBy, m.CreatedAt)
+	res, err := r.db.Exec("INSERT INTO vehicle_make (name, status, created_by, created_at, updated_by, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+		m.Name, m.Status, m.CreatedBy, m.CreatedAt, m.UpdatedBy, m.UpdatedAt)
 	if err != nil {
 		return err
 	}

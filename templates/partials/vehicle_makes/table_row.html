@@ -11,6 +11,8 @@
     </td>
     <td>{{ .Make.CreatedBy }}</td>
     <td>{{ in_timezone .Make.CreatedAt .Timezone }}</td>
+    <td>{{ if .Make.UpdatedBy }}{{ .Make.UpdatedBy }}{{ else }}-{{ end }}</td>
+    <td>{{ if .Make.UpdatedAt }}{{ in_timezone .Make.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
     <td>
         <div class="buttons are-small">
             <a href="/vehicle-makes/{{ .Make.ID }}/edit" class="button is-info">Edit</a>

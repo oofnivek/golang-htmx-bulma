@@ -31,11 +31,14 @@ func (s *vehicleMakeService) FindByID(id int64) (*model.VehicleMake, error) {
 }
 
 func (s *vehicleMakeService) CreateMake(name string, status bool, user string) (*model.VehicleMake, error) {
+	now := time.Now()
 	make := &model.VehicleMake{
 		Name:      name,
 		Status:    status,
 		CreatedBy: user,
-		CreatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedBy: &user,
+		UpdatedAt: &now,
 	}
 	err := s.repo.Create(make)
 	if err != nil {

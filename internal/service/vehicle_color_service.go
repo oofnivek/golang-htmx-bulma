@@ -31,11 +31,14 @@ func (s *vehicleColorService) FindByID(id int64) (*model.VehicleColor, error) {
 }
 
 func (s *vehicleColorService) CreateColor(name string, status bool, user string) (*model.VehicleColor, error) {
+	now := time.Now()
 	color := &model.VehicleColor{
 		Name:      name,
 		Status:    status,
 		CreatedBy: user,
-		CreatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedBy: &user,
+		UpdatedAt: &now,
 	}
 	err := s.repo.Create(color)
 	if err != nil {

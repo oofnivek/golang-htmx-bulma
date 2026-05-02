@@ -11,6 +11,8 @@
     </td>
     <td>{{ .Color.CreatedBy }}</td>
     <td>{{ in_timezone .Color.CreatedAt .Timezone }}</td>
+    <td>{{ if .Color.UpdatedBy }}{{ .Color.UpdatedBy }}{{ else }}-{{ end }}</td>
+    <td>{{ if .Color.UpdatedAt }}{{ in_timezone .Color.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
     <td>
         <div class="buttons are-small">
             <a href="/vehicle-colors/{{ .Color.ID }}/edit" class="button is-info">Edit</a>

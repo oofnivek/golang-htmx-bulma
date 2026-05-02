@@ -54,8 +54,8 @@ func (r *mysqlVehicleColorRepository) GetByID(id int64) (*model.VehicleColor, er
 }
 
 func (r *mysqlVehicleColorRepository) Create(c *model.VehicleColor) error {
-	res, err := r.db.Exec("INSERT INTO vehicle_color (name, status, created_by, created_at) VALUES (?, ?, ?, ?)",
-		c.Name, c.Status, c.CreatedBy, c.CreatedAt)
+	res, err := r.db.Exec("INSERT INTO vehicle_color (name, status, created_by, created_at, updated_by, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+		c.Name, c.Status, c.CreatedBy, c.CreatedAt, c.UpdatedBy, c.UpdatedAt)
 	if err != nil {
 		return err
 	}
