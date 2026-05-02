@@ -1,9 +1,5 @@
 /* Custom styles for Go-HTMX-Bulma */
 
-.container {
-    max-width: 960px;
-}
-
 .footer {
     padding: 3rem 1.5rem 6rem;
 }

@@ -14,28 +14,35 @@
 </head>
 <body>
     <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
-        <div class="container">
+        <div class="container is-fluid">
             <div class="navbar-brand">
                 <a class="navbar-item" href="/">
                     <strong>Go-HTMX-Bulma</strong>
                 </a>
             </div>
-            <div class="navbar-menu">
-                <div class="navbar-start">
-                    <a class="navbar-item" href="/vehicle-colors">
-                        Vehicle Colors
-                    </a>
-                    <a class="navbar-item" href="/vehicle-makes">
-                        Vehicle Makes
-                    </a>
-                </div>
-            </div>
         </div>
     </nav>
 
     <section class="section">
-        <div class="container">
-            {{ template "content" . }}
+        <div class="container is-fluid">
+            <div class="columns">
+                <aside class="column is-2">
+                    <nav class="menu">
+                        <p class="menu-label">General</p>
+                        <ul class="menu-list">
+                            <li><a href="/">Dashboard</a></li>
+                        </ul>
+                        <p class="menu-label">Administration</p>
+                        <ul class="menu-list">
+                            <li><a href="/vehicle-makes">Vehicle Makes</a></li>
+                            <li><a href="/vehicle-colors">Vehicle Colors</a></li>
+                        </ul>
+                    </nav>
+                </aside>
+                <main class="column">
+                    {{ template "content" . }}
+                </main>
+            </div>
         </div>
     </section>
 
