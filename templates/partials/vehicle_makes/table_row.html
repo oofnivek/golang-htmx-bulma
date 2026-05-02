@@ -9,8 +9,6 @@
             <span class="tag is-danger">Inactive</span>
         {{ end }}
     </td>
-    <td>{{ .Make.CreatedBy }}</td>
-    <td>{{ in_timezone .Make.CreatedAt .Timezone }}</td>
     <td>{{ if .Make.UpdatedBy }}{{ .Make.UpdatedBy }}{{ else }}-{{ end }}</td>
     <td>{{ if .Make.UpdatedAt }}{{ in_timezone .Make.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
     <td>
