@@ -1,0 +1,25 @@
+{{ define "vehicle_makes/table_row.html" }}
+<tr id="make-row-{{ .Make.ID }}">
+    <td>{{ .Make.ID }}</td>
+    <td>{{ .Make.Name }}</td>
+    <td>
+        {{ if .Make.Status }}
+            <span class="tag is-success">Active</span>
+        {{ else }}
+            <span class="tag is-danger">Inactive</span>
+        {{ end }}
+    </td>
+    <td>{{ .Make.CreatedBy }}</td>
+    <td>{{ in_timezone .Make.CreatedAt .Timezone }}</td>
+    <td>
+        <div class="buttons are-small">
+            <a href="/vehicle-makes/{{ .Make.ID }}/edit" class="button is-info">Edit</a>
+            <button class="button is-danger" 
+                    hx-get="/vehicle-makes/{{ .Make.ID }}/delete" 
+                    hx-target="#modal-container">
+                Delete
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

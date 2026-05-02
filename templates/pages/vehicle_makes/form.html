@@ -1,0 +1,35 @@
+{{ define "content" }}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box">
+            <h1 class="title">{{ .title }}</h1>
+            <form action="{{ .action }}" method="POST">
+                <div class="field">
+                    <label class="label">Name</label>
+                    <div class="control">
+                        <input class="input" type="text" name="name" placeholder="Make Name" value="{{ if .make }}{{ .make.Name }}{{ end }}" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" name="status" {{ if or (not .make) .make.Status }}checked{{ end }}>
+                            Active
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button type="submit" class="button is-link">Save</button>
+                    </div>
+                    <div class="control">
+                        <a href="/vehicle-makes" class="button is-link is-light">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}

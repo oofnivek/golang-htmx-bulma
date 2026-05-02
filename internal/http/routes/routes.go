@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(r *gin.Engine, vcHandler *web.VehicleColorHandler) {
+func RegisterRoutes(r *gin.Engine, vcHandler *web.VehicleColorHandler, vmHandler *web.VehicleMakeHandler) {
 	// Static files
 	r.Static("/static", "./static")
 
@@ -24,6 +24,18 @@ func RegisterRoutes(r *gin.Engine, vcHandler *web.VehicleColorHandler) {
 		vcGroup.POST("/:id", vcHandler.Update)
 		vcGroup.DELETE("/:id", vcHandler.Delete)
 		vcGroup.GET("/:id/delete", vcHandler.DeleteConfirm)
+	}
+
+	// Vehicle Makes
+	vmGroup := r.Group("/vehicle-makes")
+	{
+		vmGroup.GET("", vmHandler.List)
+		vmGroup.GET("/new", vmHandler.CreateForm)
+		vmGroup.POST("", vmHandler.Create)
+		vmGroup.GET("/:id/edit", vmHandler.EditForm)
+		vmGroup.POST("/:id", vmHandler.Update)
+		vmGroup.DELETE("/:id", vmHandler.Delete)
+		vmGroup.GET("/:id/delete", vmHandler.DeleteConfirm)
 	}
 
 	// API routes (HTMX targets)

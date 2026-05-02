@@ -40,7 +40,11 @@ func main() {
 	vcSvc := service.NewVehicleColorService(vcRepo)
 	vcHandler := web.NewVehicleColorHandler(vcSvc)
 
-	routes.RegisterRoutes(r, vcHandler)
+	vmRepo := repository.NewVehicleMakeRepository(database)
+	vmSvc := service.NewVehicleMakeService(vmRepo)
+	vmHandler := web.NewVehicleMakeHandler(vmSvc)
+
+	routes.RegisterRoutes(r, vcHandler, vmHandler)
 
 	// Start server
 	log.Printf("Server starting on port %s in %s mode...\n", cfg.Port, cfg.AppEnv)
