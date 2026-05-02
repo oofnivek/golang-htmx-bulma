@@ -7,6 +7,8 @@ import (
 
 type VehicleColorRepository interface {
 	GetAll() ([]model.VehicleColor, error)
+	GetPaged(limit, offset int) ([]model.VehicleColor, error)
+	Count() (int, error)
 	GetByID(id int64) (*model.VehicleColor, error)
 	Create(color *model.VehicleColor) error
 	Update(color *model.VehicleColor) error
@@ -22,7 +24,7 @@ func NewVehicleColorRepository(db *sql.DB) VehicleColorRepository {
 }
 
 func (r *mysqlVehicleColorRepository) GetAll() ([]model.VehicleColor, error) {
-	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color")
+	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color ORDER BY id DESC")
 	if err != nil {
 		return nil, err
 	}
@@ -38,6 +40,31 @@ func (r *mysqlVehicleColorRepository) GetAll() ([]model.VehicleColor, error) {
 		colors = append(colors, c)
 	}
 	return colors, nil
+}
+
+func (r *mysqlVehicleColorRepository) GetPaged(limit, offset int) ([]model.VehicleColor, error) {
+	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color ORDER BY id DESC LIMIT ? OFFSET ?", limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var colors []model.VehicleColor
+	for rows.Next() {
+		var c model.VehicleColor
+		err := rows.Scan(&c.ID, &c.Name, &c.Status, &c.CreatedBy, &c.CreatedAt, &c.UpdatedBy, &c.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		colors = append(colors, c)
+	}
+	return colors, nil
+}
+
+func (r *mysqlVehicleColorRepository) Count() (int, error) {
+	var count int
+	err := r.db.QueryRow("SELECT COUNT(*) FROM vehicle_color").Scan(&count)
+	return count, err
 }
 
 func (r *mysqlVehicleColorRepository) GetByID(id int64) (*model.VehicleColor, error) {

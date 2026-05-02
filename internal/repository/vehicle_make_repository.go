@@ -7,6 +7,8 @@ import (
 
 type VehicleMakeRepository interface {
 	GetAll() ([]model.VehicleMake, error)
+	GetPaged(limit, offset int) ([]model.VehicleMake, error)
+	Count() (int, error)
 	GetByID(id int64) (*model.VehicleMake, error)
 	Create(make *model.VehicleMake) error
 	Update(make *model.VehicleMake) error
@@ -22,7 +24,7 @@ func NewVehicleMakeRepository(db *sql.DB) VehicleMakeRepository {
 }
 
 func (r *mysqlVehicleMakeRepository) GetAll() ([]model.VehicleMake, error) {
-	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make")
+	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY id DESC")
 	if err != nil {
 		return nil, err
 	}
@@ -38,6 +40,31 @@ func (r *mysqlVehicleMakeRepository) GetAll() ([]model.VehicleMake, error) {
 		makes = append(makes, m)
 	}
 	return makes, nil
+}
+
+func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int) ([]model.VehicleMake, error) {
+	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY id DESC LIMIT ? OFFSET ?", limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var makes []model.VehicleMake
+	for rows.Next() {
+		var m model.VehicleMake
+		err := rows.Scan(&m.ID, &m.Name, &m.Status, &m.CreatedBy, &m.CreatedAt, &m.UpdatedBy, &m.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		makes = append(makes, m)
+	}
+	return makes, nil
+}
+
+func (r *mysqlVehicleMakeRepository) Count() (int, error) {
+	var count int
+	err := r.db.QueryRow("SELECT COUNT(*) FROM vehicle_make").Scan(&count)
+	return count, err
 }
 
 func (r *mysqlVehicleMakeRepository) GetByID(id int64) (*model.VehicleMake, error) {

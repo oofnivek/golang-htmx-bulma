@@ -23,7 +23,10 @@ func (h *VehicleColorHandler) List(c *gin.Context) {
 		tz = "UTC"
 	}
 
-	colors, err := h.svc.ListAll()
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+
+	colors, total, err := h.svc.ListPaged(page, pageSize)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -32,11 +35,17 @@ func (h *VehicleColorHandler) List(c *gin.Context) {
 	// Common timezones
 	timezones := []string{"UTC", "America/New_York", "America/Los_Angeles", "Europe/London", "Europe/Paris", "Asia/Tokyo", "Asia/Shanghai", "Asia/Singapore", "Australia/Sydney"}
 
+	totalPages := (total + pageSize - 1) / pageSize
+
 	c.HTML(http.StatusOK, "pages/vehicle_colors/index.html", gin.H{
-		"title":     "Vehicle Colors",
-		"colors":    colors,
-		"timezone":  tz,
-		"timezones": timezones,
+		"title":       "Vehicle Colors",
+		"colors":      colors,
+		"timezone":    tz,
+		"timezones":   timezones,
+		"currentPage": page,
+		"pageSize":    pageSize,
+		"totalPages":  totalPages,
+		"total":       total,
 	})
 }
 

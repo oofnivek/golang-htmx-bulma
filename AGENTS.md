@@ -214,6 +214,7 @@ Before finishing changes, always do the relevant checks:
 - Verify protected routes still enforce auth correctly.
 - Verify MySQL-related queries, schema assumptions, and migrations still make sense.
 - Prefer small, targeted tests for changed packages.
+- **Do not automatically fix unit tests**: When implementing changes or new functionality, do not automatically update or fix unit tests unless explicitly asked by the USER. The USER may be iterating on functionality or UI and will request test and coverage fixes when they are done.
 
 ## Safety rules
 - Never commit secrets, API keys, `.env` contents, or real credentials.

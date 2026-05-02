@@ -23,7 +23,10 @@ func (h *VehicleMakeHandler) List(c *gin.Context) {
 		tz = "UTC"
 	}
 
-	makes, err := h.svc.ListAll()
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+
+	makes, total, err := h.svc.ListPaged(page, pageSize)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -32,11 +35,17 @@ func (h *VehicleMakeHandler) List(c *gin.Context) {
 	// Common timezones
 	timezones := []string{"UTC", "America/New_York", "America/Los_Angeles", "Europe/London", "Europe/Paris", "Asia/Tokyo", "Asia/Shanghai", "Asia/Singapore", "Australia/Sydney"}
 
+	totalPages := (total + pageSize - 1) / pageSize
+
 	c.HTML(http.StatusOK, "pages/vehicle_makes/index.html", gin.H{
-		"title":     "Vehicle Makes",
-		"makes":     makes,
-		"timezone":  tz,
-		"timezones": timezones,
+		"title":       "Vehicle Makes",
+		"makes":       makes,
+		"timezone":    tz,
+		"timezones":   timezones,
+		"currentPage": page,
+		"pageSize":    pageSize,
+		"totalPages":  totalPages,
+		"total":       total,
 	})
 }
 

@@ -8,6 +8,8 @@ import (
 
 type MockVehicleColorRepository struct {
 	GetAllFn   func() ([]model.VehicleColor, error)
+	GetPagedFn func(limit, offset int) ([]model.VehicleColor, error)
+	CountFn    func() (int, error)
 	GetByIDFn  func(id int64) (*model.VehicleColor, error)
 	CreateFn   func(color *model.VehicleColor) error
 	UpdateFn   func(color *model.VehicleColor) error
@@ -16,6 +18,14 @@ type MockVehicleColorRepository struct {
 
 func (m *MockVehicleColorRepository) GetAll() ([]model.VehicleColor, error) {
 	return m.GetAllFn()
+}
+
+func (m *MockVehicleColorRepository) GetPaged(limit, offset int) ([]model.VehicleColor, error) {
+	return m.GetPagedFn(limit, offset)
+}
+
+func (m *MockVehicleColorRepository) Count() (int, error) {
+	return m.CountFn()
 }
 
 func (m *MockVehicleColorRepository) GetByID(id int64) (*model.VehicleColor, error) {

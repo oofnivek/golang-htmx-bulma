@@ -67,5 +67,47 @@
             {{ end }}
         </tbody>
     </table>
+
+    <!-- Pagination -->
+    {{ if gt .totalPages 1 }}
+    <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+        {{ if gt .currentPage 1 }}
+        <a class="pagination-previous" 
+           hx-get="/vehicle-makes?page={{ sub .currentPage 1 }}&tz={{ .timezone }}" 
+           hx-target="body" 
+           hx-push-url="true">Previous</a>
+        {{ else }}
+        <a class="pagination-previous" disabled>Previous</a>
+        {{ end }}
+        
+        {{ if lt .currentPage .totalPages }}
+        <a class="pagination-next" 
+           hx-get="/vehicle-makes?page={{ add .currentPage 1 }}&tz={{ .timezone }}" 
+           hx-target="body" 
+           hx-push-url="true">Next page</a>
+        {{ else }}
+        <a class="pagination-next" disabled>Next page</a>
+        {{ end }}
+        
+        <ul class="pagination-list">
+            {{ $current := .currentPage }}
+            {{ $total := .totalPages }}
+            {{ $tz := .timezone }}
+            
+            {{ range $p := (seq 1 .totalPages) }}
+            <li>
+                <a class="pagination-link {{ if eq $p $current }}is-current{{ end }}" 
+                   hx-get="/vehicle-makes?page={{ $p }}&tz={{ $tz }}" 
+                   hx-target="body" 
+                   hx-push-url="true"
+                   aria-label="Goto page {{ $p }}">{{ $p }}</a>
+            </li>
+            {{ end }}
+        </ul>
+    </nav>
+    <div class="has-text-centered is-size-7 has-text-grey mt-2">
+        Showing page {{ .currentPage }} of {{ .totalPages }} (Total: {{ .total }} items)
+    </div>
+    {{ end }}
 </div>
 {{ end }}

@@ -71,6 +71,15 @@ func NewRenderer(rootDir string) *Renderer {
 					}
 					return dict, nil
 				},
+				"add": func(a, b int) int { return a + b },
+				"sub": func(a, b int) int { return a - b },
+				"seq": func(start, end int) []int {
+					var s []int
+					for i := start; i <= end; i++ {
+						s = append(s, i)
+					}
+					return s
+				},
 			})
 			r.templates[rel] = template.Must(tmpl.ParseFiles(files...))
 		}
