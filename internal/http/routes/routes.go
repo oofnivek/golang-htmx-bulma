@@ -57,6 +57,7 @@ func RegisterRoutes(r *gin.Engine, vcHandler *web.VehicleColorHandler, vmHandler
 		userGroup.GET("/new", userHandler.CreateForm)
 		userGroup.POST("", userHandler.Create)
 		userGroup.GET("/:email/edit", userHandler.EditForm)
+		userGroup.GET("/:email/view", userHandler.View)
 		userGroup.POST("/:email", userHandler.Update)
 		userGroup.DELETE("/:email", userHandler.Delete)
 		userGroup.GET("/:email/delete", userHandler.DeleteConfirm)

@@ -113,6 +113,26 @@ func (h *UserHandler) EditForm(c *gin.Context) {
 	})
 }
 
+func (h *UserHandler) View(c *gin.Context) {
+	email := c.Param("email")
+	tz := c.DefaultQuery("tz", "UTC")
+	user, err := h.userSvc.GetByEmail(email)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if user == nil {
+		c.String(http.StatusNotFound, "User not found")
+		return
+	}
+
+	c.HTML(http.StatusOK, "pages/users/view.html", gin.H{
+		"title": "View User",
+		"user":  user,
+		"tz":    tz,
+	})
+}
+
 func (h *UserHandler) Update(c *gin.Context) {
 	email := c.Param("email")
 	isEnabled := c.PostForm("is_enabled") == "on"

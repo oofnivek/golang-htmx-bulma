@@ -2,6 +2,7 @@
 
 # Run the application
 run:
+	@lsof -ti:8080 | xargs kill -9 2>/dev/null || true
 	go run ./cmd/web
 
 # Build the binary

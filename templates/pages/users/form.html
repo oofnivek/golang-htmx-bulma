@@ -8,9 +8,9 @@
                 <div class="field">
                     <label class="label">Email (Username)</label>
                     <div class="control has-icons-left">
-                        <input class="input" type="email" name="email" placeholder="email@example.com" required 
-                               value="{{ if .user }}{{ .user.Email }}{{ end }}"
-                               {{ if .user }}readonly{{ else }}autofocus{{ end }}>
+                        <input class="input" type="email" name="email" placeholder="email@example.com" required
+                            value="{{ if .user }}{{ .user.Email }}{{ end }}" {{ if .user }}readonly{{ else }}autofocus{{
+                            end }}>
                         <span class="icon is-small is-left">
                             <i class="fas fa-envelope"></i>
                         </span>
@@ -25,9 +25,9 @@
                         <div class="field">
                             <label class="label">First Name</label>
                             <div class="control">
-                                <input class="input" type="text" name="first_name" placeholder="John" required 
-                                       value="{{ if .user }}{{ .user.FirstName }}{{ end }}"
-                                       {{ if .user }}autofocus{{ end }}>
+                                <input class="input" type="text" name="first_name" placeholder="John" required
+                                    value="{{ if .user }}{{ .user.FirstName }}{{ end }}" {{ if .user }}autofocus{{ end
+                                    }}>
                             </div>
                         </div>
                     </div>
@@ -35,8 +35,8 @@
                         <div class="field">
                             <label class="label">Last Name</label>
                             <div class="control">
-                                <input class="input" type="text" name="last_name" placeholder="Doe" required 
-                                       value="{{ if .user }}{{ .user.LastName }}{{ end }}">
+                                <input class="input" type="text" name="last_name" placeholder="Doe" required
+                                    value="{{ if .user }}{{ .user.LastName }}{{ end }}">
                             </div>
                         </div>
                     </div>
@@ -47,8 +47,8 @@
                         <div class="field">
                             <label class="label">Mobile</label>
                             <div class="control has-icons-left">
-                                <input class="input" type="text" name="mobile" placeholder="+1234567890" required 
-                                       value="{{ if .user }}{{ .user.Mobile }}{{ end }}">
+                                <input class="input" type="text" name="mobile" placeholder="+1234567890" required
+                                    value="{{ if .user }}{{ .user.Mobile }}{{ end }}">
                                 <span class="icon is-small is-left">
                                     <i class="fas fa-phone"></i>
                                 </span>
@@ -65,7 +65,8 @@
                                         {{ $selectedRole := "" }}
                                         {{ if .user }}{{ $selectedRole = .user.RoleID }}{{ end }}
                                         {{ range .roles }}
-                                        <option value="{{ .ID }}" {{ if eq .ID $selectedRole }}selected{{ end }}>{{ .Name }}</option>
+                                        <option value="{{ .ID }}" {{ if eq .ID $selectedRole }}selected{{ end }}>{{
+                                            .Name }}</option>
                                         {{ end }}
                                     </select>
                                 </div>
@@ -79,8 +80,8 @@
                         <div class="field">
                             <label class="label">Designation</label>
                             <div class="control">
-                                <input class="input" type="text" name="designation" placeholder="Software Engineer" required 
-                                       value="{{ if .user }}{{ .user.Designation }}{{ end }}">
+                                <input class="input" type="text" name="designation" placeholder="Software Engineer"
+                                    required value="{{ if .user }}{{ .user.Designation }}{{ end }}">
                             </div>
                         </div>
                     </div>
@@ -88,8 +89,8 @@
                         <div class="field">
                             <label class="label">Department</label>
                             <div class="control">
-                                <input class="input" type="text" name="department" placeholder="Engineering" required 
-                                       value="{{ if .user }}{{ .user.Department }}{{ end }}">
+                                <input class="input" type="text" name="department" placeholder="Engineering" required
+                                    value="{{ if .user }}{{ .user.Department }}{{ end }}">
                             </div>
                         </div>
                     </div>
@@ -98,7 +99,8 @@
                 <div class="field">
                     <div class="control">
                         <label class="checkbox">
-                            <input type="checkbox" name="is_enabled" {{ if or (not .user) .user.IsEnabled }}checked{{ end }}>
+                            <input type="checkbox" name="is_enabled" {{ if or (not .user) .user.IsEnabled }}checked{{
+                                end }}>
                             Account Enabled
                         </label>
                     </div>
@@ -106,15 +108,16 @@
 
                 <div class="field is-grouped is-grouped-right mt-5">
                     <div class="control">
-                        <button type="button" class="button is-light" hx-get="/users" hx-target="body" hx-push-url="true">Cancel</button>
-                    </div>
-                    <div class="control">
-                        <button type="submit" class="button is-primary">
+                        <button type="submit" class="button is-link">
                             <span class="icon">
                                 <i class="fas fa-save"></i>
                             </span>
-                            <span>Save User</span>
+                            <span>Save</span>
                         </button>
+                    </div>
+                    <div class="control">
+                        <button type="button" class="button is-link is-light" hx-get="/users" hx-target="body"
+                            hx-push-url="true">Cancel</button>
                     </div>
                 </div>
             </form>
