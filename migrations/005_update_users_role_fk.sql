@@ -1,0 +1,4 @@
+SET FOREIGN_KEY_CHECKS = 0;
+ALTER TABLE `users` DROP FOREIGN KEY `fk_users_roles_role_id`;
+ALTER TABLE `users` ADD CONSTRAINT `fk_users_roles_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+SET FOREIGN_KEY_CHECKS = 1;
