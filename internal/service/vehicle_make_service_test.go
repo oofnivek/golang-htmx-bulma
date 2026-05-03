@@ -210,10 +210,10 @@ func TestServiceErrorsMake(t *testing.T) {
 
 func TestListPagedMake(t *testing.T) {
 	mockRepo := &MockVehicleMakeRepository{
-		GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+		GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleMake, error) {
 			return []model.VehicleMake{{ID: 1, Name: "Toyota"}}, nil
 		},
-		CountFn: func() (int, error) {
+		CountFn: func(search string) (int, error) {
 			return 1, nil
 		},
 	}
@@ -221,7 +221,7 @@ func TestListPagedMake(t *testing.T) {
 	svc := NewVehicleMakeService(mockRepo)
 
 	t.Run("Success", func(t *testing.T) {
-		makes, total, err := svc.ListPaged(1, 10, "id", "desc")
+		makes, total, err := svc.ListPaged(1, 10, "id", "desc", "")
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -232,7 +232,7 @@ func TestListPagedMake(t *testing.T) {
 
 	t.Run("Defaults", func(t *testing.T) {
 		// Test negative page/pageSize
-		makes, _, err := svc.ListPaged(-1, -1, "id", "desc")
+		makes, _, err := svc.ListPaged(-1, -1, "id", "desc", "")
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -243,12 +243,12 @@ func TestListPagedMake(t *testing.T) {
 
 	t.Run("RepoError", func(t *testing.T) {
 		failRepo := &MockVehicleMakeRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleMake, error) {
 				return nil, errors.New("fail")
 			},
 		}
 		failSvc := NewVehicleMakeService(failRepo)
-		_, _, err := failSvc.ListPaged(1, 10, "id", "desc")
+		_, _, err := failSvc.ListPaged(1, 10, "id", "desc", "")
 		if err == nil {
 			t.Error("Expected error, got nil")
 		}
@@ -256,15 +256,15 @@ func TestListPagedMake(t *testing.T) {
 
 	t.Run("CountError", func(t *testing.T) {
 		failRepo := &MockVehicleMakeRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleMake, error) {
 				return []model.VehicleMake{}, nil
 			},
-			CountFn: func() (int, error) {
+			CountFn: func(search string) (int, error) {
 				return 0, errors.New("fail")
 			},
 		}
 		failSvc := NewVehicleMakeService(failRepo)
-		_, _, err := failSvc.ListPaged(1, 10, "id", "desc")
+		_, _, err := failSvc.ListPaged(1, 10, "id", "desc", "")
 		if err == nil {
 			t.Error("Expected error, got nil")
 		}
