@@ -80,6 +80,17 @@ func NewRenderer(rootDir string) *Renderer {
 					}
 					return s
 				},
+				"safe_id": func(s string) string {
+					res := ""
+					for _, r := range s {
+						if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
+							res += string(r)
+						} else {
+							res += "-"
+						}
+					}
+					return res
+				},
 			})
 			r.templates[rel] = template.Must(tmpl.ParseFiles(files...))
 		}
@@ -113,4 +124,16 @@ func (r *Renderer) Instance(name string, data interface{}) render.Render {
 		Name:     entryPoint,
 		Data:     data,
 	}
+}
+
+func SafeID(s string) string {
+	res := ""
+	for _, r := range s {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
+			res += string(r)
+		} else {
+			res += "-"
+		}
+	}
+	return res
 }

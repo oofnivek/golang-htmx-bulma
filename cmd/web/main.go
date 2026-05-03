@@ -55,7 +55,11 @@ func main() {
 	roleSvc := service.NewRoleService(roleRepo)
 	roleHandler := web.NewRoleHandler(roleSvc)
 
-	routes.RegisterRoutes(r, vcHandler, vmHandler, roleHandler)
+	userRepo := repository.NewUserRepository(userDatabase)
+	userSvc := service.NewUserService(userRepo)
+	userHandler := web.NewUserHandler(userSvc, roleSvc)
+
+	routes.RegisterRoutes(r, vcHandler, vmHandler, roleHandler, userHandler)
 
 	// Start server
 	log.Printf("Server starting on port %s in %s mode...\n", cfg.Port, cfg.AppEnv)

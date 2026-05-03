@@ -13,11 +13,15 @@
     <td>{{ if .Make.UpdatedAt }}{{ in_timezone .Make.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
     <td>
         <div class="buttons are-small">
-            <a href="/vehicle-makes/{{ .Make.ID }}/edit" class="button is-info">Edit</a>
-            <button class="button is-danger" 
-                    hx-get="/vehicle-makes/{{ .Make.ID }}/delete" 
-                    hx-target="#modal-container">
-                Delete
+            <button class="button is-link is-light" hx-get="/vehicle-makes/{{ .Make.ID }}/edit" hx-target="body" hx-push-url="true">
+                <span class="icon is-small">
+                    <i class="fas fa-edit"></i>
+                </span>
+            </button>
+            <button class="button is-danger is-light" hx-get="/vehicle-makes/{{ .Make.ID }}/delete" hx-target="#modal-container">
+                <span class="icon is-small">
+                    <i class="fas fa-trash"></i>
+                </span>
             </button>
         </div>
     </td>

@@ -1,0 +1,201 @@
+{{ define "content" }}
+<div class="level">
+    <div class="level-left">
+        <h1 class="title mr-4">Users</h1>
+        <div class="field has-addons">
+            <p class="control">
+                <input class="input" type="text" name="search" placeholder="Search users..." 
+                       value="{{ .search }}"
+                       onkeydown="if(event.key === 'Enter') event.preventDefault()"
+                       hx-on:input="document.getElementById('search-btn').disabled = (this.value.length === 1)">
+            </p>
+            <p class="control">
+                <button class="button is-info" id="search-btn"
+                        hx-get="/users"
+                        hx-include="[name='search'],[name='tz'],[name='pageSize'],[name='sortBy'],[name='sortOrder']"
+                        hx-target="body"
+                        hx-push-url="true">
+                    <span class="icon is-small">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </button>
+            </p>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="field has-addons mr-3">
+            <div class="control">
+                <span class="button is-static">Rows</span>
+            </div>
+            <div class="control">
+                <div class="select">
+                    <select name="pageSize" 
+                            hx-get="/users" 
+                            hx-include="[name='tz'],[name='sortBy'],[name='sortOrder'],[name='search']"
+                            hx-target="body" 
+                            hx-push-url="true">
+                        {{ $currentSize := .pageSize }}
+                        {{ range .pageSizeOptions }}
+                        <option value="{{ . }}" {{ if eq . $currentSize }}selected{{ end }}>{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button class="button is-primary" hx-get="/users/new" hx-target="body" hx-push-url="true">
+            <span class="icon">
+                <i class="fas fa-plus"></i>
+            </span>
+            <span>Add User</span>
+        </button>
+    </div>
+</div>
+
+<div class="box p-0" style="overflow-x: auto;">
+    <table class="table is-fullwidth is-hoverable is-striped mb-0">
+        <thead>
+            <tr>
+                <th class="is-clickable" hx-get="/users" hx-target="body" hx-push-url="true"
+                    hx-vals='{"sortBy": "email", "sortOrder": "{{ if and (eq .sortBy "email") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}"}'
+                    hx-include="[name='search'],[name='pageSize'],[name='tz']">
+                    Email
+                    {{ if eq .sortBy "email" }}
+                    <span class="icon is-small">
+                        <i class="fas {{ if eq .sortOrder "asc" }}fa-sort-up{{ else }}fa-sort-down{{ end }}"></i>
+                    </span>
+                    {{ end }}
+                </th>
+                <th class="is-clickable" hx-get="/users" hx-target="body" hx-push-url="true"
+                    hx-vals='{"sortBy": "first_name", "sortOrder": "{{ if and (eq .sortBy "first_name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}"}'
+                    hx-include="[name='search'],[name='pageSize'],[name='tz']">
+                    First Name
+                    {{ if eq .sortBy "first_name" }}
+                    <span class="icon is-small">
+                        <i class="fas {{ if eq .sortOrder "asc" }}fa-sort-up{{ else }}fa-sort-down{{ end }}"></i>
+                    </span>
+                    {{ end }}
+                </th>
+                <th class="is-clickable" hx-get="/users" hx-target="body" hx-push-url="true"
+                    hx-vals='{"sortBy": "last_name", "sortOrder": "{{ if and (eq .sortBy "last_name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}"}'
+                    hx-include="[name='search'],[name='pageSize'],[name='tz']">
+                    Last Name
+                    {{ if eq .sortBy "last_name" }}
+                    <span class="icon is-small">
+                        <i class="fas {{ if eq .sortOrder "asc" }}fa-sort-up{{ else }}fa-sort-down{{ end }}"></i>
+                    </span>
+                    {{ end }}
+                </th>
+                <th class="is-clickable" hx-get="/users" hx-target="body" hx-push-url="true"
+                    hx-vals='{"sortBy": "role_name", "sortOrder": "{{ if and (eq .sortBy "role_name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}"}'
+                    hx-include="[name='search'],[name='pageSize'],[name='tz']">
+                    Role
+                    {{ if eq .sortBy "role_name" }}
+                    <span class="icon is-small">
+                        <i class="fas {{ if eq .sortOrder "asc" }}fa-sort-up{{ else }}fa-sort-down{{ end }}"></i>
+                    </span>
+                    {{ end }}
+                </th>
+                <th class="is-clickable" hx-get="/users" hx-target="body" hx-push-url="true"
+                    hx-vals='{"sortBy": "is_enabled", "sortOrder": "{{ if and (eq .sortBy "is_enabled") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}"}'
+                    hx-include="[name='search'],[name='pageSize'],[name='tz']">
+                    Status
+                    {{ if eq .sortBy "is_enabled" }}
+                    <span class="icon is-small">
+                        <i class="fas {{ if eq .sortOrder "asc" }}fa-sort-up{{ else }}fa-sort-down{{ end }}"></i>
+                    </span>
+                    {{ end }}
+                </th>
+                <th class="is-clickable" hx-get="/users" hx-target="body" hx-push-url="true"
+                    hx-vals='{"sortBy": "updated_at_utc", "sortOrder": "{{ if and (eq .sortBy "updated_at_utc") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}"}'
+                    hx-include="[name='search'],[name='pageSize'],[name='tz']">
+                    Updated At
+                    {{ if eq .sortBy "updated_at_utc" }}
+                    <span class="icon is-small">
+                        <i class="fas {{ if eq .sortOrder "asc" }}fa-sort-up{{ else }}fa-sort-down{{ end }}"></i>
+                    </span>
+                    {{ end }}
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .users }}
+            <tr id="user-row-{{ safe_id .Email }}">
+                <td>{{ .Email }}</td>
+                <td>{{ .FirstName }}</td>
+                <td>{{ .LastName }}</td>
+                <td>{{ .RoleName }}</td>
+                <td>
+                    {{ if .IsEnabled }}
+                    <span class="tag is-success">Enabled</span>
+                    {{ else }}
+                    <span class="tag is-danger">Disabled</span>
+                    {{ end }}
+                </td>
+                <td>{{ in_timezone .UpdatedAt $.tz }}</td>
+                <td>
+                    <div class="buttons are-small">
+                        <button class="button is-link is-light" hx-get="/users/{{ .Email }}/edit" hx-target="body" hx-push-url="true">
+                            <span class="icon is-small">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                        </button>
+                        <button class="button is-danger is-light" hx-get="/users/{{ .Email }}/delete" hx-target="body">
+                            <span class="icon is-small">
+                                <i class="fas fa-trash"></i>
+                            </span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {{ end }}
+            {{ if not .users }}
+            <tr>
+                <td colspan="7" class="has-text-centered has-text-grey py-5">No users found</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
+
+{{ if gt .totalPages 1 }}
+<nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+    <a class="pagination-previous" 
+       {{ if gt .currentPage 1 }}
+       hx-get="/users" 
+       hx-vals='{"page": "{{ sub .currentPage 1 }}"}'
+       hx-include="[name='search'],[name='pageSize'],[name='tz'],[name='sortBy'],[name='sortOrder']"
+       hx-target="body" 
+       hx-push-url="true"
+       {{ else }}disabled{{ end }}>Previous</a>
+    <a class="pagination-next" 
+       {{ if lt .currentPage .totalPages }}
+       hx-get="/users" 
+       hx-vals='{"page": "{{ add .currentPage 1 }}"}'
+       hx-include="[name='search'],[name='pageSize'],[name='tz'],[name='sortBy'],[name='sortOrder']"
+       hx-target="body" 
+       hx-push-url="true"
+       {{ else }}disabled{{ end }}>Next page</a>
+    <ul class="pagination-list">
+        {{ $currentPage := .currentPage }}
+        {{ $totalPages := .totalPages }}
+        {{ range seq 1 .totalPages }}
+        <li>
+            <a class="pagination-link {{ if eq . $currentPage }}is-current{{ end }}" 
+               hx-get="/users" 
+               hx-vals='{"page": "{{ . }}"}'
+               hx-include="[name='search'],[name='pageSize'],[name='tz'],[name='sortBy'],[name='sortOrder']"
+               hx-target="body" 
+               hx-push-url="true"
+               aria-label="Goto page {{ . }}">{{ . }}</a>
+        </li>
+        {{ end }}
+    </ul>
+</nav>
+{{ end }}
+
+<input type="hidden" name="tz" id="tz-input">
+<script>
+    document.getElementById('tz-input').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+</script>
+{{ end }}
