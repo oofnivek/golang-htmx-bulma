@@ -7,13 +7,17 @@
                 <input class="input" type="text" name="search" placeholder="Search roles..." 
                        value="{{ .search }}"
                        hx-get="/roles"
-                       hx-trigger="keyup changed delay:500ms[target.value.length == 0 || target.value.length >= 2], search"
+                       hx-trigger="keyup[key=='Enter']"
                        hx-include="[name='pageSize'],[name='sortBy'],[name='sortOrder']"
                        hx-target="body"
                        hx-push-url="true">
             </p>
             <p class="control">
-                <button class="button is-static">
+                <button class="button is-info"
+                        hx-get="/roles"
+                        hx-include="[name='search'],[name='pageSize'],[name='sortBy'],[name='sortOrder']"
+                        hx-target="body"
+                        hx-push-url="true">
                     <span class="icon is-small">
                         <i class="fas fa-search"></i>
                     </span>
