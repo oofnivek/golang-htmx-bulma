@@ -26,7 +26,7 @@ func NewUserRepository(db *sql.DB) UserRepository {
 func (r *mysqlUserRepository) GetAll() ([]model.User, error) {
 	query := `
 		SELECT u.email, u.first_name, u.last_name, u.mobile, u.designation, u.department, u.is_enabled, 
-		       u.created_at_utc, u.updated_at_utc, u.role_id, r.name as role_name
+		       u.created_at_utc, u.updated_at_utc, u.role_id, u.password_hash, r.name as role_name
 		FROM users u
 		JOIN roles r ON u.role_id = r.id
 		ORDER BY u.email ASC`
@@ -41,7 +41,7 @@ func (r *mysqlUserRepository) GetAll() ([]model.User, error) {
 	for rows.Next() {
 		var u model.User
 		err := rows.Scan(&u.Email, &u.FirstName, &u.LastName, &u.Mobile, &u.Designation, &u.Department, &u.IsEnabled,
-			&u.CreatedAt, &u.UpdatedAt, &u.RoleID, &u.RoleName)
+			&u.CreatedAt, &u.UpdatedAt, &u.RoleID, &u.PasswordHash, &u.RoleName)
 		if err != nil {
 			return nil, err
 		}
@@ -76,7 +76,7 @@ func (r *mysqlUserRepository) GetPaged(limit, offset int, sortBy, sortOrder, sea
 
 	query := `
 		SELECT u.email, u.first_name, u.last_name, u.mobile, u.designation, u.department, u.is_enabled, 
-		       u.created_at_utc, u.updated_at_utc, u.role_id, r.name as role_name
+		       u.created_at_utc, u.updated_at_utc, u.role_id, u.password_hash, r.name as role_name
 		FROM users u
 		JOIN roles r ON u.role_id = r.id`
 	
@@ -99,7 +99,7 @@ func (r *mysqlUserRepository) GetPaged(limit, offset int, sortBy, sortOrder, sea
 	for rows.Next() {
 		var u model.User
 		err := rows.Scan(&u.Email, &u.FirstName, &u.LastName, &u.Mobile, &u.Designation, &u.Department, &u.IsEnabled,
-			&u.CreatedAt, &u.UpdatedAt, &u.RoleID, &u.RoleName)
+			&u.CreatedAt, &u.UpdatedAt, &u.RoleID, &u.PasswordHash, &u.RoleName)
 		if err != nil {
 			return nil, err
 		}
@@ -124,14 +124,14 @@ func (r *mysqlUserRepository) Count(search string) (int, error) {
 func (r *mysqlUserRepository) GetByEmail(email string) (*model.User, error) {
 	query := `
 		SELECT u.email, u.first_name, u.last_name, u.mobile, u.designation, u.department, u.is_enabled, 
-		       u.created_at_utc, u.updated_at_utc, u.role_id, r.name as role_name
+		       u.created_at_utc, u.updated_at_utc, u.role_id, u.password_hash, r.name as role_name
 		FROM users u
 		JOIN roles r ON u.role_id = r.id
 		WHERE u.email = ?`
 	
 	var u model.User
 	err := r.db.QueryRow(query, email).Scan(&u.Email, &u.FirstName, &u.LastName, &u.Mobile, &u.Designation, &u.Department, &u.IsEnabled,
-		&u.CreatedAt, &u.UpdatedAt, &u.RoleID, &u.RoleName)
+		&u.CreatedAt, &u.UpdatedAt, &u.RoleID, &u.PasswordHash, &u.RoleName)
 	
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -144,10 +144,10 @@ func (r *mysqlUserRepository) GetByEmail(email string) (*model.User, error) {
 
 func (r *mysqlUserRepository) Create(u *model.User) error {
 	query := `
-		INSERT INTO users (email, first_name, last_name, mobile, designation, department, is_enabled, created_at_utc, updated_at_utc, role_id)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		INSERT INTO users (email, first_name, last_name, mobile, designation, department, is_enabled, created_at_utc, updated_at_utc, role_id, password_hash)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	
-	_, err := r.db.Exec(query, u.Email, u.FirstName, u.LastName, u.Mobile, u.Designation, u.Department, u.IsEnabled, u.CreatedAt, u.UpdatedAt, u.RoleID)
+	_, err := r.db.Exec(query, u.Email, u.FirstName, u.LastName, u.Mobile, u.Designation, u.Department, u.IsEnabled, u.CreatedAt, u.UpdatedAt, u.RoleID, u.PasswordHash)
 	return err
 }
 

@@ -1,7 +1,9 @@
 package service
 
 import (
+	"fmt"
 	"golang-htmx-bulma/internal/model"
+	"golang-htmx-bulma/internal/pkg/crypto"
 	"golang-htmx-bulma/internal/repository"
 	"time"
 )
@@ -54,6 +56,16 @@ func (s *userService) GetByEmail(email string) (*model.User, error) {
 }
 
 func (s *userService) CreateUser(u *model.User) error {
+	if u.Password != u.ConfirmPass {
+		return fmt.Errorf("passwords do not match")
+	}
+
+	hash, err := crypto.HashPasswordV3(u.Password, 100000)
+	if err != nil {
+		return err
+	}
+	u.PasswordHash = hash
+
 	now := time.Now().UTC()
 	u.CreatedAt = now
 	u.UpdatedAt = now

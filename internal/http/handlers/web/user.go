@@ -76,6 +76,8 @@ func (h *UserHandler) Create(c *gin.Context) {
 		Department:  c.PostForm("department"),
 		IsEnabled:   isEnabled,
 		RoleID:      c.PostForm("role_id"),
+		Password:    c.PostForm("password"),
+		ConfirmPass: c.PostForm("confirm_password"),
 	}
 
 	err := h.userSvc.CreateUser(user)

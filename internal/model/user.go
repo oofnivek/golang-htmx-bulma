@@ -14,9 +14,9 @@ type User struct {
 	UpdatedAt    time.Time `json:"updated_at_utc"`
 	RoleID       string    `json:"role_id"`
 	
-	// Password related fields ignored for now
-	// PasswordResetRequestID []byte
-	// PasswordHash           string
+	PasswordHash string `json:"-"`
+	Password     string `json:"-"`
+	ConfirmPass  string `json:"-"`
 
 	// Joining with roles table for display
 	RoleName string `json:"role_name"`
