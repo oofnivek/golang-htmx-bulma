@@ -152,11 +152,18 @@ func (r *mysqlUserRepository) Create(u *model.User) error {
 }
 
 func (r *mysqlUserRepository) Update(u *model.User) error {
-	query := `
-		UPDATE users SET first_name = ?, last_name = ?, mobile = ?, designation = ?, department = ?, is_enabled = ?, updated_at_utc = ?, role_id = ?
-		WHERE email = ?`
-	
-	_, err := r.db.Exec(query, u.FirstName, u.LastName, u.Mobile, u.Designation, u.Department, u.IsEnabled, u.UpdatedAt, u.RoleID, u.Email)
+	var err error
+	if u.PasswordHash != "" {
+		query := `
+			UPDATE users SET first_name = ?, last_name = ?, mobile = ?, designation = ?, department = ?, is_enabled = ?, updated_at_utc = ?, role_id = ?, password_hash = ?
+			WHERE email = ?`
+		_, err = r.db.Exec(query, u.FirstName, u.LastName, u.Mobile, u.Designation, u.Department, u.IsEnabled, u.UpdatedAt, u.RoleID, u.PasswordHash, u.Email)
+	} else {
+		query := `
+			UPDATE users SET first_name = ?, last_name = ?, mobile = ?, designation = ?, department = ?, is_enabled = ?, updated_at_utc = ?, role_id = ?
+			WHERE email = ?`
+		_, err = r.db.Exec(query, u.FirstName, u.LastName, u.Mobile, u.Designation, u.Department, u.IsEnabled, u.UpdatedAt, u.RoleID, u.Email)
+	}
 	return err
 }
 

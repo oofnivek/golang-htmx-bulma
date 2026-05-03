@@ -106,35 +106,25 @@
                     </div>
                 </div>
 
-                {{ if not .user }}
-                <hr>
-                <div class="columns">
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Password</label>
-                            <div class="control has-icons-left">
-                                <input class="input" type="password" name="password" placeholder="••••••••" required
-                                    minlength="8">
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-lock"></i>
-                                </span>
+                <div id="password-section">
+                    {{ if not .user }}
+                        {{ template "partials/users/password_fields.html" . }}
+                    {{ else }}
+                        <div class="field mt-4">
+                            <div class="control">
+                                <button type="button" class="button is-warning is-light"
+                                        hx-get="/users/password-fields"
+                                        hx-target="#password-section"
+                                        hx-swap="innerHTML">
+                                    <span class="icon">
+                                        <i class="fas fa-key"></i>
+                                    </span>
+                                    <span>Reset Password</span>
+                                </button>
                             </div>
                         </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Confirm Password</label>
-                            <div class="control has-icons-left">
-                                <input class="input" type="password" name="confirm_password" placeholder="••••••••"
-                                    required minlength="8">
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-lock"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                    {{ end }}
                 </div>
-                {{ end }}
 
                 <div class="field is-grouped is-grouped-right mt-5">
                     <div class="control">

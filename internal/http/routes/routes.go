@@ -55,6 +55,7 @@ func RegisterRoutes(r *gin.Engine, vcHandler *web.VehicleColorHandler, vmHandler
 	{
 		userGroup.GET("", userHandler.List)
 		userGroup.GET("/new", userHandler.CreateForm)
+		userGroup.GET("/password-fields", userHandler.PasswordFields)
 		userGroup.POST("", userHandler.Create)
 		userGroup.GET("/:email/edit", userHandler.EditForm)
 		userGroup.GET("/:email/view", userHandler.View)

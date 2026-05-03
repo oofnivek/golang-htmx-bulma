@@ -115,6 +115,10 @@ func (h *UserHandler) EditForm(c *gin.Context) {
 	})
 }
 
+func (h *UserHandler) PasswordFields(c *gin.Context) {
+	c.HTML(http.StatusOK, "partials/users/password_fields.html", nil)
+}
+
 func (h *UserHandler) View(c *gin.Context) {
 	email := c.Param("email")
 	tz := c.DefaultQuery("tz", "UTC")
@@ -148,6 +152,8 @@ func (h *UserHandler) Update(c *gin.Context) {
 		Department:  c.PostForm("department"),
 		IsEnabled:   isEnabled,
 		RoleID:      c.PostForm("role_id"),
+		Password:    c.PostForm("password"),
+		ConfirmPass: c.PostForm("confirm_password"),
 	}
 
 	err := h.userSvc.UpdateUser(user)

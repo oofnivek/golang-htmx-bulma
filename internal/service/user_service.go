@@ -73,6 +73,18 @@ func (s *userService) CreateUser(u *model.User) error {
 }
 
 func (s *userService) UpdateUser(u *model.User) error {
+	if u.Password != "" {
+		if u.Password != u.ConfirmPass {
+			return fmt.Errorf("passwords do not match")
+		}
+
+		hash, err := crypto.HashPasswordV3(u.Password, 100000)
+		if err != nil {
+			return err
+		}
+		u.PasswordHash = hash
+	}
+
 	u.UpdatedAt = time.Now().UTC()
 	return s.repo.Update(u)
 }
