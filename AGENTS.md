@@ -116,7 +116,7 @@ Structure rules:
   - The number of rows per page must be customizable by the user.
   - Every column must be sortable (ascending/descending), except for the "Actions" column.
   - Sorting and pagination state (including timezone) must be preserved across interactions using HTMX.
-  - **Searching**: Searching must NOT be auto-triggered on every keyup. It must only be triggered when the user clicks the search button or presses the Enter key. Searching must only trigger if the search term is at least 2 characters long or is empty (to clear the search).
+  - **Searching**: Searching must NOT be auto-triggered on every keyup. It must only be triggered when the user clicks the search button. Searching via the Enter key must be disabled. The search button must be disabled when the search term is exactly 1 character long, and enabled when it is 0 characters (to reset) or 2+ characters long.
 
 ## Auth conventions
 - Auth is enforced through Gin middleware and route groups, not by folder names.
