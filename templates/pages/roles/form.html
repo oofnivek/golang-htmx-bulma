@@ -1,0 +1,36 @@
+{{ define "content" }}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box">
+            <h1 class="title">{{ .title }}</h1>
+            <form action="{{ .action }}" method="POST">
+                <div class="field">
+                    <label class="label">ID</label>
+                    <div class="control">
+                        <input class="input" type="text" name="id" placeholder="Role ID (e.g. ADMIN)" value="{{ if .role }}{{ .role.ID }}{{ end }}" {{ if .role }}readonly{{ else }}required autofocus{{ end }}>
+                    </div>
+                    {{ if not .role }}
+                    <p class="help">Max 10 characters.</p>
+                    {{ end }}
+                </div>
+
+                <div class="field">
+                    <label class="label">Name</label>
+                    <div class="control">
+                        <input class="input" type="text" name="name" placeholder="Role Name" value="{{ if .role }}{{ .role.Name }}{{ end }}" required {{ if .role }}autofocus{{ end }}>
+                    </div>
+                </div>
+
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button type="submit" class="button is-link">Save</button>
+                    </div>
+                    <div class="control">
+                        <a href="/roles" class="button is-link is-light">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}

@@ -1,0 +1,16 @@
+{{ define "roles/table_row.html" }}
+<tr id="role-row-{{ .ID }}">
+    <td>{{ .ID }}</td>
+    <td>{{ .Name }}</td>
+    <td>
+        <div class="buttons are-small">
+            <a href="/roles/{{ .ID }}/edit" class="button is-info">Edit</a>
+            <button class="button is-danger" 
+                    hx-get="/roles/{{ .ID }}/delete" 
+                    hx-target="#modal-container">
+                Delete
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

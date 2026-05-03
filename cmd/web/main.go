@@ -19,12 +19,19 @@ func main() {
 	// Load config
 	cfg := config.Load()
 
-	// Initialize DB
-	database, err := db.InitDB(cfg.VehicleDBDSN)
+	// Initialize Vehicle DB
+	vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
 	if err != nil {
-		log.Fatalf("Failed to connect to MySQL: %v\n", err)
+		log.Fatalf("Failed to connect to Vehicle MySQL: %v\n", err)
 	}
-	defer database.Close()
+	defer vehicleDatabase.Close()
+
+	// Initialize User DB
+	userDatabase, err := db.InitDB(cfg.UserDBDSN)
+	if err != nil {
+		log.Fatalf("Failed to connect to User MySQL: %v\n", err)
+	}
+	defer userDatabase.Close()
 
 	// Initialize Gin
 	if cfg.AppEnv == "production" {
@@ -36,15 +43,19 @@ func main() {
 	r.HTMLRender = view.NewRenderer("templates")
 
 	// Register routes
-	vcRepo := repository.NewVehicleColorRepository(database)
+	vcRepo := repository.NewVehicleColorRepository(vehicleDatabase)
 	vcSvc := service.NewVehicleColorService(vcRepo)
 	vcHandler := web.NewVehicleColorHandler(vcSvc)
 
-	vmRepo := repository.NewVehicleMakeRepository(database)
+	vmRepo := repository.NewVehicleMakeRepository(vehicleDatabase)
 	vmSvc := service.NewVehicleMakeService(vmRepo)
 	vmHandler := web.NewVehicleMakeHandler(vmSvc)
 
-	routes.RegisterRoutes(r, vcHandler, vmHandler)
+	roleRepo := repository.NewRoleRepository(userDatabase)
+	roleSvc := service.NewRoleService(roleRepo)
+	roleHandler := web.NewRoleHandler(roleSvc)
+
+	routes.RegisterRoutes(r, vcHandler, vmHandler, roleHandler)
 
 	// Start server
 	log.Printf("Server starting on port %s in %s mode...\n", cfg.Port, cfg.AppEnv)

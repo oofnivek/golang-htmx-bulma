@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Port         string
 	VehicleDBDSN string
+	UserDBDSN    string
 	AppEnv       string
 }
 
@@ -22,6 +23,7 @@ func Load() *Config {
 	return &Config{
 		Port:         getEnv("PORT", "8080"),
 		VehicleDBDSN: getEnv("VEHICLE_DB_DSN", ""),
+		UserDBDSN:    getEnv("FMS_USER_DB_DSN", ""),
 		AppEnv:       getEnv("APP_ENV", "development"),
 	}
 }
