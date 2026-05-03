@@ -1,7 +1,29 @@
 {{ define "content" }}
 <div class="level">
     <div class="level-left">
-        <h1 class="title">Vehicle Makes</h1>
+        <h1 class="title mr-4">Vehicle Makes</h1>
+        <div class="field has-addons">
+            <p class="control">
+                <input class="input" type="text" name="search" placeholder="Search makes..." 
+                       value="{{ .search }}"
+                       hx-get="/vehicle-makes"
+                       hx-trigger="keyup[key=='Enter']"
+                       hx-include="[name='tz'],[name='pageSize'],[name='sortBy'],[name='sortOrder']"
+                       hx-target="body"
+                       hx-push-url="true">
+            </p>
+            <p class="control">
+                <button class="button is-info"
+                        hx-get="/vehicle-makes"
+                        hx-include="[name='search'],[name='tz'],[name='pageSize'],[name='sortBy'],[name='sortOrder']"
+                        hx-target="body"
+                        hx-push-url="true">
+                    <span class="icon is-small">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </button>
+            </p>
+        </div>
     </div>
     <div class="level-right">
         <div class="field has-addons mr-3">
@@ -12,7 +34,7 @@
                 <div class="select">
                     <select name="pageSize" 
                             hx-get="/vehicle-makes" 
-                            hx-include="[name='tz'],[name='sortBy'],[name='sortOrder']"
+                            hx-include="[name='tz'],[name='sortBy'],[name='sortOrder'],[name='search']"
                             hx-target="body" 
                             hx-push-url="true">
                         {{ $currentSize := .pageSize }}
@@ -31,7 +53,7 @@
                 <div class="select">
                     <select name="tz" 
                             hx-get="/vehicle-makes" 
-                            hx-include="[name='pageSize'],[name='sortBy'],[name='sortOrder']"
+                            hx-include="[name='pageSize'],[name='sortBy'],[name='sortOrder'],[name='search']"
                             hx-target="body" 
                             hx-push-url="true"
                             id="tz-select">
@@ -72,36 +94,37 @@
     <!-- Hidden inputs to preserve sort state in filters -->
     <input type="hidden" name="sortBy" value="{{ .sortBy }}">
     <input type="hidden" name="sortOrder" value="{{ .sortOrder }}">
+    <input type="hidden" name="search" value="{{ .search }}">
 
     <table class="table is-fullwidth is-striped">
         <thead>
             <tr>
                 <th>
-                    <a hx-get="/vehicle-makes?sortBy=id&sortOrder={{ if and (eq .sortBy "id") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}" 
+                    <a hx-get="/vehicle-makes?sortBy=id&sortOrder={{ if and (eq .sortBy "id") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&search={{ .search }}" 
                        hx-target="body" hx-push-url="true" class="has-text-dark">
                         ID {{ if eq .sortBy "id" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
                     </a>
                 </th>
                 <th>
-                    <a hx-get="/vehicle-makes?sortBy=name&sortOrder={{ if and (eq .sortBy "name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}" 
+                    <a hx-get="/vehicle-makes?sortBy=name&sortOrder={{ if and (eq .sortBy "name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&search={{ .search }}" 
                        hx-target="body" hx-push-url="true" class="has-text-dark">
                         Name {{ if eq .sortBy "name" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
                     </a>
                 </th>
                 <th>
-                    <a hx-get="/vehicle-makes?sortBy=status&sortOrder={{ if and (eq .sortBy "status") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}" 
+                    <a hx-get="/vehicle-makes?sortBy=status&sortOrder={{ if and (eq .sortBy "status") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&search={{ .search }}" 
                        hx-target="body" hx-push-url="true" class="has-text-dark">
                         Status {{ if eq .sortBy "status" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
                     </a>
                 </th>
                 <th>
-                    <a hx-get="/vehicle-makes?sortBy=updated_by&sortOrder={{ if and (eq .sortBy "updated_by") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}" 
+                    <a hx-get="/vehicle-makes?sortBy=updated_by&sortOrder={{ if and (eq .sortBy "updated_by") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&search={{ .search }}" 
                        hx-target="body" hx-push-url="true" class="has-text-dark">
                         Updated By {{ if eq .sortBy "updated_by" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
                     </a>
                 </th>
                 <th>
-                    <a hx-get="/vehicle-makes?sortBy=updated_at&sortOrder={{ if and (eq .sortBy "updated_at") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}" 
+                    <a hx-get="/vehicle-makes?sortBy=updated_at&sortOrder={{ if and (eq .sortBy "updated_at") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&search={{ .search }}" 
                        hx-target="body" hx-push-url="true" class="has-text-dark">
                         Updated At {{ if eq .sortBy "updated_at" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
                     </a>
@@ -122,7 +145,7 @@
     <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
         {{ if gt .currentPage 1 }}
         <a class="pagination-previous" 
-           hx-get="/vehicle-makes?page={{ sub .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}" 
+           hx-get="/vehicle-makes?page={{ sub .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}&search={{ .search }}" 
            hx-target="body" 
            hx-push-url="true">Previous</a>
         {{ else }}
@@ -131,7 +154,7 @@
         
         {{ if lt .currentPage .totalPages }}
         <a class="pagination-next" 
-           hx-get="/vehicle-makes?page={{ add .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}" 
+           hx-get="/vehicle-makes?page={{ add .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}&search={{ .search }}" 
            hx-target="body" 
            hx-push-url="true">Next page</a>
         {{ else }}
@@ -145,11 +168,12 @@
             {{ $size := .pageSize }}
             {{ $sortBy := .sortBy }}
             {{ $sortOrder := .sortOrder }}
+            {{ $search := .search }}
             
             {{ range $p := (seq 1 .totalPages) }}
             <li>
                 <a class="pagination-link {{ if eq $p $current }}is-current{{ end }}" 
-                   hx-get="/vehicle-makes?page={{ $p }}&tz={{ $tz }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}" 
+                   hx-get="/vehicle-makes?page={{ $p }}&tz={{ $tz }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}&search={{ $search }}" 
                    hx-target="body" 
                    hx-push-url="true"
                    aria-label="Goto page {{ $p }}">{{ $p }}</a>

@@ -27,8 +27,9 @@ func (h *VehicleMakeHandler) List(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 	sortBy := c.DefaultQuery("sortBy", "id")
 	sortOrder := c.DefaultQuery("sortOrder", "desc")
+	search := c.Query("search")
 
-	makes, total, err := h.svc.ListPaged(page, pageSize, sortBy, sortOrder)
+	makes, total, err := h.svc.ListPaged(page, pageSize, sortBy, sortOrder, search)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -51,6 +52,7 @@ func (h *VehicleMakeHandler) List(c *gin.Context) {
 		"total":           total,
 		"sortBy":          sortBy,
 		"sortOrder":       sortOrder,
+		"search":          search,
 	})
 }
 
