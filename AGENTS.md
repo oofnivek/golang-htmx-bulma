@@ -180,6 +180,8 @@ Structure rules:
 - Keep templates organized into layouts, pages, and partials.
 - Reuse partials for repeated UI such as forms, flash messages, table rows, and modals.
 - **Autofocus**: When creating "new", "edit", or "delete" (modal) views, always add the `autofocus` attribute to the first or most relevant input field to improve UX.
+- **Autofocus**: When creating "new", "edit", or "delete" (modal) views, always add the `autofocus` attribute to the first or most relevant input field to improve UX.
+- **Cancel Button**: Form pages ("new" and "edit") must include a "Cancel" button in the footer area (using `is-grouped-right` or `is-grouped`) that redirects back to the index page using HTMX.
 - **Action Buttons**: The "Actions" column in index tables must use icon-only buttons (FontAwesome) rather than text. Standard colors: `is-link is-light` for edit, `is-danger is-light` for delete. Use the `buttons are-small` container.
 - Keep conditional logic in templates minimal.
 - Format HTML clearly so partials are easy to update.

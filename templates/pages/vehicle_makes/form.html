@@ -2,8 +2,8 @@
 <div class="columns is-centered">
     <div class="column is-half">
         <div class="box">
-            <h1 class="title">{{ .title }}</h1>
-            <form action="{{ .action }}" method="POST">
+            <h1 class="title mb-5">{{ .title }}</h1>
+            <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
                 <div class="field">
                     <label class="label">Name</label>
                     <div class="control">
@@ -25,7 +25,7 @@
                         <button type="submit" class="button is-link">Save</button>
                     </div>
                     <div class="control">
-                        <a href="/vehicle-makes" class="button is-link is-light">Cancel</a>
+                        <button type="button" class="button is-link is-light" hx-get="/vehicle-makes" hx-target="body" hx-push-url="true">Cancel</button>
                     </div>
                 </div>
             </form>
