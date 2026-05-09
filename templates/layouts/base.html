@@ -28,6 +28,7 @@
     <section class="section">
         <div class="container is-fluid">
             <div class="columns">
+                {{ if not .hideSidebar }}
                 <aside class="column is-2">
                     <nav class="menu">
                         <p class="menu-label">General</p>
@@ -43,7 +44,8 @@
                         </ul>
                     </nav>
                 </aside>
-                <main class="column">
+                {{ end }}
+                <main class="column {{ if .hideSidebar }}is-4 is-offset-4{{ end }}">
                     {{ template "content" . }}
                 </main>
             </div>

@@ -7,12 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(r *gin.Engine, vcHandler *web.VehicleColorHandler, vmHandler *web.VehicleMakeHandler, roleHandler *web.RoleHandler, userHandler *web.UserHandler) {
+func RegisterRoutes(r *gin.Engine, vcHandler *web.VehicleColorHandler, vmHandler *web.VehicleMakeHandler, roleHandler *web.RoleHandler, userHandler *web.UserHandler, authHandler *web.AuthHandler) {
 	// Static files
 	r.Static("/static", "./static")
 
-	// Web routes
-	r.GET("/", web.HomeHandler)
+	// Auth & Web routes
+	r.GET("/", authHandler.LoginForm)
+	r.GET("/login", authHandler.LoginForm)
+	r.POST("/login", authHandler.Login)
+	r.GET("/logout", authHandler.Logout)
 
 	// Vehicle Colors
 	vcGroup := r.Group("/vehicle-colors")

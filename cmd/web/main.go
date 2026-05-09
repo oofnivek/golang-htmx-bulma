@@ -59,7 +59,13 @@ func main() {
 	userSvc := service.NewUserService(userRepo)
 	userHandler := web.NewUserHandler(userSvc, roleSvc)
 
-	routes.RegisterRoutes(r, vcHandler, vmHandler, roleHandler, userHandler)
+	if cfg.JWTSigningKey == "" {
+		log.Fatal("JWT_SIGNING_KEY environment variable is not set")
+	}
+	authSvc := service.NewAuthService(userSvc, cfg.JWTSigningKey)
+	authHandler := web.NewAuthHandler(authSvc)
+
+	routes.RegisterRoutes(r, vcHandler, vmHandler, roleHandler, userHandler, authHandler)
 
 	// Start server
 	log.Printf("Server starting on port %s in %s mode...\n", cfg.Port, cfg.AppEnv)
