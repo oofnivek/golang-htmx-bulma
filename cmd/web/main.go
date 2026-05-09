@@ -65,7 +65,7 @@ func main() {
 	authSvc := service.NewAuthService(userSvc, cfg.JWTSigningKey)
 	authHandler := web.NewAuthHandler(authSvc)
 
-	routes.RegisterRoutes(r, vcHandler, vmHandler, roleHandler, userHandler, authHandler)
+	routes.RegisterRoutes(r, vcHandler, vmHandler, roleHandler, userHandler, authHandler, cfg.JWTSigningKey)
 
 	// Start server
 	log.Printf("Server starting on port %s in %s mode...\n", cfg.Port, cfg.AppEnv)

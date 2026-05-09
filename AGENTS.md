@@ -120,6 +120,15 @@ Structure rules:
 
 ## Auth conventions
 - Auth is enforced through Gin middleware and route groups, not by folder names.
+- **JWT Implementation**:
+  - Use `github.com/golang-jwt/jwt/v5` for token management.
+  - Algorithm: **HS256**.
+  - Signing Key: Minimum **256 bits (32 bytes)** random key, stored as a 64-character hex string in `.env`.
+  - Claims: Standard claims (`sub`, `iss`, `iat`, `exp`, `jti`) plus custom claims (`email`, `role_id`, `first_name`, `last_name`).
+  - Storage: Store the JWT in an **HttpOnly** cookie named `jwt_token`.
+- **Middleware**:
+  - Protected routes must be wrapped in an `AuthMiddleware` group.
+  - The middleware must handle both standard redirects and **HTMX redirects** (using the `HX-Redirect` header) to ensure a seamless UI experience when a session expires.
 - Protected browser routes and protected HTMX routes must pass auth checks.
 - Protected API routes must pass auth checks.
 - Keep web handlers and API handlers separate when that improves clarity.
@@ -151,6 +160,8 @@ Structure rules:
 - Do not hardcode DSN, ports, secrets, or file paths.
 - Prefer environment variables or config files for:
   - VEHICLE_DB_DSN
+  - FMS_USER_DB_DSN
+  - JWT_SIGNING_KEY
   - server port
   - app environment
   - auth settings
