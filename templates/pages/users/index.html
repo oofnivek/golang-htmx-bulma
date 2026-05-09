@@ -42,6 +42,26 @@
                 </div>
             </div>
         </div>
+        <div class="field has-addons mr-3">
+            <div class="control">
+                <span class="button is-static">Timezone</span>
+            </div>
+            <div class="control">
+                <div class="select">
+                    <select name="tz" 
+                            hx-get="/users" 
+                            hx-include="[name='pageSize'],[name='sortBy'],[name='sortOrder'],[name='search']"
+                            hx-target="body" 
+                            hx-push-url="true"
+                            id="tz-select">
+                        {{ $currentTz := .timezone }}
+                        {{ range .timezones }}
+                            <option value="{{ . }}" {{ if eq . $currentTz }}selected{{ end }}>{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+            </div>
+        </div>
         <button class="button is-primary" hx-get="/users/new" hx-target="body" hx-push-url="true">
             <span class="icon">
                 <i class="fas fa-plus"></i>
@@ -50,6 +70,27 @@
         </button>
     </div>
 </div>
+
+<script>
+    // If no timezone is in the URL, try to detect and redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('tz')) {
+        const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const select = document.getElementById('tz-select');
+        // Check if the detected timezone is in our list
+        let found = false;
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === browserTz) {
+                found = true;
+                break;
+            }
+        }
+        
+        if (found) {
+            window.location.search = `?tz=${browserTz}`;
+        }
+    }
+</script>
 
 <div class="box p-0" style="overflow-x: auto;">
     <table class="table is-fullwidth is-hoverable is-striped mb-0">
@@ -132,7 +173,7 @@
                     <span class="tag is-danger">Disabled</span>
                     {{ end }}
                 </td>
-                <td>{{ in_timezone .UpdatedAt $.tz }}</td>
+                <td>{{ in_timezone .UpdatedAt $.timezone }}</td>
                 <td>
                     <div class="buttons are-small">
                         <button class="button is-info is-light" hx-get="/users/{{ .Email }}/view" hx-target="body" hx-push-url="true" hx-include="[name='tz']">
@@ -199,8 +240,4 @@
 </nav>
 {{ end }}
 
-<input type="hidden" name="tz" id="tz-input">
-<script>
-    document.getElementById('tz-input').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
-</script>
 {{ end }}

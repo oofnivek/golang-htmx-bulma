@@ -34,6 +34,9 @@ func (h *UserHandler) List(c *gin.Context) {
 		return
 	}
 
+	// Common timezones
+	timezones := []string{"UTC", "America/New_York", "America/Los_Angeles", "Europe/London", "Europe/Paris", "Asia/Tokyo", "Asia/Shanghai", "Asia/Singapore", "Australia/Sydney"}
+
 	totalPages := (total + pageSize - 1) / pageSize
 
 	c.HTML(http.StatusOK, "pages/users/index.html", gin.H{
@@ -47,7 +50,8 @@ func (h *UserHandler) List(c *gin.Context) {
 		"sortBy":          sortBy,
 		"sortOrder":       sortOrder,
 		"search":          search,
-		"tz":              tz,
+		"timezone":        tz,
+		"timezones":       timezones,
 	})
 }
 
