@@ -24,6 +24,15 @@ A full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
     # or
     go run ./cmd/web
     ```
+4.  **Generating Password Hashes (for Database Seeding)**:
+    To manually insert or update a user in your MySQL database with a compatible hashed password, you can use the built-in test helper:
+    - Open `internal/pkg/crypto/password_test.go` and set your desired plain password.
+    - Run the generator command:
+      ```bash
+      go test -v ./internal/pkg/crypto -run TestGenerateHash
+      ```
+    - Use the printed Base64 hash in your SQL insert or update query.
+
 
 ## Testing & Coverage
 
