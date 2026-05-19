@@ -167,6 +167,13 @@ Structure rules:
   - auth settings
   - session/security settings
 
+## Logging and Telemetry rules
+- **OpenTelemetry Standard**: All application logging must use OpenTelemetry standard logging via the OTel slog bridge.
+- **Structured JSON Logging**: Do not use `log.Printf`, `log.Println`, or `fmt.Printf` for application logging. All logging must use standard Go's structured logger `log/slog`.
+- **Vendor Neutrality**: Keep the codebase free from proprietary vendor SDKs (e.g. Datadog SDKs). Use OTel standard exporters to ship logs to OTel-compliant backends.
+- **Rich Context/Attributes**: Always include useful structured attributes as key-value pairs (e.g., `email`, `client_ip`, `error`) so they are indexed automatically as searchable facets in log backends.
+- **Secure Server Logs**: Use `slog.Error` to log actual database/system failures securely on the server-side, while returning safe, user-friendly error messages to the client.
+
 ## Code style
 - Write idiomatic Go.
 - **Language**: Always use US English for variable names, database fields, and UI text (e.g., "color" instead of "colour").

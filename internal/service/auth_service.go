@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -41,25 +42,31 @@ func (s *authService) Login(email, password string) (string, *model.User, error)
 	// 1. Get user by email
 	user, err := s.userSvc.GetByEmail(email)
 	if err != nil {
+		// Log the actual internal database/system error securely on the server
+		slog.Error("Database query failed during login", "email", email, "error", err.Error())
 		return "", nil, errors.New("invalid email or password")
 	}
 	if user == nil {
+		slog.Warn("Login failed: email not found", "email", email)
 		return "", nil, errors.New("invalid email or password")
 	}
 
 	// 2. Check if user is enabled
 	if !user.IsEnabled {
+		slog.Warn("Login failed: account is disabled", "email", email)
 		return "", nil, errors.New("account is disabled")
 	}
 
 	// 3. Verify password
 	if err := crypto.VerifyPasswordV3(password, user.PasswordHash); err != nil {
+		slog.Warn("Login failed: incorrect password", "email", email)
 		return "", nil, errors.New("invalid email or password")
 	}
 
 	// 4. Generate JWT ID
 	jti, err := generateJTI()
 	if err != nil {
+		slog.Error("Failed to generate token ID during login", "email", email, "error", err.Error())
 		return "", nil, fmt.Errorf("failed to generate token id: %w", err)
 	}
 
@@ -83,6 +90,7 @@ func (s *authService) Login(email, password string) (string, *model.User, error)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString(s.signingKey)
 	if err != nil {
+		slog.Error("Failed to sign token during login", "email", email, "error", err.Error())
 		return "", nil, fmt.Errorf("failed to sign token: %w", err)
 	}
 

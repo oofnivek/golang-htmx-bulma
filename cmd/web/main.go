@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -10,6 +11,7 @@ import (
 	"golang-htmx-bulma/internal/http/routes"
 	"golang-htmx-bulma/internal/repository"
 	"golang-htmx-bulma/internal/service"
+	"golang-htmx-bulma/internal/telemetry"
 	"golang-htmx-bulma/internal/view"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +20,18 @@ import (
 func main() {
 	// Load config
 	cfg := config.Load()
+
+	// Initialize OpenTelemetry Logging
+	ctx := context.Background()
+	logProvider, err := telemetry.InitLogger(ctx, "fleet-management-system", cfg.AppEnv)
+	if err != nil {
+		log.Fatalf("Failed to initialize OpenTelemetry logging: %v\n", err)
+	}
+	defer func() {
+		if err := logProvider.Shutdown(ctx); err != nil {
+			log.Printf("Error shutting down OpenTelemetry logger provider: %v\n", err)
+		}
+	}()
 
 	// Initialize Vehicle DB
 	vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)

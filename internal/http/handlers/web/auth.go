@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	token, _, err := h.authSvc.Login(email, password)
 	if err != nil {
+		// Log the failed login attempt using structured OpenTelemetry logging via slog.
+		slog.Warn("Unsuccessful sign-in attempt",
+			"email", email,
+			"client_ip", c.ClientIP(),
+			"error", err.Error(),
+		)
+
 		c.HTML(http.StatusUnauthorized, "pages/index.html", gin.H{
 			"title":       "Sign In",
 			"hideSidebar": true,
