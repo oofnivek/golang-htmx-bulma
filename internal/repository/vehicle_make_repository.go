@@ -7,8 +7,8 @@ import (
 
 type VehicleMakeRepository interface {
 	GetAll() ([]model.VehicleMake, error)
-	GetPaged(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleMake, error)
-	Count(search string) (int, error)
+	GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error)
+	Count() (int, error)
 	GetByID(id int64) (*model.VehicleMake, error)
 	Create(make *model.VehicleMake) error
 	Update(make *model.VehicleMake) error
@@ -42,7 +42,7 @@ func (r *mysqlVehicleMakeRepository) GetAll() ([]model.VehicleMake, error) {
 	return makes, nil
 }
 
-func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleMake, error) {
+func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
 	// Whitelist sorting columns to prevent SQL injection
 	validColumns := map[string]bool{
 		"id":         true,
@@ -58,18 +58,8 @@ func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrd
 		sortOrder = "desc"
 	}
 
-	query := "SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make"
-	var args []interface{}
-
-	if len(search) >= 2 {
-		query += " WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE)"
-		args = append(args, search)
-	}
-
-	query += " ORDER BY " + sortBy + " " + sortOrder + " LIMIT ? OFFSET ?"
-	args = append(args, limit, offset)
-
-	rows, err := r.db.Query(query, args...)
+	query := "SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY " + sortBy + " " + sortOrder + " LIMIT ? OFFSET ?"
+	rows, err := r.db.Query(query, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -87,16 +77,9 @@ func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrd
 	return makes, nil
 }
 
-func (r *mysqlVehicleMakeRepository) Count(search string) (int, error) {
-	query := "SELECT COUNT(*) FROM vehicle_make"
-	var args []interface{}
-	if len(search) >= 2 {
-		query += " WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE)"
-		args = append(args, search)
-	}
-
+func (r *mysqlVehicleMakeRepository) Count() (int, error) {
 	var count int
-	err := r.db.QueryRow(query, args...).Scan(&count)
+	err := r.db.QueryRow("SELECT COUNT(*) FROM vehicle_make").Scan(&count)
 	return count, err
 }
 

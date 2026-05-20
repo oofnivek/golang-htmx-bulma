@@ -6,8 +6,8 @@ import (
 
 type MockVehicleMakeRepository struct {
 	GetAllFn   func() ([]model.VehicleMake, error)
-	GetPagedFn func(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleMake, error)
-	CountFn    func(search string) (int, error)
+	GetPagedFn func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error)
+	CountFn    func() (int, error)
 	GetByIDFn  func(id int64) (*model.VehicleMake, error)
 	CreateFn   func(make *model.VehicleMake) error
 	UpdateFn   func(make *model.VehicleMake) error
@@ -18,12 +18,12 @@ func (m *MockVehicleMakeRepository) GetAll() ([]model.VehicleMake, error) {
 	return m.GetAllFn()
 }
 
-func (m *MockVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrder, search string) ([]model.VehicleMake, error) {
-	return m.GetPagedFn(limit, offset, sortBy, sortOrder, search)
+func (m *MockVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+	return m.GetPagedFn(limit, offset, sortBy, sortOrder)
 }
 
-func (m *MockVehicleMakeRepository) Count(search string) (int, error) {
-	return m.CountFn(search)
+func (m *MockVehicleMakeRepository) Count() (int, error) {
+	return m.CountFn()
 }
 
 func (m *MockVehicleMakeRepository) GetByID(id int64) (*model.VehicleMake, error) {
