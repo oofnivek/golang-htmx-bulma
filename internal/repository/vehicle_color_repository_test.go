@@ -254,43 +254,12 @@ func TestGetPaged(t *testing.T) {
 			WithArgs(10, 0).
 			WillReturnRows(rows)
 
-		colors, err := repo.GetPaged(10, 0, "id", "desc", "")
+		colors, err := repo.GetPaged(10, 0, "id", "desc")
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
 		if len(colors) != 1 {
 			t.Errorf("Expected 1 color, got %d", len(colors))
-		}
-	})
-
-	t.Run("SuccessWithSearch", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at"}).
-			AddRow(1, "Yellow", true, "user1", now, "user2", now)
-
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE) ORDER BY name asc LIMIT ? OFFSET ?")).
-			WithArgs("low", 5, 0).
-			WillReturnRows(rows)
-
-		colors, err := repo.GetPaged(5, 0, "name", "asc", "low")
-		if err != nil {
-			t.Errorf("Unexpected error: %v", err)
-		}
-		if len(colors) != 1 || colors[0].Name != "Yellow" {
-			t.Errorf("Expected 'Yellow', got %v", colors)
-		}
-	})
-
-	t.Run("SuccessShortSearch", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at"}).
-			AddRow(1, "Red", true, "user1", now, "user2", now)
-
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_color ORDER BY id desc LIMIT ? OFFSET ?")).
-			WithArgs(10, 0).
-			WillReturnRows(rows)
-
-		_, err := repo.GetPaged(10, 0, "id", "desc", "a")
-		if err != nil {
-			t.Errorf("Unexpected error: %v", err)
 		}
 	})
 
@@ -300,7 +269,7 @@ func TestGetPaged(t *testing.T) {
 			WithArgs(10, 0).
 			WillReturnRows(sqlmock.NewRows([]string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at"}))
 
-		_, err := repo.GetPaged(10, 0, "invalid", "desc", "")
+		_, err := repo.GetPaged(10, 0, "invalid", "desc")
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -312,7 +281,7 @@ func TestGetPaged(t *testing.T) {
 			WithArgs(10, 0).
 			WillReturnRows(sqlmock.NewRows([]string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at"}))
 
-		_, err := repo.GetPaged(10, 0, "id", "invalid", "")
+		_, err := repo.GetPaged(10, 0, "id", "invalid")
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -326,7 +295,7 @@ func TestGetPaged(t *testing.T) {
 			WithArgs(10, 0).
 			WillReturnRows(rows)
 
-		_, err := repo.GetPaged(10, 0, "id", "desc", "")
+		_, err := repo.GetPaged(10, 0, "id", "desc")
 		if err == nil {
 			t.Error("Expected scan error, got nil")
 		}
@@ -335,7 +304,7 @@ func TestGetPaged(t *testing.T) {
 	t.Run("QueryError", func(t *testing.T) {
 		mock.ExpectQuery("SELECT").WillReturnError(errors.New("db error"))
 
-		_, err := repo.GetPaged(10, 0, "id", "desc", "")
+		_, err := repo.GetPaged(10, 0, "id", "desc")
 		if err == nil {
 			t.Error("Expected error, got nil")
 		}
@@ -355,7 +324,7 @@ func TestCount(t *testing.T) {
 		mock.ExpectQuery(regexp.QuoteMeta("SELECT COUNT(*) FROM vehicle_color")).
 			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(10))
 
-		count, err := repo.Count("")
+		count, err := repo.Count()
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -364,24 +333,10 @@ func TestCount(t *testing.T) {
 		}
 	})
 
-	t.Run("SuccessWithSearch", func(t *testing.T) {
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT COUNT(*) FROM vehicle_color WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE)")).
-			WithArgs("blue").
-			WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(2))
-
-		count, err := repo.Count("blue")
-		if err != nil {
-			t.Errorf("Unexpected error: %v", err)
-		}
-		if count != 2 {
-			t.Errorf("Expected count 2, got %d", count)
-		}
-	})
-
 	t.Run("DBError", func(t *testing.T) {
 		mock.ExpectQuery("SELECT COUNT").WillReturnError(errors.New("db error"))
 
-		_, err := repo.Count("")
+		_, err := repo.Count()
 		if err == nil {
 			t.Error("Expected error, got nil")
 		}
