@@ -1,33 +1,31 @@
-package service
+package vehicle
 
 import (
-	"golang-htmx-bulma/internal/model"
-	"golang-htmx-bulma/internal/repository"
 	"time"
 )
 
 type VehicleMakeService interface {
-	ListAll() ([]model.VehicleMake, error)
-	ListPaged(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleMake, int, error)
-	FindByID(id int64) (*model.VehicleMake, error)
-	CreateMake(name string, status bool, user string) (*model.VehicleMake, error)
-	UpdateMake(id int64, name string, status bool, user string) (*model.VehicleMake, error)
+	ListAll() ([]VehicleMake, error)
+	ListPaged(page, pageSize int, sortBy, sortOrder string) ([]VehicleMake, int, error)
+	FindByID(id int64) (*VehicleMake, error)
+	CreateMake(name string, status bool, user string) (*VehicleMake, error)
+	UpdateMake(id int64, name string, status bool, user string) (*VehicleMake, error)
 	DeleteMake(id int64) error
 }
 
 type vehicleMakeService struct {
-	repo repository.VehicleMakeRepository
+	repo VehicleMakeRepository
 }
 
-func NewVehicleMakeService(repo repository.VehicleMakeRepository) VehicleMakeService {
+func NewVehicleMakeService(repo VehicleMakeRepository) VehicleMakeService {
 	return &vehicleMakeService{repo: repo}
 }
 
-func (s *vehicleMakeService) ListAll() ([]model.VehicleMake, error) {
+func (s *vehicleMakeService) ListAll() ([]VehicleMake, error) {
 	return s.repo.GetAll()
 }
 
-func (s *vehicleMakeService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleMake, int, error) {
+func (s *vehicleMakeService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]VehicleMake, int, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -49,13 +47,13 @@ func (s *vehicleMakeService) ListPaged(page, pageSize int, sortBy, sortOrder str
 	return makes, total, nil
 }
 
-func (s *vehicleMakeService) FindByID(id int64) (*model.VehicleMake, error) {
+func (s *vehicleMakeService) FindByID(id int64) (*VehicleMake, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *vehicleMakeService) CreateMake(name string, status bool, user string) (*model.VehicleMake, error) {
+func (s *vehicleMakeService) CreateMake(name string, status bool, user string) (*VehicleMake, error) {
 	now := time.Now()
-	make := &model.VehicleMake{
+	make := &VehicleMake{
 		Name:      name,
 		Status:    status,
 		CreatedBy: user,
@@ -70,7 +68,7 @@ func (s *vehicleMakeService) CreateMake(name string, status bool, user string) (
 	return make, nil
 }
 
-func (s *vehicleMakeService) UpdateMake(id int64, name string, status bool, user string) (*model.VehicleMake, error) {
+func (s *vehicleMakeService) UpdateMake(id int64, name string, status bool, user string) (*VehicleMake, error) {
 	make, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err

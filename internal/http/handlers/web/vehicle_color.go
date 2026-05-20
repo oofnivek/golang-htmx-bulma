@@ -4,16 +4,16 @@ import (
 	"net/http"
 	"strconv"
 
-	"golang-htmx-bulma/internal/service"
+	"golang-htmx-bulma/internal/vehicle"
 
 	"github.com/gin-gonic/gin"
 )
 
 type VehicleColorHandler struct {
-	svc service.VehicleColorService
+	svc vehicle.VehicleColorService
 }
 
-func NewVehicleColorHandler(svc service.VehicleColorService) *VehicleColorHandler {
+func NewVehicleColorHandler(svc vehicle.VehicleColorService) *VehicleColorHandler {
 	return &VehicleColorHandler{svc: svc}
 }
 

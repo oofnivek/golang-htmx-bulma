@@ -1,14 +1,13 @@
-package service
+package vehicle
 
 import (
 	"errors"
-	"golang-htmx-bulma/internal/model"
 	"testing"
 )
 
 func TestCreateColor(t *testing.T) {
 	mockRepo := &MockVehicleColorRepository{
-		CreateFn: func(color *model.VehicleColor) error {
+		CreateFn: func(color *VehicleColor) error {
 			color.ID = 1
 			return nil
 		},
@@ -33,9 +32,9 @@ func TestCreateColor(t *testing.T) {
 
 func TestFindByID(t *testing.T) {
 	mockRepo := &MockVehicleColorRepository{
-		GetByIDFn: func(id int64) (*model.VehicleColor, error) {
+		GetByIDFn: func(id int64) (*VehicleColor, error) {
 			if id == 1 {
-				return &model.VehicleColor{ID: 1, Name: "Blue"}, nil
+				return &VehicleColor{ID: 1, Name: "Blue"}, nil
 			}
 			return nil, nil
 		},
@@ -66,8 +65,8 @@ func TestFindByID(t *testing.T) {
 
 func TestListAll(t *testing.T) {
 	mockRepo := &MockVehicleColorRepository{
-		GetAllFn: func() ([]model.VehicleColor, error) {
-			return []model.VehicleColor{
+		GetAllFn: func() ([]VehicleColor, error) {
+			return []VehicleColor{
 				{ID: 1, Name: "Red"},
 				{ID: 2, Name: "Blue"},
 			}, nil
@@ -88,13 +87,13 @@ func TestListAll(t *testing.T) {
 
 func TestUpdateColor(t *testing.T) {
 	mockRepo := &MockVehicleColorRepository{
-		GetByIDFn: func(id int64) (*model.VehicleColor, error) {
+		GetByIDFn: func(id int64) (*VehicleColor, error) {
 			if id == 1 {
-				return &model.VehicleColor{ID: 1, Name: "Old Name"}, nil
+				return &VehicleColor{ID: 1, Name: "Old Name"}, nil
 			}
 			return nil, nil
 		},
-		UpdateFn: func(color *model.VehicleColor) error {
+		UpdateFn: func(color *VehicleColor) error {
 			return nil
 		},
 	}
@@ -139,16 +138,16 @@ func TestDeleteColor(t *testing.T) {
 
 func TestServiceErrors(t *testing.T) {
 	errRepo := &MockVehicleColorRepository{
-		GetAllFn: func() ([]model.VehicleColor, error) {
+		GetAllFn: func() ([]VehicleColor, error) {
 			return nil, errors.New("db error")
 		},
-		CreateFn: func(color *model.VehicleColor) error {
+		CreateFn: func(color *VehicleColor) error {
 			return errors.New("db error")
 		},
-		UpdateFn: func(color *model.VehicleColor) error {
+		UpdateFn: func(color *VehicleColor) error {
 			return errors.New("db error")
 		},
-		GetByIDFn: func(id int64) (*model.VehicleColor, error) {
+		GetByIDFn: func(id int64) (*VehicleColor, error) {
 			return nil, errors.New("db error")
 		},
 		DeleteFn: func(id int64) error {
@@ -189,10 +188,10 @@ func TestServiceErrors(t *testing.T) {
 	t.Run("UpdateColorExecError", func(t *testing.T) {
 		// Mock where GetByID succeeds but Update fails
 		failRepo := &MockVehicleColorRepository{
-			GetByIDFn: func(id int64) (*model.VehicleColor, error) {
-				return &model.VehicleColor{ID: 1}, nil
+			GetByIDFn: func(id int64) (*VehicleColor, error) {
+				return &VehicleColor{ID: 1}, nil
 			},
-			UpdateFn: func(color *model.VehicleColor) error {
+			UpdateFn: func(color *VehicleColor) error {
 				return errors.New("update failed")
 			},
 		}
@@ -206,8 +205,8 @@ func TestServiceErrors(t *testing.T) {
 
 func TestListPaged(t *testing.T) {
 	mockRepo := &MockVehicleColorRepository{
-		GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleColor, error) {
-			return []model.VehicleColor{{ID: 1, Name: "Red"}}, nil
+		GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]VehicleColor, error) {
+			return []VehicleColor{{ID: 1, Name: "Red"}}, nil
 		},
 		CountFn: func() (int, error) {
 			return 1, nil
@@ -239,7 +238,7 @@ func TestListPaged(t *testing.T) {
 
 	t.Run("RepoError", func(t *testing.T) {
 		failRepo := &MockVehicleColorRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleColor, error) {
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]VehicleColor, error) {
 				return nil, errors.New("fail")
 			},
 		}
@@ -252,8 +251,8 @@ func TestListPaged(t *testing.T) {
 
 	t.Run("CountError", func(t *testing.T) {
 		failRepo := &MockVehicleColorRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleColor, error) {
-				return []model.VehicleColor{}, nil
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]VehicleColor, error) {
+				return []VehicleColor{}, nil
 			},
 			CountFn: func() (int, error) {
 				return 0, errors.New("fail")

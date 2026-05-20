@@ -1,33 +1,31 @@
-package service
+package vehicle
 
 import (
-	"golang-htmx-bulma/internal/model"
-	"golang-htmx-bulma/internal/repository"
 	"time"
 )
 
 type VehicleColorService interface {
-	ListAll() ([]model.VehicleColor, error)
-	ListPaged(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleColor, int, error)
-	FindByID(id int64) (*model.VehicleColor, error)
-	CreateColor(name string, status bool, user string) (*model.VehicleColor, error)
-	UpdateColor(id int64, name string, status bool, user string) (*model.VehicleColor, error)
+	ListAll() ([]VehicleColor, error)
+	ListPaged(page, pageSize int, sortBy, sortOrder string) ([]VehicleColor, int, error)
+	FindByID(id int64) (*VehicleColor, error)
+	CreateColor(name string, status bool, user string) (*VehicleColor, error)
+	UpdateColor(id int64, name string, status bool, user string) (*VehicleColor, error)
 	DeleteColor(id int64) error
 }
 
 type vehicleColorService struct {
-	repo repository.VehicleColorRepository
+	repo VehicleColorRepository
 }
 
-func NewVehicleColorService(repo repository.VehicleColorRepository) VehicleColorService {
+func NewVehicleColorService(repo VehicleColorRepository) VehicleColorService {
 	return &vehicleColorService{repo: repo}
 }
 
-func (s *vehicleColorService) ListAll() ([]model.VehicleColor, error) {
+func (s *vehicleColorService) ListAll() ([]VehicleColor, error) {
 	return s.repo.GetAll()
 }
 
-func (s *vehicleColorService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleColor, int, error) {
+func (s *vehicleColorService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]VehicleColor, int, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -49,13 +47,13 @@ func (s *vehicleColorService) ListPaged(page, pageSize int, sortBy, sortOrder st
 	return colors, total, nil
 }
 
-func (s *vehicleColorService) FindByID(id int64) (*model.VehicleColor, error) {
+func (s *vehicleColorService) FindByID(id int64) (*VehicleColor, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *vehicleColorService) CreateColor(name string, status bool, user string) (*model.VehicleColor, error) {
+func (s *vehicleColorService) CreateColor(name string, status bool, user string) (*VehicleColor, error) {
 	now := time.Now()
-	color := &model.VehicleColor{
+	color := &VehicleColor{
 		Name:      name,
 		Status:    status,
 		CreatedBy: user,
@@ -70,7 +68,7 @@ func (s *vehicleColorService) CreateColor(name string, status bool, user string)
 	return color, nil
 }
 
-func (s *vehicleColorService) UpdateColor(id int64, name string, status bool, user string) (*model.VehicleColor, error) {
+func (s *vehicleColorService) UpdateColor(id int64, name string, status bool, user string) (*VehicleColor, error) {
 	color, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err

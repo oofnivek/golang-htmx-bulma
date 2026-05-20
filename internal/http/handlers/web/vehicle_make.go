@@ -4,16 +4,16 @@ import (
 	"net/http"
 	"strconv"
 
-	"golang-htmx-bulma/internal/service"
+	"golang-htmx-bulma/internal/vehicle"
 
 	"github.com/gin-gonic/gin"
 )
 
 type VehicleMakeHandler struct {
-	svc service.VehicleMakeService
+	svc vehicle.VehicleMakeService
 }
 
-func NewVehicleMakeHandler(svc service.VehicleMakeService) *VehicleMakeHandler {
+func NewVehicleMakeHandler(svc vehicle.VehicleMakeService) *VehicleMakeHandler {
 	return &VehicleMakeHandler{svc: svc}
 }
 

@@ -12,6 +12,7 @@ import (
 	"golang-htmx-bulma/internal/repository"
 	"golang-htmx-bulma/internal/service"
 	"golang-htmx-bulma/internal/telemetry"
+	"golang-htmx-bulma/internal/vehicle"
 	"golang-htmx-bulma/internal/view"
 
 	"github.com/gin-gonic/gin"
@@ -57,12 +58,12 @@ func main() {
 	r.HTMLRender = view.NewRenderer("templates")
 
 	// Register routes
-	vcRepo := repository.NewVehicleColorRepository(vehicleDatabase)
-	vcSvc := service.NewVehicleColorService(vcRepo)
+	vcRepo := vehicle.NewVehicleColorRepository(vehicleDatabase)
+	vcSvc := vehicle.NewVehicleColorService(vcRepo)
 	vcHandler := web.NewVehicleColorHandler(vcSvc)
 
-	vmRepo := repository.NewVehicleMakeRepository(vehicleDatabase)
-	vmSvc := service.NewVehicleMakeService(vmRepo)
+	vmRepo := vehicle.NewVehicleMakeRepository(vehicleDatabase)
+	vmSvc := vehicle.NewVehicleMakeService(vmRepo)
 	vmHandler := web.NewVehicleMakeHandler(vmSvc)
 
 	roleRepo := repository.NewRoleRepository(userDatabase)

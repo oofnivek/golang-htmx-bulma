@@ -187,7 +187,11 @@ Structure rules:
 - Avoid global mutable state unless clearly justified.
 - Prefer composition over unnecessary abstraction.
 
-## Package design rules
+## Package design rules and Modular Monolith Boundaries
+- **Encapsulated Domain Packages**: Group related domain features (e.g., models, repositories, and services) into self-contained packages under `internal/` (such as `internal/vehicle`).
+- **Strict Boundary Check / Warnings**:
+  - The AI MUST actively warn the user if they attempt to put new or existing domain files in the wrong service package, or if they import/leak private package details across boundaries.
+  - The AI MUST verify imports and refuse or warn when domain-specific models/logic bypass the public interface of a domain package.
 - Do not create deep package nesting without a clear reason.
 - Do not create generic utility packages too early.
 - Prefer domain- or feature-oriented packages over vague shared helpers when the project grows.

@@ -1,14 +1,13 @@
-package service
+package vehicle
 
 import (
 	"errors"
-	"golang-htmx-bulma/internal/model"
 	"testing"
 )
 
 func TestCreateMake(t *testing.T) {
 	mockRepo := &MockVehicleMakeRepository{
-		CreateFn: func(make *model.VehicleMake) error {
+		CreateFn: func(make *VehicleMake) error {
 			make.ID = 1
 			return nil
 		},
@@ -37,9 +36,9 @@ func TestCreateMake(t *testing.T) {
 
 func TestFindByIDMake(t *testing.T) {
 	mockRepo := &MockVehicleMakeRepository{
-		GetByIDFn: func(id int64) (*model.VehicleMake, error) {
+		GetByIDFn: func(id int64) (*VehicleMake, error) {
 			if id == 1 {
-				return &model.VehicleMake{ID: 1, Name: "Honda"}, nil
+				return &VehicleMake{ID: 1, Name: "Honda"}, nil
 			}
 			return nil, nil
 		},
@@ -70,8 +69,8 @@ func TestFindByIDMake(t *testing.T) {
 
 func TestListAllMake(t *testing.T) {
 	mockRepo := &MockVehicleMakeRepository{
-		GetAllFn: func() ([]model.VehicleMake, error) {
-			return []model.VehicleMake{
+		GetAllFn: func() ([]VehicleMake, error) {
+			return []VehicleMake{
 				{ID: 1, Name: "Toyota"},
 				{ID: 2, Name: "Honda"},
 			}, nil
@@ -92,13 +91,13 @@ func TestListAllMake(t *testing.T) {
 
 func TestUpdateMake(t *testing.T) {
 	mockRepo := &MockVehicleMakeRepository{
-		GetByIDFn: func(id int64) (*model.VehicleMake, error) {
+		GetByIDFn: func(id int64) (*VehicleMake, error) {
 			if id == 1 {
-				return &model.VehicleMake{ID: 1, Name: "Old Name"}, nil
+				return &VehicleMake{ID: 1, Name: "Old Name"}, nil
 			}
 			return nil, nil
 		},
-		UpdateFn: func(make *model.VehicleMake) error {
+		UpdateFn: func(make *VehicleMake) error {
 			return nil
 		},
 	}
@@ -143,16 +142,16 @@ func TestDeleteMake(t *testing.T) {
 
 func TestServiceErrorsMake(t *testing.T) {
 	errRepo := &MockVehicleMakeRepository{
-		GetAllFn: func() ([]model.VehicleMake, error) {
+		GetAllFn: func() ([]VehicleMake, error) {
 			return nil, errors.New("db error")
 		},
-		CreateFn: func(make *model.VehicleMake) error {
+		CreateFn: func(make *VehicleMake) error {
 			return errors.New("db error")
 		},
-		UpdateFn: func(make *model.VehicleMake) error {
+		UpdateFn: func(make *VehicleMake) error {
 			return errors.New("db error")
 		},
-		GetByIDFn: func(id int64) (*model.VehicleMake, error) {
+		GetByIDFn: func(id int64) (*VehicleMake, error) {
 			return nil, errors.New("db error")
 		},
 		DeleteFn: func(id int64) error {
@@ -193,10 +192,10 @@ func TestServiceErrorsMake(t *testing.T) {
 	t.Run("UpdateMakeExecError", func(t *testing.T) {
 		// Mock where GetByID succeeds but Update fails
 		failRepo := &MockVehicleMakeRepository{
-			GetByIDFn: func(id int64) (*model.VehicleMake, error) {
-				return &model.VehicleMake{ID: 1}, nil
+			GetByIDFn: func(id int64) (*VehicleMake, error) {
+				return &VehicleMake{ID: 1}, nil
 			},
-			UpdateFn: func(make *model.VehicleMake) error {
+			UpdateFn: func(make *VehicleMake) error {
 				return errors.New("update failed")
 			},
 		}
@@ -210,8 +209,8 @@ func TestServiceErrorsMake(t *testing.T) {
 
 func TestListPagedMake(t *testing.T) {
 	mockRepo := &MockVehicleMakeRepository{
-		GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
-			return []model.VehicleMake{{ID: 1, Name: "Toyota"}}, nil
+		GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]VehicleMake, error) {
+			return []VehicleMake{{ID: 1, Name: "Toyota"}}, nil
 		},
 		CountFn: func() (int, error) {
 			return 1, nil
@@ -243,7 +242,7 @@ func TestListPagedMake(t *testing.T) {
 
 	t.Run("RepoError", func(t *testing.T) {
 		failRepo := &MockVehicleMakeRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]VehicleMake, error) {
 				return nil, errors.New("fail")
 			},
 		}
@@ -256,8 +255,8 @@ func TestListPagedMake(t *testing.T) {
 
 	t.Run("CountError", func(t *testing.T) {
 		failRepo := &MockVehicleMakeRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
-				return []model.VehicleMake{}, nil
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]VehicleMake, error) {
+				return []VehicleMake{}, nil
 			},
 			CountFn: func() (int, error) {
 				return 0, errors.New("fail")

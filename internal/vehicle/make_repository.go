@@ -1,17 +1,16 @@
-package repository
+package vehicle
 
 import (
 	"database/sql"
-	"golang-htmx-bulma/internal/model"
 )
 
 type VehicleMakeRepository interface {
-	GetAll() ([]model.VehicleMake, error)
-	GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error)
+	GetAll() ([]VehicleMake, error)
+	GetPaged(limit, offset int, sortBy, sortOrder string) ([]VehicleMake, error)
 	Count() (int, error)
-	GetByID(id int64) (*model.VehicleMake, error)
-	Create(make *model.VehicleMake) error
-	Update(make *model.VehicleMake) error
+	GetByID(id int64) (*VehicleMake, error)
+	Create(make *VehicleMake) error
+	Update(make *VehicleMake) error
 	Delete(id int64) error
 }
 
@@ -23,16 +22,16 @@ func NewVehicleMakeRepository(db *sql.DB) VehicleMakeRepository {
 	return &mysqlVehicleMakeRepository{db: db}
 }
 
-func (r *mysqlVehicleMakeRepository) GetAll() ([]model.VehicleMake, error) {
+func (r *mysqlVehicleMakeRepository) GetAll() ([]VehicleMake, error) {
 	rows, err := r.db.Query("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make ORDER BY id DESC")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var makes []model.VehicleMake
+	var makes []VehicleMake
 	for rows.Next() {
-		var m model.VehicleMake
+		var m VehicleMake
 		err := rows.Scan(&m.ID, &m.Name, &m.Status, &m.CreatedBy, &m.CreatedAt, &m.UpdatedBy, &m.UpdatedAt)
 		if err != nil {
 			return nil, err
@@ -42,7 +41,7 @@ func (r *mysqlVehicleMakeRepository) GetAll() ([]model.VehicleMake, error) {
 	return makes, nil
 }
 
-func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrder string) ([]model.VehicleMake, error) {
+func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrder string) ([]VehicleMake, error) {
 	// Whitelist sorting columns to prevent SQL injection
 	validColumns := map[string]bool{
 		"id":         true,
@@ -65,9 +64,9 @@ func (r *mysqlVehicleMakeRepository) GetPaged(limit, offset int, sortBy, sortOrd
 	}
 	defer rows.Close()
 
-	var makes []model.VehicleMake
+	var makes []VehicleMake
 	for rows.Next() {
-		var m model.VehicleMake
+		var m VehicleMake
 		err := rows.Scan(&m.ID, &m.Name, &m.Status, &m.CreatedBy, &m.CreatedAt, &m.UpdatedBy, &m.UpdatedAt)
 		if err != nil {
 			return nil, err
@@ -83,9 +82,9 @@ func (r *mysqlVehicleMakeRepository) Count() (int, error) {
 	return count, err
 }
 
-func (r *mysqlVehicleMakeRepository) GetByID(id int64) (*model.VehicleMake, error) {
+func (r *mysqlVehicleMakeRepository) GetByID(id int64) (*VehicleMake, error) {
 	row := r.db.QueryRow("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_make WHERE id = ?", id)
-	var m model.VehicleMake
+	var m VehicleMake
 	err := row.Scan(&m.ID, &m.Name, &m.Status, &m.CreatedBy, &m.CreatedAt, &m.UpdatedBy, &m.UpdatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -96,7 +95,7 @@ func (r *mysqlVehicleMakeRepository) GetByID(id int64) (*model.VehicleMake, erro
 	return &m, nil
 }
 
-func (r *mysqlVehicleMakeRepository) Create(m *model.VehicleMake) error {
+func (r *mysqlVehicleMakeRepository) Create(m *VehicleMake) error {
 	res, err := r.db.Exec("INSERT INTO vehicle_make (name, status, created_by, created_at, updated_by, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
 		m.Name, m.Status, m.CreatedBy, m.CreatedAt, m.UpdatedBy, m.UpdatedAt)
 	if err != nil {
@@ -110,7 +109,7 @@ func (r *mysqlVehicleMakeRepository) Create(m *model.VehicleMake) error {
 	return nil
 }
 
-func (r *mysqlVehicleMakeRepository) Update(m *model.VehicleMake) error {
+func (r *mysqlVehicleMakeRepository) Update(m *VehicleMake) error {
 	_, err := r.db.Exec("UPDATE vehicle_make SET name = ?, status = ?, updated_by = ?, updated_at = ? WHERE id = ?",
 		m.Name, m.Status, m.UpdatedBy, m.UpdatedAt, m.ID)
 	return err

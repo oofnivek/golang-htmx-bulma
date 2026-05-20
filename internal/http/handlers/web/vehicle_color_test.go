@@ -6,14 +6,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"golang-htmx-bulma/internal/model"
-	"golang-htmx-bulma/internal/service"
+	"golang-htmx-bulma/internal/vehicle"
 	"golang-htmx-bulma/internal/view"
 
 	"github.com/gin-gonic/gin"
 )
 
-func setupTestRouter(svc service.VehicleColorService) *gin.Engine {
+func setupTestRouter(svc vehicle.VehicleColorService) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	// Initialize renderer pointing to the templates directory
@@ -24,8 +23,8 @@ func setupTestRouter(svc service.VehicleColorService) *gin.Engine {
 
 func TestList(t *testing.T) {
 	mockSvc := &MockVehicleColorService{
-		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleColor, int, error) {
-			return []model.VehicleColor{{ID: 1, Name: "Red"}}, 1, nil
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]vehicle.VehicleColor, int, error) {
+			return []vehicle.VehicleColor{{ID: 1, Name: "Red"}}, 1, nil
 		},
 	}
 
@@ -59,8 +58,8 @@ func TestCreateForm(t *testing.T) {
 
 func TestDeleteConfirm(t *testing.T) {
 	mockSvc := &MockVehicleColorService{
-		FindByIDFn: func(id int64) (*model.VehicleColor, error) {
-			return &model.VehicleColor{ID: id, Name: "Red"}, nil
+		FindByIDFn: func(id int64) (*vehicle.VehicleColor, error) {
+			return &vehicle.VehicleColor{ID: id, Name: "Red"}, nil
 		},
 	}
 	h := NewVehicleColorHandler(mockSvc)
@@ -78,8 +77,8 @@ func TestDeleteConfirm(t *testing.T) {
 
 func TestCreate(t *testing.T) {
 	mockSvc := &MockVehicleColorService{
-		CreateColorFn: func(name string, status bool, user string) (*model.VehicleColor, error) {
-			return &model.VehicleColor{ID: 1, Name: name}, nil
+		CreateColorFn: func(name string, status bool, user string) (*vehicle.VehicleColor, error) {
+			return &vehicle.VehicleColor{ID: 1, Name: name}, nil
 		},
 	}
 	h := NewVehicleColorHandler(mockSvc)
@@ -97,8 +96,8 @@ func TestCreate(t *testing.T) {
 
 func TestEditForm(t *testing.T) {
 	mockSvc := &MockVehicleColorService{
-		FindByIDFn: func(id int64) (*model.VehicleColor, error) {
-			return &model.VehicleColor{ID: id, Name: "Red"}, nil
+		FindByIDFn: func(id int64) (*vehicle.VehicleColor, error) {
+			return &vehicle.VehicleColor{ID: id, Name: "Red"}, nil
 		},
 	}
 	h := NewVehicleColorHandler(mockSvc)
@@ -116,8 +115,8 @@ func TestEditForm(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	mockSvc := &MockVehicleColorService{
-		UpdateColorFn: func(id int64, name string, status bool, user string) (*model.VehicleColor, error) {
-			return &model.VehicleColor{ID: id, Name: name}, nil
+		UpdateColorFn: func(id int64, name string, status bool, user string) (*vehicle.VehicleColor, error) {
+			return &vehicle.VehicleColor{ID: id, Name: name}, nil
 		},
 	}
 	h := NewVehicleColorHandler(mockSvc)
@@ -155,16 +154,16 @@ func TestDelete(t *testing.T) {
 func TestHandlerErrors(t *testing.T) {
 	// A service that always returns errors
 	errSvc := &MockVehicleColorService{
-		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleColor, int, error) {
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]vehicle.VehicleColor, int, error) {
 			return nil, 0, errors.New("fail")
 		},
-		FindByIDFn: func(id int64) (*model.VehicleColor, error) {
+		FindByIDFn: func(id int64) (*vehicle.VehicleColor, error) {
 			return nil, errors.New("fail")
 		},
-		CreateColorFn: func(name string, status bool, user string) (*model.VehicleColor, error) {
+		CreateColorFn: func(name string, status bool, user string) (*vehicle.VehicleColor, error) {
 			return nil, errors.New("fail")
 		},
-		UpdateColorFn: func(id int64, name string, status bool, user string) (*model.VehicleColor, error) {
+		UpdateColorFn: func(id int64, name string, status bool, user string) (*vehicle.VehicleColor, error) {
 			return nil, errors.New("fail")
 		},
 		DeleteColorFn: func(id int64) error {
@@ -239,7 +238,7 @@ func TestHandlerErrors(t *testing.T) {
 	t.Run("NotFoundErrors", func(t *testing.T) {
 		// A service that returns nil (not found)
 		nilSvc := &MockVehicleColorService{
-			FindByIDFn: func(id int64) (*model.VehicleColor, error) {
+			FindByIDFn: func(id int64) (*vehicle.VehicleColor, error) {
 				return nil, nil
 			},
 		}

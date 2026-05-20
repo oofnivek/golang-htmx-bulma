@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"golang-htmx-bulma/internal/model"
+	"golang-htmx-bulma/internal/vehicle"
 	"golang-htmx-bulma/internal/view"
 
 	"github.com/gin-gonic/gin"
@@ -21,8 +21,8 @@ func setupMakeTestRouter(svc *MockVehicleMakeService) *gin.Engine {
 
 func TestListMake(t *testing.T) {
 	mockSvc := &MockVehicleMakeService{
-		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleMake, int, error) {
-			return []model.VehicleMake{{ID: 1, Name: "Toyota"}}, 1, nil
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]vehicle.VehicleMake, int, error) {
+			return []vehicle.VehicleMake{{ID: 1, Name: "Toyota"}}, 1, nil
 		},
 	}
 
@@ -56,8 +56,8 @@ func TestCreateFormMake(t *testing.T) {
 
 func TestCreateMakeHandler(t *testing.T) {
 	mockSvc := &MockVehicleMakeService{
-		CreateMakeFn: func(name string, status bool, user string) (*model.VehicleMake, error) {
-			return &model.VehicleMake{ID: 1, Name: name}, nil
+		CreateMakeFn: func(name string, status bool, user string) (*vehicle.VehicleMake, error) {
+			return &vehicle.VehicleMake{ID: 1, Name: name}, nil
 		},
 	}
 	h := NewVehicleMakeHandler(mockSvc)
@@ -75,8 +75,8 @@ func TestCreateMakeHandler(t *testing.T) {
 
 func TestEditFormMake(t *testing.T) {
 	mockSvc := &MockVehicleMakeService{
-		FindByIDFn: func(id int64) (*model.VehicleMake, error) {
-			return &model.VehicleMake{ID: id, Name: "Toyota"}, nil
+		FindByIDFn: func(id int64) (*vehicle.VehicleMake, error) {
+			return &vehicle.VehicleMake{ID: id, Name: "Toyota"}, nil
 		},
 	}
 	h := NewVehicleMakeHandler(mockSvc)
@@ -94,8 +94,8 @@ func TestEditFormMake(t *testing.T) {
 
 func TestUpdateMakeHandler(t *testing.T) {
 	mockSvc := &MockVehicleMakeService{
-		UpdateMakeFn: func(id int64, name string, status bool, user string) (*model.VehicleMake, error) {
-			return &model.VehicleMake{ID: id, Name: name}, nil
+		UpdateMakeFn: func(id int64, name string, status bool, user string) (*vehicle.VehicleMake, error) {
+			return &vehicle.VehicleMake{ID: id, Name: name}, nil
 		},
 	}
 	h := NewVehicleMakeHandler(mockSvc)
@@ -132,16 +132,16 @@ func TestDeleteMakeHandler(t *testing.T) {
 
 func TestHandlerErrorsMake(t *testing.T) {
 	errSvc := &MockVehicleMakeService{
-		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]model.VehicleMake, int, error) {
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]vehicle.VehicleMake, int, error) {
 			return nil, 0, errors.New("fail")
 		},
-		FindByIDFn: func(id int64) (*model.VehicleMake, error) {
+		FindByIDFn: func(id int64) (*vehicle.VehicleMake, error) {
 			return nil, errors.New("fail")
 		},
-		CreateMakeFn: func(name string, status bool, user string) (*model.VehicleMake, error) {
+		CreateMakeFn: func(name string, status bool, user string) (*vehicle.VehicleMake, error) {
 			return nil, errors.New("fail")
 		},
-		UpdateMakeFn: func(id int64, name string, status bool, user string) (*model.VehicleMake, error) {
+		UpdateMakeFn: func(id int64, name string, status bool, user string) (*vehicle.VehicleMake, error) {
 			return nil, errors.New("fail")
 		},
 		DeleteMakeFn: func(id int64) error {
@@ -216,8 +216,8 @@ func TestHandlerErrorsMake(t *testing.T) {
 
 func TestDeleteConfirmMake(t *testing.T) {
 	mockSvc := &MockVehicleMakeService{
-		FindByIDFn: func(id int64) (*model.VehicleMake, error) {
-			return &model.VehicleMake{ID: id, Name: "Toyota"}, nil
+		FindByIDFn: func(id int64) (*vehicle.VehicleMake, error) {
+			return &vehicle.VehicleMake{ID: id, Name: "Toyota"}, nil
 		},
 	}
 	h := NewVehicleMakeHandler(mockSvc)
@@ -236,7 +236,7 @@ func TestDeleteConfirmMake(t *testing.T) {
 func TestNotFoundErrorsMake(t *testing.T) {
 	// A service that returns nil (not found)
 	nilSvc := &MockVehicleMakeService{
-		FindByIDFn: func(id int64) (*model.VehicleMake, error) {
+		FindByIDFn: func(id int64) (*vehicle.VehicleMake, error) {
 			return nil, nil
 		},
 	}
