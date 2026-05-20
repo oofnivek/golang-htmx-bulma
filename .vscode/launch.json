@@ -1,0 +1,36 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Web App",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/web",
+            "cwd": "${workspaceFolder}",
+            "showLog": true
+        },
+        {
+            "name": "Debug Current Test File",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-run",
+                "^${selectedText}$"
+            ],
+            "showLog": true
+        },
+        {
+            "name": "Debug All Tests in Package",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
+            "showLog": true
+        }
+    ]
+}
