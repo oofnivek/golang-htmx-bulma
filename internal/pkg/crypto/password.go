@@ -107,3 +107,41 @@ func VerifyPasswordV3(password, encodedHash string) error {
 
 	return nil
 }
+
+// PasswordVerificationResult mirrors the PasswordVerificationResult enum in ASP.NET Core Identity.
+type PasswordVerificationResult int
+
+const (
+	PasswordVerificationFailed        PasswordVerificationResult = 0
+	PasswordVerificationSuccess       PasswordVerificationResult = 1
+	PasswordVerificationSuccessRehash PasswordVerificationResult = 2
+)
+
+// HashUserPassword hashes a password linked to the user's email, using standard ASP.NET Core V3 PBKDF2 format.
+func HashUserPassword(email, password string, iterations int) (string, error) {
+	return HashPasswordV3(ownerLinkedPassword(email, password), iterations)
+}
+
+// VerifyUserPassword verifies a hashed password against a provided plaintext password.
+// It first attempts verification using the owner-linked format (email + "\n" + password).
+// If that fails, it falls back to verifying the plaintext password directly (supporting legacy hashes).
+func VerifyUserPassword(email, hashedPassword, providedPassword string) PasswordVerificationResult {
+	// 1. Verify using owner-linked password
+	err := VerifyPasswordV3(ownerLinkedPassword(email, providedPassword), hashedPassword)
+	if err == nil {
+		return PasswordVerificationSuccess
+	}
+
+	// 2. Fall back to standard password (old method)
+	err = VerifyPasswordV3(providedPassword, hashedPassword)
+	if err == nil {
+		return PasswordVerificationSuccessRehash
+	}
+
+	return PasswordVerificationFailed
+}
+
+// ownerLinkedPassword concatenates email, a newline, and password.
+func ownerLinkedPassword(email, password string) string {
+	return email + "\n" + password
+}

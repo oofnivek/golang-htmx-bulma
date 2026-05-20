@@ -58,9 +58,14 @@ func (s *authService) Login(email, password string) (string, *model.User, error)
 	}
 
 	// 3. Verify password
-	if err := crypto.VerifyPasswordV3(password, user.PasswordHash); err != nil {
+	verificationResult := crypto.VerifyUserPassword(email, user.PasswordHash, password)
+	if verificationResult == crypto.PasswordVerificationFailed {
 		slog.Warn("Login failed: incorrect password", "email", email)
 		return "", nil, errors.New("invalid email or password")
+	}
+
+	if verificationResult == crypto.PasswordVerificationSuccessRehash {
+		slog.Info("Password verification succeeded using legacy fallback; rehash recommended", "email", email)
 	}
 
 	// 4. Generate JWT ID
