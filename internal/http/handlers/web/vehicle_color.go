@@ -34,8 +34,7 @@ func (h *VehicleColorHandler) List(c *gin.Context) {
 		return
 	}
 
-	// Common timezones
-	timezones := []string{"UTC", "America/New_York", "America/Los_Angeles", "Europe/London", "Europe/Paris", "Asia/Tokyo", "Asia/Shanghai", "Asia/Singapore", "Australia/Sydney"}
+	timezones := Timezones
 
 	totalPages := (total + pageSize - 1) / pageSize
 

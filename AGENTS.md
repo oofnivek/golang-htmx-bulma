@@ -215,6 +215,7 @@ Each role wires only the required internal packages, keeping the other domain pa
 - **Cancel Button**: Form pages ("new" and "edit") must include a "Cancel" button in the footer area (using `is-grouped-right`) that redirects back to the index page using HTMX. The "Save" button must be on the left of the "Cancel" button, use the `is-link` class, and include a FontAwesome save icon. The "Cancel" button must use the `is-link is-light` class.
 - **View Page**: Modules with extensive details must provide a read-only view page. This page should mirror the edit form's layout but with all inputs in `readonly` or `disabled` mode. The footer must only contain a "Back to List" button (using `is-link is-light` and right-aligned).
 - **Action Buttons**: The "Actions" column in index tables must use icon-only buttons (FontAwesome) rather than text. Standard colors: `is-info is-light` for view (eye icon), `is-link is-light` for edit (edit icon), `is-danger is-light` for delete (trash icon). Use the `buttons are-small` container.
+- **Timezone selector**: Use the shared `web.Timezones` constant when populating timezone dropdowns in index pages (e.g., vehicle_colors, vehicle_makes, users) to keep the list consistent across the application.
 - Keep conditional logic in templates minimal.
 - Format HTML clearly so partials are easy to update.
 - Keep HTMX-targeted fragments small and reusable.
