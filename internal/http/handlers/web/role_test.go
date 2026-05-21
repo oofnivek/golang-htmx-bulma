@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"golang-htmx-bulma/internal/model"
+	"golang-htmx-bulma/internal/user"
 	"golang-htmx-bulma/internal/view"
 
 	"github.com/gin-gonic/gin"
@@ -21,8 +21,8 @@ func setupRoleTestRouter(svc *MockRoleService) *gin.Engine {
 
 func TestListRole(t *testing.T) {
 	mockSvc := &MockRoleService{
-		ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]model.Role, int, error) {
-			return []model.Role{{ID: "ADMIN", Name: "Administrator"}}, 1, nil
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]user.Role, int, error) {
+			return []user.Role{{ID: "ADMIN", Name: "Administrator"}}, 1, nil
 		},
 	}
 
@@ -41,7 +41,7 @@ func TestListRole(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		errSvc := &MockRoleService{
-			ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]model.Role, int, error) {
+			ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]user.Role, int, error) {
 				return nil, 0, errors.New("fail")
 			},
 		}
@@ -75,8 +75,8 @@ func TestCreateFormRole(t *testing.T) {
 func TestCreateRoleHandler(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			CreateRoleFn: func(id, name string) (*model.Role, error) {
-				return &model.Role{ID: id, Name: name}, nil
+			CreateRoleFn: func(id, name string) (*user.Role, error) {
+				return &user.Role{ID: id, Name: name}, nil
 			},
 		}
 		h := NewRoleHandler(mockSvc)
@@ -94,7 +94,7 @@ func TestCreateRoleHandler(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			CreateRoleFn: func(id, name string) (*model.Role, error) {
+			CreateRoleFn: func(id, name string) (*user.Role, error) {
 				return nil, errors.New("fail")
 			},
 		}
@@ -115,8 +115,8 @@ func TestCreateRoleHandler(t *testing.T) {
 func TestEditFormRole(t *testing.T) {
 	t.Run("Found", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			FindByIDFn: func(id string) (*model.Role, error) {
-				return &model.Role{ID: id, Name: "Admin"}, nil
+			FindByIDFn: func(id string) (*user.Role, error) {
+				return &user.Role{ID: id, Name: "Admin"}, nil
 			},
 		}
 		h := NewRoleHandler(mockSvc)
@@ -134,7 +134,7 @@ func TestEditFormRole(t *testing.T) {
 
 	t.Run("NotFound", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			FindByIDFn: func(id string) (*model.Role, error) {
+			FindByIDFn: func(id string) (*user.Role, error) {
 				return nil, nil
 			},
 		}
@@ -153,7 +153,7 @@ func TestEditFormRole(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			FindByIDFn: func(id string) (*model.Role, error) {
+			FindByIDFn: func(id string) (*user.Role, error) {
 				return nil, errors.New("fail")
 			},
 		}
@@ -174,8 +174,8 @@ func TestEditFormRole(t *testing.T) {
 func TestUpdateRoleHandler(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			UpdateRoleFn: func(id, name string) (*model.Role, error) {
-				return &model.Role{ID: id, Name: name}, nil
+			UpdateRoleFn: func(id, name string) (*user.Role, error) {
+				return &user.Role{ID: id, Name: name}, nil
 			},
 		}
 		h := NewRoleHandler(mockSvc)
@@ -193,7 +193,7 @@ func TestUpdateRoleHandler(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			UpdateRoleFn: func(id, name string) (*model.Role, error) {
+			UpdateRoleFn: func(id, name string) (*user.Role, error) {
 				return nil, errors.New("fail")
 			},
 		}
@@ -254,8 +254,8 @@ func TestDeleteRoleHandler(t *testing.T) {
 func TestDeleteConfirmRole(t *testing.T) {
 	t.Run("Found", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			FindByIDFn: func(id string) (*model.Role, error) {
-				return &model.Role{ID: id, Name: "Admin"}, nil
+			FindByIDFn: func(id string) (*user.Role, error) {
+				return &user.Role{ID: id, Name: "Admin"}, nil
 			},
 		}
 		h := NewRoleHandler(mockSvc)
@@ -273,7 +273,7 @@ func TestDeleteConfirmRole(t *testing.T) {
 
 	t.Run("NotFound", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			FindByIDFn: func(id string) (*model.Role, error) {
+			FindByIDFn: func(id string) (*user.Role, error) {
 				return nil, nil
 			},
 		}
@@ -292,7 +292,7 @@ func TestDeleteConfirmRole(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		mockSvc := &MockRoleService{
-			FindByIDFn: func(id string) (*model.Role, error) {
+			FindByIDFn: func(id string) (*user.Role, error) {
 				return nil, errors.New("fail")
 			},
 		}

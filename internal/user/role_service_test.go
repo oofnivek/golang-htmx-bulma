@@ -1,18 +1,17 @@
-package service
+package user
 
 import (
 	"errors"
-	"golang-htmx-bulma/internal/model"
 	"testing"
 )
 
 func TestListAllRole(t *testing.T) {
 	mockRepo := &MockRoleRepository{
-		GetAllFn: func() ([]model.Role, error) {
-			return []model.Role{{ID: "ADMIN"}}, nil
+		GetAllFn: func() ([]Role, error) {
+			return []Role{{ID: "ADMIN"}}, nil
 		},
 	}
-	svc := NewRoleService(mockRepo)
+	svc := NewLocalRoleService(mockRepo)
 	roles, err := svc.ListAll()
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -24,15 +23,15 @@ func TestListAllRole(t *testing.T) {
 
 func TestListPagedRole(t *testing.T) {
 	mockRepo := &MockRoleRepository{
-		GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]model.Role, error) {
-			return []model.Role{{ID: "ADMIN", Name: "Administrator"}}, nil
+		GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]Role, error) {
+			return []Role{{ID: "ADMIN", Name: "Administrator"}}, nil
 		},
 		CountFn: func(search string) (int, error) {
 			return 1, nil
 		},
 	}
 
-	svc := NewRoleService(mockRepo)
+	svc := NewLocalRoleService(mockRepo)
 
 	t.Run("Success", func(t *testing.T) {
 		roles, total, err := svc.ListPaged(1, 10, "id", "asc", "")
@@ -56,11 +55,11 @@ func TestListPagedRole(t *testing.T) {
 
 	t.Run("GetPagedError", func(t *testing.T) {
 		failRepo := &MockRoleRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]model.Role, error) {
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]Role, error) {
 				return nil, errors.New("fail")
 			},
 		}
-		failSvc := NewRoleService(failRepo)
+		failSvc := NewLocalRoleService(failRepo)
 		_, _, err := failSvc.ListPaged(1, 10, "id", "asc", "")
 		if err == nil {
 			t.Error("Expected error, got nil")
@@ -69,14 +68,14 @@ func TestListPagedRole(t *testing.T) {
 
 	t.Run("CountError", func(t *testing.T) {
 		failRepo := &MockRoleRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]model.Role, error) {
-				return []model.Role{}, nil
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]Role, error) {
+				return []Role{}, nil
 			},
 			CountFn: func(search string) (int, error) {
 				return 0, errors.New("fail")
 			},
 		}
-		failSvc := NewRoleService(failRepo)
+		failSvc := NewLocalRoleService(failRepo)
 		_, _, err := failSvc.ListPaged(1, 10, "id", "asc", "")
 		if err == nil {
 			t.Error("Expected error, got nil")
@@ -86,14 +85,14 @@ func TestListPagedRole(t *testing.T) {
 
 func TestFindByIDRole(t *testing.T) {
 	mockRepo := &MockRoleRepository{
-		GetByIDFn: func(id string) (*model.Role, error) {
+		GetByIDFn: func(id string) (*Role, error) {
 			if id == "ADMIN" {
-				return &model.Role{ID: "ADMIN"}, nil
+				return &Role{ID: "ADMIN"}, nil
 			}
 			return nil, nil
 		},
 	}
-	svc := NewRoleService(mockRepo)
+	svc := NewLocalRoleService(mockRepo)
 
 	role, err := svc.FindByID("ADMIN")
 	if err != nil {
@@ -107,11 +106,11 @@ func TestFindByIDRole(t *testing.T) {
 func TestCreateRole(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		mockRepo := &MockRoleRepository{
-			CreateFn: func(role *model.Role) error {
+			CreateFn: func(role *Role) error {
 				return nil
 			},
 		}
-		svc := NewRoleService(mockRepo)
+		svc := NewLocalRoleService(mockRepo)
 		role, err := svc.CreateRole("ADMIN", "Admin")
 		if err != nil {
 			t.Fatalf("Unexpected error: %v", err)
@@ -123,11 +122,11 @@ func TestCreateRole(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		mockRepo := &MockRoleRepository{
-			CreateFn: func(role *model.Role) error {
+			CreateFn: func(role *Role) error {
 				return errors.New("fail")
 			},
 		}
-		svc := NewRoleService(mockRepo)
+		svc := NewLocalRoleService(mockRepo)
 		_, err := svc.CreateRole("ADMIN", "Admin")
 		if err == nil {
 			t.Error("Expected error, got nil")
@@ -137,17 +136,17 @@ func TestCreateRole(t *testing.T) {
 
 func TestUpdateRole(t *testing.T) {
 	mockRepo := &MockRoleRepository{
-		GetByIDFn: func(id string) (*model.Role, error) {
+		GetByIDFn: func(id string) (*Role, error) {
 			if id == "ADMIN" {
-				return &model.Role{ID: "ADMIN", Name: "Old"}, nil
+				return &Role{ID: "ADMIN", Name: "Old"}, nil
 			}
 			return nil, nil
 		},
-		UpdateFn: func(role *model.Role) error {
+		UpdateFn: func(role *Role) error {
 			return nil
 		},
 	}
-	svc := NewRoleService(mockRepo)
+	svc := NewLocalRoleService(mockRepo)
 
 	t.Run("Success", func(t *testing.T) {
 		role, err := svc.UpdateRole("ADMIN", "New")
@@ -171,11 +170,11 @@ func TestUpdateRole(t *testing.T) {
 
 	t.Run("GetError", func(t *testing.T) {
 		errRepo := &MockRoleRepository{
-			GetByIDFn: func(id string) (*model.Role, error) {
+			GetByIDFn: func(id string) (*Role, error) {
 				return nil, errors.New("fail")
 			},
 		}
-		errSvc := NewRoleService(errRepo)
+		errSvc := NewLocalRoleService(errRepo)
 		_, err := errSvc.UpdateRole("ADMIN", "New")
 		if err == nil {
 			t.Error("Expected error, got nil")
@@ -184,14 +183,14 @@ func TestUpdateRole(t *testing.T) {
 
 	t.Run("UpdateError", func(t *testing.T) {
 		errRepo := &MockRoleRepository{
-			GetByIDFn: func(id string) (*model.Role, error) {
-				return &model.Role{ID: "ADMIN"}, nil
+			GetByIDFn: func(id string) (*Role, error) {
+				return &Role{ID: "ADMIN"}, nil
 			},
-			UpdateFn: func(role *model.Role) error {
+			UpdateFn: func(role *Role) error {
 				return errors.New("fail")
 			},
 		}
-		errSvc := NewRoleService(errRepo)
+		errSvc := NewLocalRoleService(errRepo)
 		_, err := errSvc.UpdateRole("ADMIN", "New")
 		if err == nil {
 			t.Error("Expected error, got nil")
@@ -205,7 +204,7 @@ func TestDeleteRole(t *testing.T) {
 			return nil
 		},
 	}
-	svc := NewRoleService(mockRepo)
+	svc := NewLocalRoleService(mockRepo)
 	err := svc.DeleteRole("ADMIN")
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)

@@ -1,11 +1,9 @@
-package repository
+package user
 
 import (
 	"errors"
 	"regexp"
 	"testing"
-
-	"golang-htmx-bulma/internal/model"
 
 	"github.com/DATA-DOG/go-sqlmock"
 )
@@ -236,7 +234,7 @@ func TestCreateRoleRepo(t *testing.T) {
 	defer db.Close()
 
 	repo := NewRoleRepository(db)
-	role := &model.Role{ID: "TEST", Name: "Test Role"}
+	role := &Role{ID: "TEST", Name: "Test Role"}
 
 	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO roles (id, name) VALUES (?, ?)")).
 		WithArgs(role.ID, role.Name).
@@ -256,7 +254,7 @@ func TestUpdateRoleRepo(t *testing.T) {
 	defer db.Close()
 
 	repo := NewRoleRepository(db)
-	role := &model.Role{ID: "ADMIN", Name: "New Admin"}
+	role := &Role{ID: "ADMIN", Name: "New Admin"}
 
 	mock.ExpectExec(regexp.QuoteMeta("UPDATE roles SET name = ? WHERE id = ?")).
 		WithArgs(role.Name, role.ID).

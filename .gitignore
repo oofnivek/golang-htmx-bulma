@@ -44,4 +44,6 @@ Thumbs.db
 
 # App specific
 /web
+/app
 bin/
+

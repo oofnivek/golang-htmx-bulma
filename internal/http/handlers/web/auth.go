@@ -6,14 +6,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"golang-htmx-bulma/internal/service"
+	"golang-htmx-bulma/internal/user"
 )
 
 type AuthHandler struct {
-	authSvc service.AuthService
+	authSvc user.AuthService
 }
 
-func NewAuthHandler(authSvc service.AuthService) *AuthHandler {
+func NewAuthHandler(authSvc user.AuthService) *AuthHandler {
 	return &AuthHandler{authSvc: authSvc}
 }
 

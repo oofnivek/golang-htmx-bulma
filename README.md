@@ -5,7 +5,13 @@ A full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
 ## Project Structure
 
 - `cmd/web/`: Main entrypoint
-- `internal/`: Application logic (config, db, handlers, routes, etc.)
+- `internal/`: Private application domain logic
+  - `internal/user/`: Core User, Role, and Auth domain logic (interfaces, local DB implementations, HTTP API clients)
+  - `internal/vehicle/`: Core Vehicle (Colors & Makes) domain logic
+  - `internal/http/`: Web & REST handlers, middleware, and route registration
+  - `internal/view/`: HTML render helpers
+  - `internal/config/`: Configuration manager
+  - `internal/db/`: Database helpers
 - `templates/`: HTML templates (layouts, pages, partials)
 - `static/`: Static assets (CSS, JS, images)
 - `migrations/`: MySQL schema migrations
@@ -16,14 +22,32 @@ A full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
 2.  **Setup Environment**:
     ```bash
     cp .env.example .env
-    # Update .env with your MySQL DSN
+    # Update .env with your MySQL DSN settings and JWT signature key
     ```
-3.  **Run the Application**:
+
+3.  **Run the Application (Multi-Role Configuration)**:
+
+    The application is built as a modular monolith and can be run in three distinct roles using the `APP_ROLE` environment variable:
+
+    ### Option A: Monolith Mode (Default)
+    Runs all web presentation handlers and API endpoints in-memory, requiring connections to both User and Vehicle MySQL databases.
     ```bash
-    make run
-    # or
     go run ./cmd/web
+    # Server starts on port 8080 (or PORT in .env)
     ```
+
+    ### Option B: Isolated User Service Mode
+    Runs strictly as a headless JSON API server on port `8081`, requiring connection **only** to the user database.
+    ```bash
+    APP_ROLE=user-service PORT=8081 go run ./cmd/web
+    ```
+
+    ### Option C: Isolated Web/View Mode
+    Runs as a pure presentation layer on port `8080`, serving HTML/HTMX templates and connecting only to the vehicle database. User, Role, and Auth actions are dynamically delegated to the remote User Service over REST APIs.
+    ```bash
+    APP_ROLE=web-view PORT=8080 USER_SERVICE_URL="http://localhost:8081" go run ./cmd/web
+    ```
+
 4.  **Generating Password Hashes (for Database Seeding)**:
     To manually insert or update a user in your MySQL database with a compatible hashed password, you can use the built-in test helper:
     - Open `internal/pkg/crypto/password_test.go` and set your desired plain password.
@@ -67,16 +91,16 @@ make clean
 
 | Package | Target |
 |---|---|
-| `internal/service/` | 80%+ |
-| `internal/repository/` | 80%+ |
-| `internal/http/handlers/web/` | Medium |
+| `internal/user/` | **High (80%+)** (Business logic, REST clients, and DB repositories) |
+| `internal/vehicle/` | **High (80%+)** (Business logic and DB repositories) |
+| `internal/http/handlers/` | Medium |
 | `internal/view/`, `internal/config/`, `internal/db/`, `cmd/` | Skip (infrastructure/wiring) |
 
 ## Available Commands
 
 | Command | Description |
 |---|---|
-| `make run` | Run the application |
+| `make run` | Run the application (Monolith mode) |
 | `make build` | Compile the binary |
 | `make test` | Run all tests |
 | `make test-coverage` | Run tests with filtered coverage report |

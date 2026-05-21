@@ -4,16 +4,16 @@ import (
 	"net/http"
 	"strconv"
 
-	"golang-htmx-bulma/internal/service"
+	"golang-htmx-bulma/internal/user"
 
 	"github.com/gin-gonic/gin"
 )
 
 type RoleHandler struct {
-	svc service.RoleService
+	svc user.RoleService
 }
 
-func NewRoleHandler(svc service.RoleService) *RoleHandler {
+func NewRoleHandler(svc user.RoleService) *RoleHandler {
 	return &RoleHandler{svc: svc}
 }
 

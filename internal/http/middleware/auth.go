@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 
-	"golang-htmx-bulma/internal/service"
+	"golang-htmx-bulma/internal/user"
 )
 
 func AuthMiddleware(signingKey string) gin.HandlerFunc {
@@ -27,7 +27,7 @@ func AuthMiddleware(signingKey string) gin.HandlerFunc {
 		}
 
 		// Parse and validate token
-		claims := &service.CustomClaims{}
+		claims := &user.CustomClaims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			// Validate the alg is what we expect
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

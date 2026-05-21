@@ -4,19 +4,18 @@ import (
 	"net/http"
 	"strconv"
 
-	"golang-htmx-bulma/internal/model"
-	"golang-htmx-bulma/internal/service"
+	"golang-htmx-bulma/internal/user"
 	"golang-htmx-bulma/internal/view"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
-	userSvc service.UserService
-	roleSvc service.RoleService
+	userSvc user.UserService
+	roleSvc user.RoleService
 }
 
-func NewUserHandler(userSvc service.UserService, roleSvc service.RoleService) *UserHandler {
+func NewUserHandler(userSvc user.UserService, roleSvc user.RoleService) *UserHandler {
 	return &UserHandler{userSvc: userSvc, roleSvc: roleSvc}
 }
 
@@ -71,7 +70,7 @@ func (h *UserHandler) CreateForm(c *gin.Context) {
 
 func (h *UserHandler) Create(c *gin.Context) {
 	isEnabled := c.PostForm("is_enabled") == "on"
-	user := &model.User{
+	user := &user.User{
 		Email:       c.PostForm("email"),
 		FirstName:   c.PostForm("first_name"),
 		LastName:    c.PostForm("last_name"),
@@ -147,7 +146,7 @@ func (h *UserHandler) Update(c *gin.Context) {
 	email := c.Param("email")
 	isEnabled := c.PostForm("is_enabled") == "on"
 	
-	user := &model.User{
+	user := &user.User{
 		Email:       email,
 		FirstName:   c.PostForm("first_name"),
 		LastName:    c.PostForm("last_name"),
