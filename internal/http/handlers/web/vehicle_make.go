@@ -65,7 +65,8 @@ func (h *VehicleMakeHandler) Create(c *gin.Context) {
 	statusStr := c.PostForm("status")
 	status := statusStr == "on"
 
-	_, err := h.svc.CreateMake(name, status, "admin") // Hardcoded user for now
+	userEmail := c.GetString("user_email")
+	_, err := h.svc.CreateMake(name, status, userEmail) // Use authenticated user email
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -102,7 +103,8 @@ func (h *VehicleMakeHandler) Update(c *gin.Context) {
 	statusStr := c.PostForm("status")
 	status := statusStr == "on"
 
-	_, err := h.svc.UpdateMake(id, name, status, "admin")
+	userEmail := c.GetString("user_email")
+	_, err := h.svc.UpdateMake(id, name, status, userEmail)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return

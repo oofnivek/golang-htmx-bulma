@@ -65,7 +65,8 @@ func (h *VehicleColorHandler) Create(c *gin.Context) {
 	statusStr := c.PostForm("status")
 	status := statusStr == "on" // Bulma checkbox or select? Let's assume checkbox for now.
 
-	_, err := h.svc.CreateColor(name, status, "admin") // Hardcoded user for now
+	userEmail := c.GetString("user_email")
+	_, err := h.svc.CreateColor(name, status, userEmail)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -102,7 +103,8 @@ func (h *VehicleColorHandler) Update(c *gin.Context) {
 	statusStr := c.PostForm("status")
 	status := statusStr == "on"
 
-	_, err := h.svc.UpdateColor(id, name, status, "admin")
+	userEmail := c.GetString("user_email")
+	_, err := h.svc.UpdateColor(id, name, status, userEmail)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return

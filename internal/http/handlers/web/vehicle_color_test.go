@@ -76,22 +76,33 @@ func TestDeleteConfirm(t *testing.T) {
 }
 
 func TestCreate(t *testing.T) {
-	mockSvc := &MockVehicleColorService{
-		CreateColorFn: func(name string, status bool, user string) (*vehicle.VehicleColor, error) {
-			return &vehicle.VehicleColor{ID: 1, Name: name}, nil
-		},
-	}
-	h := NewVehicleColorHandler(mockSvc)
-	r := setupTestRouter(mockSvc)
-	r.POST("/vehicle-colors", h.Create)
+    // Capture the user email passed to the service
+    var capturedUser string
+    mockSvc := &MockVehicleColorService{
+        CreateColorFn: func(name string, status bool, user string) (*vehicle.VehicleColor, error) {
+            capturedUser = user
+            return &vehicle.VehicleColor{ID: 1, Name: name}, nil
+        },
+    }
+    h := NewVehicleColorHandler(mockSvc)
+    r := setupTestRouter(mockSvc)
+    // Middleware to simulate authenticated user
+    r.Use(func(c *gin.Context) {
+        c.Set("user_email", "tester@example.com")
+        c.Next()
+    })
+    r.POST("/vehicle-colors", h.Create)
 
-	req, _ := http.NewRequest("POST", "/vehicle-colors", nil)
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+    req, _ := http.NewRequest("POST", "/vehicle-colors", nil)
+    w := httptest.NewRecorder()
+    r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusSeeOther {
-		t.Errorf("Expected redirect, got %d", w.Code)
-	}
+    if w.Code != http.StatusSeeOther {
+        t.Errorf("Expected redirect, got %d", w.Code)
+    }
+    if capturedUser != "tester@example.com" {
+        t.Errorf("Expected user email to be passed to service, got %s", capturedUser)
+    }
 }
 
 func TestEditForm(t *testing.T) {
@@ -114,22 +125,32 @@ func TestEditForm(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	mockSvc := &MockVehicleColorService{
-		UpdateColorFn: func(id int64, name string, status bool, user string) (*vehicle.VehicleColor, error) {
-			return &vehicle.VehicleColor{ID: id, Name: name}, nil
-		},
-	}
-	h := NewVehicleColorHandler(mockSvc)
-	r := setupTestRouter(mockSvc)
-	r.POST("/vehicle-colors/:id", h.Update)
+    var capturedUser string
+    mockSvc := &MockVehicleColorService{
+        UpdateColorFn: func(id int64, name string, status bool, user string) (*vehicle.VehicleColor, error) {
+            capturedUser = user
+            return &vehicle.VehicleColor{ID: id, Name: name}, nil
+        },
+    }
+    h := NewVehicleColorHandler(mockSvc)
+    r := setupTestRouter(mockSvc)
+    // Middleware to simulate authenticated user
+    r.Use(func(c *gin.Context) {
+        c.Set("user_email", "tester@example.com")
+        c.Next()
+    })
+    r.POST("/vehicle-colors/:id", h.Update)
 
-	req, _ := http.NewRequest("POST", "/vehicle-colors/1", nil)
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+    req, _ := http.NewRequest("POST", "/vehicle-colors/1", nil)
+    w := httptest.NewRecorder()
+    r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusSeeOther {
-		t.Errorf("Expected redirect, got %d", w.Code)
-	}
+    if w.Code != http.StatusSeeOther {
+        t.Errorf("Expected redirect, got %d", w.Code)
+    }
+    if capturedUser != "tester@example.com" {
+        t.Errorf("Expected user email to be passed to service, got %s", capturedUser)
+    }
 }
 
 func TestDelete(t *testing.T) {

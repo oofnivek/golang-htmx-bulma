@@ -55,22 +55,33 @@ func TestCreateFormMake(t *testing.T) {
 }
 
 func TestCreateMakeHandler(t *testing.T) {
-	mockSvc := &MockVehicleMakeService{
-		CreateMakeFn: func(name string, status bool, user string) (*vehicle.VehicleMake, error) {
-			return &vehicle.VehicleMake{ID: 1, Name: name}, nil
-		},
-	}
-	h := NewVehicleMakeHandler(mockSvc)
-	r := setupMakeTestRouter(mockSvc)
-	r.POST("/vehicle-makes", h.Create)
+    // Capture the user email passed to the service
+    var capturedUser string
+    mockSvc := &MockVehicleMakeService{
+        CreateMakeFn: func(name string, status bool, user string) (*vehicle.VehicleMake, error) {
+            capturedUser = user
+            return &vehicle.VehicleMake{ID: 1, Name: name}, nil
+        },
+    }
+    h := NewVehicleMakeHandler(mockSvc)
+    r := setupMakeTestRouter(mockSvc)
+    // Middleware to simulate authenticated user
+    r.Use(func(c *gin.Context) {
+        c.Set("user_email", "tester@example.com")
+        c.Next()
+    })
+    r.POST("/vehicle-makes", h.Create)
 
-	req, _ := http.NewRequest("POST", "/vehicle-makes", nil)
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+    req, _ := http.NewRequest("POST", "/vehicle-makes", nil)
+    w := httptest.NewRecorder()
+    r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusSeeOther {
-		t.Errorf("Expected redirect, got %d", w.Code)
-	}
+    if w.Code != http.StatusSeeOther {
+        t.Errorf("Expected redirect, got %d", w.Code)
+    }
+    if capturedUser != "tester@example.com" {
+        t.Errorf("Expected user email to be passed to service, got %s", capturedUser)
+    }
 }
 
 func TestEditFormMake(t *testing.T) {
@@ -93,22 +104,33 @@ func TestEditFormMake(t *testing.T) {
 }
 
 func TestUpdateMakeHandler(t *testing.T) {
-	mockSvc := &MockVehicleMakeService{
-		UpdateMakeFn: func(id int64, name string, status bool, user string) (*vehicle.VehicleMake, error) {
-			return &vehicle.VehicleMake{ID: id, Name: name}, nil
-		},
-	}
-	h := NewVehicleMakeHandler(mockSvc)
-	r := setupMakeTestRouter(mockSvc)
-	r.POST("/vehicle-makes/:id", h.Update)
+    // Capture the user email passed to the service
+    var capturedUser string
+    mockSvc := &MockVehicleMakeService{
+        UpdateMakeFn: func(id int64, name string, status bool, user string) (*vehicle.VehicleMake, error) {
+            capturedUser = user
+            return &vehicle.VehicleMake{ID: id, Name: name}, nil
+        },
+    }
+    h := NewVehicleMakeHandler(mockSvc)
+    r := setupMakeTestRouter(mockSvc)
+    // Middleware to simulate authenticated user
+    r.Use(func(c *gin.Context) {
+        c.Set("user_email", "tester@example.com")
+        c.Next()
+    })
+    r.POST("/vehicle-makes/:id", h.Update)
 
-	req, _ := http.NewRequest("POST", "/vehicle-makes/1", nil)
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
+    req, _ := http.NewRequest("POST", "/vehicle-makes/1", nil)
+    w := httptest.NewRecorder()
+    r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusSeeOther {
-		t.Errorf("Expected redirect, got %d", w.Code)
-	}
+    if w.Code != http.StatusSeeOther {
+        t.Errorf("Expected redirect, got %d", w.Code)
+    }
+    if capturedUser != "tester@example.com" {
+        t.Errorf("Expected user email to be passed to service, got %s", capturedUser)
+    }
 }
 
 func TestDeleteMakeHandler(t *testing.T) {
