@@ -19,6 +19,8 @@ func RegisterRoutes(
 	userAPI *api.UserAPIHandler,
 	roleAPI *api.RoleAPIHandler,
 	authAPI *api.AuthAPIHandler,
+	vcAPI *api.VehicleColorAPIHandler,
+	vmAPI *api.VehicleMakeAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -120,6 +122,24 @@ func RegisterRoutes(
 
 		if authAPI != nil {
 			apiGroup.POST("/auth/login", authAPI.Login)
+		}
+
+		if vcAPI != nil {
+			apiGroup.GET("/vehicle-colors/all", vcAPI.ListAll)
+			apiGroup.GET("/vehicle-colors", vcAPI.List)
+			apiGroup.GET("/vehicle-colors/:id", vcAPI.Get)
+			apiGroup.POST("/vehicle-colors", vcAPI.Create)
+			apiGroup.PUT("/vehicle-colors/:id", vcAPI.Update)
+			apiGroup.DELETE("/vehicle-colors/:id", vcAPI.Delete)
+		}
+
+		if vmAPI != nil {
+			apiGroup.GET("/vehicle-makes/all", vmAPI.ListAll)
+			apiGroup.GET("/vehicle-makes", vmAPI.List)
+			apiGroup.GET("/vehicle-makes/:id", vmAPI.Get)
+			apiGroup.POST("/vehicle-makes", vmAPI.Create)
+			apiGroup.PUT("/vehicle-makes/:id", vmAPI.Update)
+			apiGroup.DELETE("/vehicle-makes/:id", vmAPI.Delete)
 		}
 	}
 }

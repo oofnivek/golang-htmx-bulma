@@ -23,7 +23,7 @@ func main() {
 	// Load config
 	cfg := config.Load()
 
-	// Read application role: monolith (default), user-service, web-view
+	// Read application role: monolith (default), user-service, vehicle-service, web-view
 	appRole := os.Getenv("APP_ROLE")
 	if appRole == "" {
 		appRole = "monolith"
@@ -62,6 +62,8 @@ func main() {
 		userAPI *api.UserAPIHandler
 		roleAPI *api.RoleAPIHandler
 		authAPI *api.AuthAPIHandler
+		vcAPI   *api.VehicleColorAPIHandler
+		vmAPI   *api.VehicleMakeAPIHandler
 
 		port string = cfg.Port
 	)
@@ -95,6 +97,32 @@ func main() {
 		userAPI = api.NewUserAPIHandler(userSvc)
 		roleAPI = api.NewRoleAPIHandler(roleSvc)
 		authAPI = api.NewAuthAPIHandler(authSvc)
+
+	case "vehicle-service":
+		log.Println("Booting in VEHICLE-SERVICE role...")
+		if os.Getenv("PORT") != "" {
+			port = os.Getenv("PORT")
+		} else {
+			port = "8082" // Default vehicle service port
+		}
+
+		// Initialize Vehicle DB only
+		vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
+		if err != nil {
+			log.Fatalf("Failed to connect to Vehicle MySQL: %v\n", err)
+		}
+		defer vehicleDatabase.Close()
+
+		// Wire services
+		vcRepo := vehicle.NewVehicleColorRepository(vehicleDatabase)
+		vcSvc := vehicle.NewVehicleColorService(vcRepo)
+
+		vmRepo := vehicle.NewVehicleMakeRepository(vehicleDatabase)
+		vmSvc := vehicle.NewVehicleMakeService(vmRepo)
+
+		// Set up API handlers
+		vcAPI = api.NewVehicleColorAPIHandler(vcSvc)
+		vmAPI = api.NewVehicleMakeAPIHandler(vmSvc)
 
 	case "web-view":
 		log.Println("Booting in WEB-VIEW role...")
@@ -134,22 +162,35 @@ func main() {
 			authSvc = user.NewLocalAuthService(userSvc, cfg.JWTSigningKey)
 		}
 
-		// Initialize Vehicle DB (remains local for now until vehicle-service is segregated)
-		vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
-		if err != nil {
-			log.Fatalf("Failed to connect to Vehicle MySQL: %v\n", err)
+		// Wires Vehicle Services (remote or fallback local)
+		var (
+			vcSvc vehicle.VehicleColorService
+			vmSvc vehicle.VehicleMakeService
+		)
+
+		vehicleServiceURL := os.Getenv("VEHICLE_SERVICE_URL")
+		if vehicleServiceURL != "" {
+			log.Printf("Using remote Vehicle Service at: %s\n", vehicleServiceURL)
+			vcSvc = vehicle.NewRemoteVehicleColorService(vehicleServiceURL)
+			vmSvc = vehicle.NewRemoteVehicleMakeService(vehicleServiceURL)
+		} else {
+			log.Println("WARNING: VEHICLE_SERVICE_URL is not set. Falling back to local Vehicle DB access.")
+			vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
+			if err != nil {
+				log.Fatalf("Failed to connect to fallback Vehicle MySQL: %v\n", err)
+			}
+			defer vehicleDatabase.Close()
+
+			vcRepo := vehicle.NewVehicleColorRepository(vehicleDatabase)
+			vcSvc = vehicle.NewVehicleColorService(vcRepo)
+
+			vmRepo := vehicle.NewVehicleMakeRepository(vehicleDatabase)
+			vmSvc = vehicle.NewVehicleMakeService(vmRepo)
 		}
-		defer vehicleDatabase.Close()
-
-		vcRepo := vehicle.NewVehicleColorRepository(vehicleDatabase)
-		vcSvc := vehicle.NewVehicleColorService(vcRepo)
-		vcHandler = web.NewVehicleColorHandler(vcSvc)
-
-		vmRepo := vehicle.NewVehicleMakeRepository(vehicleDatabase)
-		vmSvc := vehicle.NewVehicleMakeService(vmRepo)
-		vmHandler = web.NewVehicleMakeHandler(vmSvc)
 
 		// Set up Web Handlers
+		vcHandler = web.NewVehicleColorHandler(vcSvc)
+		vmHandler = web.NewVehicleMakeHandler(vmSvc)
 		roleHandler = web.NewRoleHandler(roleSvc)
 		userHandler = web.NewUserHandler(userSvc, roleSvc)
 		authHandler = web.NewAuthHandler(authSvc)
@@ -202,6 +243,8 @@ func main() {
 		userAPI = api.NewUserAPIHandler(userSvc)
 		roleAPI = api.NewRoleAPIHandler(roleSvc)
 		authAPI = api.NewAuthAPIHandler(authSvc)
+		vcAPI = api.NewVehicleColorAPIHandler(vcSvc)
+		vmAPI = api.NewVehicleMakeAPIHandler(vmSvc)
 
 		// Set up templates
 		r.HTMLRender = view.NewRenderer("templates")
@@ -218,6 +261,8 @@ func main() {
 		userAPI,
 		roleAPI,
 		authAPI,
+		vcAPI,
+		vmAPI,
 		cfg.JWTSigningKey,
 	)
 

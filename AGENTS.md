@@ -91,6 +91,16 @@ Structure rules:
 - Do not put SQL in handlers or templates.
 - Do not mix MySQL access directly into handlers.
 - Reuse existing patterns before introducing new abstractions.
+## Current Clean Modular Monolith Architecture
+
+The application can run in three distinct modes controlled by the `APP_ROLE` environment variable:
+
+- **web-view** – Starts the Gin server and serves HTML pages. It uses the remote **user-service** and **vehicle-service** via HTTP (`USER_SERVICE_URL`, `VEHICLE_SERVICE_URL`).
+- **user-service** – Runs only the user domain (handlers, services, repositories) on its own port, exposing both web and API endpoints for user operations.
+- **vehicle-service** – Runs only the vehicle domain (handlers, services, repositories) on its own port, exposing both web and API endpoints for vehicle operations.
+
+Each role wires only the required internal packages, keeping the other domain packages compiled but unused. The Mermaid diagram in the project README visualises this architecture and the wiring between `cmd/web/main.go`, the route registration, and the service layers.
+
 
 ## Gin and routing conventions
 - Use Gin routing, middleware, and context patterns consistently.

@@ -6,6 +6,70 @@ A full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
 
 - `cmd/web/`: Main entrypoint
 - `internal/`: Private application domain logic
+
+```mermaid
+graph TD
+  subgraph Cmd
+    C1[cmd/web/main.go] -->|starts| R[internal/http/routes/routes.go]
+    C1 -->|loads| CFG[internal/config/config.go]
+    C1 -->|sets up| OT[internal/telemetry/telemetry.go]
+  end
+
+  subgraph Internal
+    subgraph Service
+      US[internal/user] --> UR[internal/user/repository.go]
+      US --> USvc[internal/user/service.go]
+      US --> URemote[internal/user/remote_service.go]
+
+      VS[internal/vehicle] --> VR[internal/vehicle/repository.go]
+      VS --> VSvc[internal/vehicle/service.go]
+      VS --> VRemote[internal/vehicle/remote_service.go]
+    end
+
+    subgraph HTTP
+      HWeb[internal/http/handlers/web] -->|Web handlers| HVC[vehicle_color.go]
+      HWeb -->|Web handlers| HVM[vehicle_make.go]
+      HWeb -->|Web handlers| HUser[user.go]
+      HWeb -->|Web handlers| HRole[role.go]
+      HWeb -->|Web handlers| HAuth[auth.go]
+
+      HAPI[internal/http/handlers/api] -->|API handlers| API_VC[vehicle_color.go]
+      HAPI -->|API handlers| API_VM[vehicle_make.go]
+      HAPI -->|API handlers| API_User[user.go]
+      HAPI -->|API handlers| API_Role[role.go]
+      HAPI -->|API handlers| API_Auth[auth.go]
+
+      Middleware[internal/http/middleware] --> AuthMid[auth.go]
+    end
+
+    View[internal/view] --> Renderer[templates renderer]
+  end
+
+  subgraph Templates
+    TLayouts[templates/layouts] --> Base[base.html]
+    TPages[templates/pages] --> VehicleColors[vehicle_colors/index.html]
+    TPages --> VehicleMakes[vehicle_makes/index.html]
+    TPartials[templates/partials] --> TableRows[vehicle_colors/table_row.html]
+    TPartials --> TableRowsMake[vehicle_makes/table_row.html]
+  end
+
+  subgraph Static
+    CSS[static/css] --> Bulma[Bulma.css]
+    JS[static/js] --> HTMX[htmx.js]
+    IMG[static/img]
+  end
+
+  subgraph DB
+    DBUser[User MySQL DB] -->|FMS_USER_DB_DSN| USvc
+    DBVeh[Vehicle MySQL DB] -->|VEHICLE_DB_DSN| VSvc
+  end
+
+  %% Role wiring (set by APP_ROLE env var)
+  C1 -->|APP_ROLE=user-service| USvc
+  C1 -->|APP_ROLE=vehicle-service| VSvc
+  C1 -->|APP_ROLE=web-view| HWeb & HAPI
+```
+
   - `internal/user/`: Core User, Role, and Auth domain logic (interfaces, local DB implementations, HTTP API clients)
   - `internal/vehicle/`: Core Vehicle (Colors & Makes) domain logic
   - `internal/http/`: Web & REST handlers, middleware, and route registration
@@ -27,7 +91,7 @@ A full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
 
 3.  **Run the Application (Multi-Role Configuration)**:
 
-    The application is built as a modular monolith and can be run in three distinct roles using the `APP_ROLE` environment variable:
+    The application is built as a modular monolith and can be run in four distinct roles using the `APP_ROLE` environment variable:
 
     ### Option A: Monolith Mode (Default)
     Runs all web presentation handlers and API endpoints in-memory, requiring connections to both User and Vehicle MySQL databases.
@@ -37,16 +101,23 @@ A full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
     ```
 
     ### Option B: Isolated User Service Mode
-    Runs strictly as a headless JSON API server on port `8081`, requiring connection **only** to the user database.
+    Runs strictly as a headless JSON API server on port `8081`, requiring connection **only** to the user database (`FMS_USER_DB_DSN`).
     ```bash
     APP_ROLE=user-service PORT=8081 go run ./cmd/web
     ```
 
-    ### Option C: Isolated Web/View Mode
-    Runs as a pure presentation layer on port `8080`, serving HTML/HTMX templates and connecting only to the vehicle database. User, Role, and Auth actions are dynamically delegated to the remote User Service over REST APIs.
+    ### Option C: Isolated Vehicle Service Mode
+    Runs strictly as a headless JSON API server on port `8082`, requiring connection **only** to the vehicle database (`VEHICLE_DB_DSN`).
     ```bash
-    APP_ROLE=web-view PORT=8080 USER_SERVICE_URL="http://localhost:8081" go run ./cmd/web
+    APP_ROLE=vehicle-service PORT=8082 go run ./cmd/web
     ```
+
+    ### Option D: Isolated Web/View Mode (Database-Free!)
+    Runs as a pure presentation layer serving HTML/HTMX templates on port `8080`. When both backend service URLs are provided, it operates with **zero database connections**, delegating all data queries to remote JSON APIs over HTTP:
+    ```bash
+    APP_ROLE=web-view PORT=8080 USER_SERVICE_URL="http://localhost:8081" VEHICLE_SERVICE_URL="http://localhost:8082" go run ./cmd/web
+    ```
+
 
 4.  **Generating Password Hashes (for Database Seeding)**:
     To manually insert or update a user in your MySQL database with a compatible hashed password, you can use the built-in test helper:
