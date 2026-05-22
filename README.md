@@ -179,6 +179,63 @@ make clean
 | `make lint` | Run `golangci-lint` |
 | `make clean` | Remove coverage artifacts |
 
+## UI Tests (Playwright)
+
+End-to-end browser tests live in `test/e2e/` and use [Playwright](https://playwright.dev/).
+
+**Prerequisites:** Node.js 18+, and the app must be running before the tests execute.
+
+### Setup (first time only)
+
+```bash
+cd test/e2e
+npm install
+npx playwright install chromium
+```
+
+### Running the tests
+
+Start the app in one terminal:
+```bash
+go run ./cmd/web
+```
+
+Then in another terminal:
+```bash
+cd test/e2e
+
+# Run all tests headless (CI-style)
+npm test
+
+# Run with a visible browser window (useful for debugging)
+npm run test:headed
+
+# Open Playwright's interactive UI explorer
+npm run test:ui
+
+# View the HTML report from the last run
+npm run report
+```
+
+### Environment variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `APP_URL` | `http://localhost:8080` | Base URL of the running app |
+| `TEST_EMAIL` | `admin@example.com` | Valid login email for success-path tests |
+| `TEST_PASSWORD` | `password` | Valid login password for success-path tests |
+
+```bash
+cd test/e2e
+APP_URL=http://localhost:8080 TEST_EMAIL=admin@fleet.com TEST_PASSWORD=secret npm test
+```
+
+### Test coverage
+
+| File | Tests |
+|---|---|
+| `tests/login.spec.ts` | Form render, autofocus, empty submit validation, wrong credentials error, email pre-population, dismiss notification, successful redirect, `/` alias |
+
 ## Technology Stack
 
 - **Backend**: [Gin](https://github.com/gin-gonic/gin)

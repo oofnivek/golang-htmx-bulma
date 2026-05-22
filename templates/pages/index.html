@@ -17,9 +17,9 @@
 
     <form method="POST" action="/login">
         <div class="field">
-            <label class="label">Email Address</label>
+            <label class="label" for="email">Email Address</label>
             <div class="control has-icons-left">
-                <input class="input" type="email" name="email" placeholder="you@example.com" required autofocus autocomplete="email" value="{{ .email }}">
+                <input id="email" class="input" type="email" name="email" placeholder="you@example.com" required autofocus autocomplete="email" value="{{ .email }}">
                 <span class="icon is-small is-left">
                     <i class="fas fa-envelope"></i>
                 </span>
@@ -27,9 +27,9 @@
         </div>
 
         <div class="field">
-            <label class="label">Password</label>
+            <label class="label" for="password">Password</label>
             <div class="control has-icons-left">
-                <input class="input" type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                <input id="password" class="input" type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
                 <span class="icon is-small is-left">
                     <i class="fas fa-lock"></i>
                 </span>
