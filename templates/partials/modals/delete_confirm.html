@@ -17,13 +17,13 @@
         </section>
         <footer class="modal-card-foot">
             <div class="buttons is-right">
-                <button class="button is-danger" 
-                        id="confirm-delete-btn" 
-                        disabled 
+                <button class="button is-danger"
+                        id="confirm-delete-btn"
+                        disabled
                         hx-delete="{{ .DeleteURL }}"
                         hx-target="#{{ .RowID }}"
                         hx-swap="outerHTML"
-                        onclick="closeModal()">
+                        hx-on::after-request="closeModal()">
                     Delete
                 </button>
                 <button class="button" onclick="closeModal()">Cancel</button>

@@ -1,0 +1,29 @@
+{{ define "vehicle_types/table_row.html" }}
+<tr id="type-row-{{ .Type.ID }}">
+    <td>{{ .Type.ID }}</td>
+    <td>{{ .Type.Name }}</td>
+    <td>
+        {{ if .Type.Status }}
+            <span class="tag is-success">Active</span>
+        {{ else }}
+            <span class="tag is-danger">Inactive</span>
+        {{ end }}
+    </td>
+    <td>{{ if .Type.UpdatedBy }}{{ .Type.UpdatedBy }}{{ else }}-{{ end }}</td>
+    <td>{{ if .Type.UpdatedAt }}{{ in_timezone .Type.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
+    <td>
+        <div class="buttons are-small">
+            <button class="button is-link is-light" hx-get="/vehicle-types/{{ .Type.ID }}/edit" hx-target="body" hx-push-url="true">
+                <span class="icon is-small">
+                    <i class="fas fa-edit"></i>
+                </span>
+            </button>
+            <button class="button is-danger is-light" hx-get="/vehicle-types/{{ .Type.ID }}/delete" hx-target="#modal-container">
+                <span class="icon is-small">
+                    <i class="fas fa-trash"></i>
+                </span>
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

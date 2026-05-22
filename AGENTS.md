@@ -267,6 +267,10 @@ Before finishing changes, always do the relevant checks:
 - Ask before making destructive schema changes or irreversible migrations.
 - Ask before changing core project structure or replacing major libraries/frameworks.
 
+## Legacy / ignored fields
+
+- `VehicleType.OldID` (`old_id` column) — legacy migration artifact. The column exists in the database and on the struct but must not be exposed in forms, API responses, or new features.
+
 ## Ask first
 Ask before doing any of the following:
 - adding or removing dependencies

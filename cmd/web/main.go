@@ -55,6 +55,7 @@ func main() {
 	var (
 		vcHandler   *web.VehicleColorHandler
 		vmHandler   *web.VehicleMakeHandler
+		vtHandler   *web.VehicleTypeHandler
 		roleHandler *web.RoleHandler
 		userHandler *web.UserHandler
 		authHandler *web.AuthHandler
@@ -166,6 +167,7 @@ func main() {
 		var (
 			vcSvc vehicle.VehicleColorService
 			vmSvc vehicle.VehicleMakeService
+			vtSvc vehicle.VehicleTypeService
 		)
 
 		vehicleServiceURL := os.Getenv("VEHICLE_SERVICE_URL")
@@ -173,6 +175,7 @@ func main() {
 			log.Printf("Using remote Vehicle Service at: %s\n", vehicleServiceURL)
 			vcSvc = vehicle.NewRemoteVehicleColorService(vehicleServiceURL)
 			vmSvc = vehicle.NewRemoteVehicleMakeService(vehicleServiceURL)
+			vtSvc = vehicle.NewRemoteVehicleTypeService(vehicleServiceURL)
 		} else {
 			log.Println("WARNING: VEHICLE_SERVICE_URL is not set. Falling back to local Vehicle DB access.")
 			vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
@@ -186,11 +189,15 @@ func main() {
 
 			vmRepo := vehicle.NewVehicleMakeRepository(vehicleDatabase)
 			vmSvc = vehicle.NewVehicleMakeService(vmRepo)
+
+			vtRepo := vehicle.NewVehicleTypeRepository(vehicleDatabase)
+			vtSvc = vehicle.NewVehicleTypeService(vtRepo)
 		}
 
 		// Set up Web Handlers
 		vcHandler = web.NewVehicleColorHandler(vcSvc)
 		vmHandler = web.NewVehicleMakeHandler(vmSvc)
+		vtHandler = web.NewVehicleTypeHandler(vtSvc)
 		roleHandler = web.NewRoleHandler(roleSvc)
 		userHandler = web.NewUserHandler(userSvc, roleSvc)
 		authHandler = web.NewAuthHandler(authSvc)
@@ -225,6 +232,10 @@ func main() {
 		vmSvc := vehicle.NewVehicleMakeService(vmRepo)
 		vmHandler = web.NewVehicleMakeHandler(vmSvc)
 
+		vtRepo := vehicle.NewVehicleTypeRepository(vehicleDatabase)
+		vtSvc := vehicle.NewVehicleTypeService(vtRepo)
+		vtHandler = web.NewVehicleTypeHandler(vtSvc)
+
 		// Wire User services/handlers (local implementations)
 		userRepo := user.NewUserRepository(userDatabase)
 		userSvc := user.NewLocalUserService(userRepo)
@@ -255,6 +266,7 @@ func main() {
 		r,
 		vcHandler,
 		vmHandler,
+		vtHandler,
 		roleHandler,
 		userHandler,
 		authHandler,

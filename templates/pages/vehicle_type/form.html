@@ -1,0 +1,36 @@
+{{ define "content" }}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box">
+            <h1 class="title mb-5">{{ .title }}</h1>
+            <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+                <div class="field">
+                    <label class="label">Name</label>
+                    <div class="control">
+                        <input class="input" type="text" name="name" placeholder="Type Name" value="{{ if .type }}{{ .type.Name }}{{ end }}" required autofocus>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" name="status" {{ if or (not .type) .type.Status }}checked{{ end }}>
+                            Active
+                        </label>
+                    </div>
+                </div>
+                <div class="field is-grouped is-grouped-right mt-5">
+                    <div class="control">
+                        <button type="submit" class="button is-link">
+                            <span class="icon"><i class="fas fa-save"></i></span>
+                            <span>Save</span>
+                        </button>
+                    </div>
+                    <div class="control">
+                        <button type="button" class="button is-link is-light" hx-get="/vehicle-types" hx-target="body" hx-push-url="true">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}

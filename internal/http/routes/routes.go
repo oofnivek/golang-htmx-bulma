@@ -13,6 +13,7 @@ func RegisterRoutes(
 	r *gin.Engine,
 	vcHandler *web.VehicleColorHandler,
 	vmHandler *web.VehicleMakeHandler,
+	vtHandler *web.VehicleTypeHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -64,6 +65,21 @@ func RegisterRoutes(
 					vmGroup.POST("/:id", vmHandler.Update)
 					vmGroup.DELETE("/:id", vmHandler.Delete)
 					vmGroup.GET("/:id/delete", vmHandler.DeleteConfirm)
+				}
+			}
+
+			// Vehicle Types
+			if vtHandler != nil {
+				vtGroup := protected.Group("/vehicle-types")
+				{
+					vtGroup.GET("", vtHandler.List)
+					vtGroup.GET("/new", vtHandler.CreateForm)
+					vtGroup.POST("", vtHandler.Create)
+					vtGroup.GET("/:id", vtHandler.View)
+					vtGroup.GET("/:id/edit", vtHandler.EditForm)
+					vtGroup.POST("/:id", vtHandler.Update)
+					vtGroup.DELETE("/:id", vtHandler.Delete)
+					vtGroup.GET("/:id/delete", vtHandler.DeleteConfirm)
 				}
 			}
 
