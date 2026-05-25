@@ -1,0 +1,31 @@
+{{ define "vehicle_models/table_row.html" }}
+<tr id="model-row-{{ .Model.ID }}">
+    <td>{{ .Model.ID }}</td>
+    <td>{{ .Model.Name }}</td>
+    <td>{{ .Model.VehicleTypeName }}</td>
+    <td>{{ .Model.VehicleMakeName }}</td>
+    <td>
+        {{ if .Model.Status }}
+            <span class="tag is-success">Active</span>
+        {{ else }}
+            <span class="tag is-danger">Inactive</span>
+        {{ end }}
+    </td>
+    <td>{{ if .Model.UpdatedBy }}{{ .Model.UpdatedBy }}{{ else }}-{{ end }}</td>
+    <td>{{ if .Model.UpdatedAt }}{{ in_timezone .Model.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
+    <td>
+        <div class="buttons are-small">
+            <button class="button is-link is-light" hx-get="/vehicle-models/{{ .Model.ID }}/edit" hx-target="body" hx-push-url="true">
+                <span class="icon is-small">
+                    <i class="fas fa-edit"></i>
+                </span>
+            </button>
+            <button class="button is-danger is-light" hx-get="/vehicle-models/{{ .Model.ID }}/delete" hx-target="#modal-container">
+                <span class="icon is-small">
+                    <i class="fas fa-trash"></i>
+                </span>
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

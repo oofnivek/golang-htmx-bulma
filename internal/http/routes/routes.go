@@ -16,6 +16,7 @@ func RegisterRoutes(
 	vtHandler *web.VehicleTypeHandler,
 	vsHandler *web.VehicleStatusHandler,
 	ftHandler *web.FuelTypeHandler,
+	vmdlHandler *web.VehicleModelHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -26,6 +27,7 @@ func RegisterRoutes(
 	vmAPI *api.VehicleMakeAPIHandler,
 	vsAPI *api.VehicleStatusAPIHandler,
 	ftAPI *api.FuelTypeAPIHandler,
+	vmdlAPI *api.VehicleModelAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -40,7 +42,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -98,6 +100,20 @@ func RegisterRoutes(
 					ftGroup.POST("/:id", ftHandler.Update)
 					ftGroup.DELETE("/:id", ftHandler.Delete)
 					ftGroup.GET("/:id/delete", ftHandler.DeleteConfirm)
+				}
+			}
+
+			// Vehicle Models
+			if vmdlHandler != nil {
+				vmdlGroup := protected.Group("/vehicle-models")
+				{
+					vmdlGroup.GET("", vmdlHandler.List)
+					vmdlGroup.GET("/new", vmdlHandler.CreateForm)
+					vmdlGroup.POST("", vmdlHandler.Create)
+					vmdlGroup.GET("/:id/edit", vmdlHandler.EditForm)
+					vmdlGroup.POST("/:id", vmdlHandler.Update)
+					vmdlGroup.DELETE("/:id", vmdlHandler.Delete)
+					vmdlGroup.GET("/:id/delete", vmdlHandler.DeleteConfirm)
 				}
 			}
 
@@ -206,6 +222,15 @@ func RegisterRoutes(
 			apiGroup.POST("/fuel-types", ftAPI.Create)
 			apiGroup.PUT("/fuel-types/:id", ftAPI.Update)
 			apiGroup.DELETE("/fuel-types/:id", ftAPI.Delete)
+		}
+
+		if vmdlAPI != nil {
+			apiGroup.GET("/vehicle-models/all", vmdlAPI.ListAll)
+			apiGroup.GET("/vehicle-models", vmdlAPI.List)
+			apiGroup.GET("/vehicle-models/:id", vmdlAPI.Get)
+			apiGroup.POST("/vehicle-models", vmdlAPI.Create)
+			apiGroup.PUT("/vehicle-models/:id", vmdlAPI.Update)
+			apiGroup.DELETE("/vehicle-models/:id", vmdlAPI.Delete)
 		}
 	}
 }

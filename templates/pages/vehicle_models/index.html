@@ -1,0 +1,170 @@
+{{ define "content" }}
+<div class="level">
+    <div class="level-left">
+        <h1 class="title mr-4">Vehicle Models</h1>
+    </div>
+    <div class="level-right">
+        <div class="field has-addons mr-3">
+            <div class="control">
+                <span class="button is-static">Rows</span>
+            </div>
+            <div class="control">
+                <div class="select">
+                    <select name="pageSize"
+                            hx-get="/vehicle-models"
+                            hx-include="[name='tz'],[name='sortBy'],[name='sortOrder']"
+                            hx-target="body"
+                            hx-push-url="true">
+                        {{ $currentSize := .pageSize }}
+                        {{ range .pageSizeOptions }}
+                            <option value="{{ . }}" {{ if eq . $currentSize }}selected{{ end }}>{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="field has-addons mr-3">
+            <div class="control">
+                <span class="button is-static">Timezone</span>
+            </div>
+            <div class="control">
+                <div class="select">
+                    <select name="tz"
+                            hx-get="/vehicle-models"
+                            hx-include="[name='pageSize'],[name='sortBy'],[name='sortOrder']"
+                            hx-target="body"
+                            hx-push-url="true"
+                            id="tz-select">
+                        {{ $currentTz := .timezone }}
+                        {{ range .timezones }}
+                            <option value="{{ . }}" {{ if eq . $currentTz }}selected{{ end }}>{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <a href="/vehicle-models/new" class="button is-primary">Add New Model</a>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('tz')) {
+        const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const select = document.getElementById('tz-select');
+        let found = false;
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === browserTz) {
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            window.location.search = `?tz=${browserTz}`;
+        }
+    }
+</script>
+
+<div class="box">
+    <input type="hidden" name="sortBy" value="{{ .sortBy }}">
+    <input type="hidden" name="sortOrder" value="{{ .sortOrder }}">
+
+    <table class="table is-fullwidth is-striped">
+        <thead>
+            <tr>
+                <th>
+                    <a hx-get="/vehicle-models?sortBy=id&sortOrder={{ if and (eq .sortBy "id") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        ID {{ if eq .sortBy "id" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>
+                    <a hx-get="/vehicle-models?sortBy=name&sortOrder={{ if and (eq .sortBy "name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        Name {{ if eq .sortBy "name" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>
+                    <a hx-get="/vehicle-models?sortBy=vehicle_type_name&sortOrder={{ if and (eq .sortBy "vehicle_type_name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        Vehicle Type {{ if eq .sortBy "vehicle_type_name" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>
+                    <a hx-get="/vehicle-models?sortBy=vehicle_make_name&sortOrder={{ if and (eq .sortBy "vehicle_make_name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        Vehicle Make {{ if eq .sortBy "vehicle_make_name" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>
+                    <a hx-get="/vehicle-models?sortBy=status&sortOrder={{ if and (eq .sortBy "status") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        Status {{ if eq .sortBy "status" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>
+                    <a hx-get="/vehicle-models?sortBy=updated_by&sortOrder={{ if and (eq .sortBy "updated_by") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        Updated By {{ if eq .sortBy "updated_by" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>
+                    <a hx-get="/vehicle-models?sortBy=updated_at&sortOrder={{ if and (eq .sortBy "updated_at") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        Updated At {{ if eq .sortBy "updated_at" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ $tz := .timezone }}
+            {{ range .models }}
+                {{ template "vehicle_models/table_row.html" (dict "Model" . "Timezone" $tz) }}
+            {{ end }}
+        </tbody>
+    </table>
+
+    {{ if gt .totalPages 1 }}
+    <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+        {{ if gt .currentPage 1 }}
+        <a class="pagination-previous"
+           hx-get="/vehicle-models?page={{ sub .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+           hx-target="body"
+           hx-push-url="true">Previous</a>
+        {{ else }}
+        <a class="pagination-previous" disabled>Previous</a>
+        {{ end }}
+
+        {{ if lt .currentPage .totalPages }}
+        <a class="pagination-next"
+           hx-get="/vehicle-models?page={{ add .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+           hx-target="body"
+           hx-push-url="true">Next page</a>
+        {{ else }}
+        <a class="pagination-next" disabled>Next page</a>
+        {{ end }}
+
+        <ul class="pagination-list">
+            {{ $current := .currentPage }}
+            {{ $tz := .timezone }}
+            {{ $size := .pageSize }}
+            {{ $sortBy := .sortBy }}
+            {{ $sortOrder := .sortOrder }}
+            {{ range $p := (seq 1 .totalPages) }}
+            <li>
+                <a class="pagination-link {{ if eq $p $current }}is-current{{ end }}"
+                   hx-get="/vehicle-models?page={{ $p }}&tz={{ $tz }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}"
+                   hx-target="body"
+                   hx-push-url="true"
+                   aria-label="Goto page {{ $p }}">{{ $p }}</a>
+            </li>
+            {{ end }}
+        </ul>
+    </nav>
+    <div class="has-text-centered is-size-7 has-text-grey mt-2">
+        Showing page {{ .currentPage }} of {{ .totalPages }} (Total: {{ .total }} items, {{ .pageSize }} rows per page)
+    </div>
+    {{ end }}
+</div>
+{{ end }}

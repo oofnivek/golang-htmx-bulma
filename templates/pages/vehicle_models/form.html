@@ -1,0 +1,70 @@
+{{ define "content" }}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box">
+            <h1 class="title mb-5">{{ .title }}</h1>
+            <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+                <div class="field">
+                    <label class="label">Vehicle Type</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="vehicle_type_id" required autofocus>
+                                <option value="">-- Select Vehicle Type --</option>
+                                {{ range .vehicleTypes }}
+                                    <option value="{{ .ID }}" {{ if eq .ID $.currentTypeID }}selected{{ end }}>{{ .Name }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Vehicle Make</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="vehicle_make_id" required>
+                                <option value="">-- Select Vehicle Make --</option>
+                                {{ range .vehicleMakes }}
+                                    <option value="{{ .ID }}" {{ if eq .ID $.currentMakeID }}selected{{ end }}>{{ .Name }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Name</label>
+                    <div class="control">
+                        <input class="input" type="text" name="name" placeholder="Model Name"
+                               value="{{ if .model }}{{ .model.Name }}{{ end }}" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" name="status" {{ if or (not .model) .model.Status }}checked{{ end }}>
+                            Active
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field is-grouped is-grouped-right mt-5">
+                    <div class="control">
+                        <button type="submit" class="button is-link">
+                            <span class="icon">
+                                <i class="fas fa-save"></i>
+                            </span>
+                            <span>Save</span>
+                        </button>
+                    </div>
+                    <div class="control">
+                        <button type="button" class="button is-link is-light"
+                                hx-get="/vehicle-models" hx-target="body" hx-push-url="true">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}
