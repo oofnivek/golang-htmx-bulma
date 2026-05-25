@@ -22,6 +22,173 @@ DDL for all tables is in `schema/`, organized by database name:
 - Prefer clarity and maintainability over clever abstractions.
 - Make small, focused changes instead of large rewrites.
 
+## New feature scaffold
+
+Use this checklist when adding a new CRUD feature. Work in layer order — each layer's interface is the contract the next layer depends on. Replace `Thing` / `thing` / `things` with the real name.
+
+### Layer 1 — Domain model  
+File: `internal/<domain>/<thing>.go`
+```go
+type Thing struct {
+    ID        int64      `json:"id"`
+    Name      string     `json:"name"`
+    // ... domain fields
+    CreatedBy string     `json:"created_by"`
+    CreatedAt time.Time  `json:"created_at"`
+    UpdatedBy *string    `json:"updated_by"`
+    UpdatedAt *time.Time `json:"updated_at"`
+}
+```
+- Use `int64` for numeric PKs; `string` for natural-key PKs (e.g. role ID).
+- Pointer types (`*string`, `*time.Time`) for nullable columns.
+- Include display-only join fields (e.g. `TypeName string`) for list views.
+
+### Layer 2 — Repository  
+File: `internal/<domain>/<thing>_repository.go`
+
+Interface (define at top of file, implemented below):
+```go
+type ThingRepository interface {
+    GetAll() ([]Thing, error)
+    GetPaged(limit, offset int, sortBy, sortOrder string) ([]Thing, error)
+    Count() (int, error)
+    GetByID(id int64) (*Thing, error)
+    Create(t *Thing) error
+    Update(t *Thing) error
+    Delete(id int64) error
+}
+```
+Implementation struct: `mysqlThingRepository` wrapping `*sql.DB`.  
+Constructor: `NewThingRepository(db *sql.DB) ThingRepository`.  
+Use named `const` for SELECT columns and FROM/JOIN clauses; extract a `scanThing()` helper.  
+`GetPaged`: apply a `sortableColumns` allowlist map before interpolating `sortBy`/`sortOrder` into the query.
+
+### Layer 3 — Service  
+File: `internal/<domain>/<thing>_service.go`
+
+Interface:
+```go
+type ThingService interface {
+    ListAll() ([]Thing, error)
+    ListPaged(page, pageSize int, sortBy, sortOrder string) ([]Thing, int, error)
+    FindByID(id int64) (*Thing, error)
+    CreateThing(/* fields */, user string) (*Thing, error)
+    UpdateThing(id int64, /* fields */, user string) (*Thing, error)
+    DeleteThing(id int64) error
+}
+```
+Implementation struct: `thingService{repo ThingRepository}`.  
+Constructor: `NewThingService(repo ThingRepository) ThingService`.  
+`ListPaged`: clamp `page`/`pageSize` to ≥1, compute `offset = (page-1)*pageSize`, call `repo.GetPaged` then `repo.Count`.  
+`CreateThing`: set `CreatedAt`, `UpdatedAt` to `time.Now().UTC()`; set `CreatedBy`, `UpdatedBy` from `user`.  
+`UpdateThing`: fetch existing record first (`GetByID`), return `nil,nil` if not found, mutate then call `repo.Update`.
+
+### Layer 4 — Remote service (for web-view mode)  
+File: `internal/<domain>/remote_service.go` — add a new `remoteThingService` struct at the bottom.
+
+```go
+type remoteThingService struct{ baseURL string }
+func NewRemoteThingService(baseURL string) ThingService { ... }
+```
+Each method: build URL, call `http.Get`/`http.Post`/etc., decode JSON response.  
+Mirror the local service's method signatures exactly.
+
+### Layer 5 — Web handler  
+File: `internal/http/handlers/web/<thing>.go`
+
+```go
+type ThingHandler struct{ svc domain.ThingService }
+func NewThingHandler(svc domain.ThingService) *ThingHandler
+```
+Methods: `List`, `View`, `CreateForm`, `Create`, `EditForm`, `Update`, `Delete`, `DeleteConfirm`.  
+- `List`: read `page`, `pageSize`, `sortBy`, `sortOrder`, `tz` from query; render `pages/things/index.html` with pagination map.  
+- `CreateForm` / `EditForm`: render `pages/things/form.html`; pass `"action"` URL and any lookup lists needed by dropdowns.  
+- `Create` / `Update`: parse form values, call service, `c.Redirect(303, "/things")`.  
+- `Delete`: call service, `c.Status(200)` (HTMX row removal via `hx-target`/`hx-swap="outerHTML"`).  
+- `DeleteConfirm`: fetch record, render `partials/modals/delete_confirm.html` with `Name`, `DeleteURL`, `RowID`.  
+- `View`: fetch record, render `pages/things/view.html`.
+
+### Layer 6 — API handler  
+File: `internal/http/handlers/api/<thing>.go`
+
+```go
+type ThingAPIHandler struct{ svc domain.ThingService }
+func NewThingAPIHandler(svc domain.ThingService) *ThingAPIHandler
+```
+Methods: `ListAll` (no pagination), `List` (paged), `Get`, `Create`, `Update`, `Delete`.  
+Use `c.ShouldBindJSON` for request bodies; return `c.JSON(400/404/500/200/201, gin.H{...})`.
+
+### Layer 7 — Routes  
+File: `internal/http/routes/routes.go`
+
+1. Add `thingHandler *web.ThingHandler` and `thingAPI *api.ThingAPIHandler` parameters to `RegisterRoutes`.
+2. Add to the nil-guard condition (`if ... || thingHandler != nil ...`).
+3. Inside `protected` group:
+```go
+if thingHandler != nil {
+    g := protected.Group("/things")
+    {
+        g.GET("",          thingHandler.List)
+        g.GET("/new",      thingHandler.CreateForm)
+        g.POST("",         thingHandler.Create)
+        g.GET("/:id/view", thingHandler.View)
+        g.GET("/:id/edit", thingHandler.EditForm)
+        g.POST("/:id",     thingHandler.Update)
+        g.DELETE("/:id",   thingHandler.Delete)
+        g.GET("/:id/delete", thingHandler.DeleteConfirm)
+    }
+}
+```
+4. Inside `apiGroup`:
+```go
+if thingAPI != nil {
+    apiGroup.GET("/things/all", thingAPI.ListAll)
+    apiGroup.GET("/things",     thingAPI.List)
+    apiGroup.GET("/things/:id", thingAPI.Get)
+    apiGroup.POST("/things",    thingAPI.Create)
+    apiGroup.PUT("/things/:id", thingAPI.Update)
+    apiGroup.DELETE("/things/:id", thingAPI.Delete)
+}
+```
+
+### Layer 8 — Main wiring  
+File: `cmd/web/main.go`
+
+Add variable declarations, then wire inside **each APP_ROLE case** that owns the domain:
+```go
+// vehicle-service / user-service case:
+thingRepo := domain.NewThingRepository(db)
+thingSvc  := domain.NewThingService(thingRepo)
+thingHandler = web.NewThingHandler(thingSvc)
+thingAPI     = api.NewThingAPIHandler(thingSvc)
+
+// web-view case (remote):
+thingSvc = domain.NewRemoteThingService(serviceURL)
+thingHandler = web.NewThingHandler(thingSvc)
+```
+Pass `thingHandler` and `thingAPI` to `routes.RegisterRoutes(...)`.
+
+### Layer 9 — Templates
+
+| File | Purpose |
+|---|---|
+| `templates/pages/things/index.html` | Paginated table, sort headers, rows per page, timezone selector, pagination nav |
+| `templates/pages/things/form.html` | Create/edit form; `autofocus` on first field; Save + Cancel footer buttons |
+| `templates/pages/things/view.html` | Read-only mirror of form; only "Back to List" footer button |
+| `templates/partials/things/table_row.html` | `<tr id="thing-row-{{ .ID }}">` with icon-only action buttons |
+
+Template conventions recap:
+- Index: `hx-target="body" hx-push-url="true"` on sort links, page links, and selectors.
+- Table row: `{{ define "things/table_row.html" }}` — called with `{{ template "things/table_row.html" . }}`.
+- Action button order: view (`is-info is-light`, eye), edit (`is-link is-light`, edit), delete (`is-danger is-light`, trash).
+- Form footer (right-aligned): Save button (`is-link`, `fa-save`) **left of** Cancel button (`is-link is-light`).
+- Delete modal target: `hx-target="#modal-container"`.
+
+### Layer 10 — Sidebar nav  
+File: `templates/layouts/base.html` — add `<li><a href="/things">Things</a></li>` under the correct `<p class="menu-label">` section.
+
+---
+
 ## Go project structure
 Use idiomatic Go project structure with `cmd/` for the executable entrypoint and `internal/` for application-specific code that should not be imported by other modules.
 
