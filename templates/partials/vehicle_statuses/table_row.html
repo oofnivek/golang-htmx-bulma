@@ -1,0 +1,27 @@
+{{ define "vehicle_statuses/table_row.html" }}
+<tr id="status-row-{{ .ID }}">
+    <td>{{ .ID }}</td>
+    <td>{{ .Substatus }}</td>
+    <td>
+        {{ if .IsActive }}
+            <span class="tag is-success">Active</span>
+        {{ else }}
+            <span class="tag is-danger">Inactive</span>
+        {{ end }}
+    </td>
+    <td>
+        <div class="buttons are-small">
+            <button class="button is-link is-light" hx-get="/vehicle-statuses/{{ .ID }}/edit" hx-target="body" hx-push-url="true">
+                <span class="icon is-small">
+                    <i class="fas fa-edit"></i>
+                </span>
+            </button>
+            <button class="button is-danger is-light" hx-get="/vehicle-statuses/{{ .ID }}/delete" hx-target="#modal-container">
+                <span class="icon is-small">
+                    <i class="fas fa-trash"></i>
+                </span>
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

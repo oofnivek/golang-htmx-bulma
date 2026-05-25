@@ -6,8 +6,13 @@ This project is a full-stack web application built with Go, Gin, HTMX, Bulma CSS
 - Backend framework: Gin
 - Frontend: server-rendered HTML templates enhanced with HTMX
 - CSS framework: Bulma
-- Database: MySQL only
+- Database: MySQL only (connects to existing databases — no migrations run from this repo)
 - Goal: keep the app simple, server-driven, and easy to maintain
+
+## Database schema
+DDL for all tables is in `schema/`, organized by database name:
+- `schema/vehicles/` — tables in the `vehicles` database
+- `schema/fms_users/` — tables in the `fms_users` database
 
 ## Core principles
 - Prefer server-rendered HTML over heavy frontend JavaScript.
@@ -298,6 +303,6 @@ When implementing a feature or fix:
 - Reusable HTML partials
 - Minimal JavaScript
 - Bulma-first styling
-- MySQL-only data model and migrations
+- MySQL-only data model (this app connects to an existing database — no migrations are run from this repo)
 - `cmd/` for entrypoints and `internal/` for app code
 - **Time Handling**: UTC in database, local/selected timezone in UI

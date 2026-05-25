@@ -1,0 +1,107 @@
+{{ define "content" }}
+<div class="level">
+    <div class="level-left">
+        <h1 class="title mr-4">Vehicle Statuses</h1>
+    </div>
+    <div class="level-right">
+        <div class="field has-addons mr-3">
+            <div class="control">
+                <span class="button is-static">Rows</span>
+            </div>
+            <div class="control">
+                <div class="select">
+                    <select name="pageSize"
+                            hx-get="/vehicle-statuses"
+                            hx-include="[name='sortBy'],[name='sortOrder']"
+                            hx-target="body"
+                            hx-push-url="true">
+                        {{ $currentSize := .pageSize }}
+                        {{ range .pageSizeOptions }}
+                            <option value="{{ . }}" {{ if eq . $currentSize }}selected{{ end }}>{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <a href="/vehicle-statuses/new" class="button is-primary">Add New Status</a>
+    </div>
+</div>
+
+<div class="box">
+    <input type="hidden" name="sortBy" value="{{ .sortBy }}">
+    <input type="hidden" name="sortOrder" value="{{ .sortOrder }}">
+
+    <table class="table is-fullwidth is-striped">
+        <thead>
+            <tr>
+                <th>
+                    <a hx-get="/vehicle-statuses?sortBy=id&sortOrder={{ if and (eq .sortBy "id") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        ID {{ if eq .sortBy "id" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>
+                    <a hx-get="/vehicle-statuses?sortBy=substatus&sortOrder={{ if and (eq .sortBy "substatus") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        Substatus {{ if eq .sortBy "substatus" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>
+                    <a hx-get="/vehicle-statuses?sortBy=is_active&sortOrder={{ if and (eq .sortBy "is_active") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&pageSize={{ .pageSize }}"
+                       hx-target="body" hx-push-url="true" class="has-text-dark">
+                        Active {{ if eq .sortBy "is_active" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
+                    </a>
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .statuses }}
+                {{ template "vehicle_statuses/table_row.html" . }}
+            {{ end }}
+        </tbody>
+    </table>
+
+    {{ if gt .totalPages 1 }}
+    <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+        {{ if gt .currentPage 1 }}
+        <a class="pagination-previous"
+           hx-get="/vehicle-statuses?page={{ sub .currentPage 1 }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+           hx-target="body"
+           hx-push-url="true">Previous</a>
+        {{ else }}
+        <a class="pagination-previous" disabled>Previous</a>
+        {{ end }}
+
+        {{ if lt .currentPage .totalPages }}
+        <a class="pagination-next"
+           hx-get="/vehicle-statuses?page={{ add .currentPage 1 }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+           hx-target="body"
+           hx-push-url="true">Next page</a>
+        {{ else }}
+        <a class="pagination-next" disabled>Next page</a>
+        {{ end }}
+
+        <ul class="pagination-list">
+            {{ $current := .currentPage }}
+            {{ $size := .pageSize }}
+            {{ $sortBy := .sortBy }}
+            {{ $sortOrder := .sortOrder }}
+
+            {{ range $p := (seq 1 .totalPages) }}
+            <li>
+                <a class="pagination-link {{ if eq $p $current }}is-current{{ end }}"
+                   hx-get="/vehicle-statuses?page={{ $p }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}"
+                   hx-target="body"
+                   hx-push-url="true"
+                   aria-label="Goto page {{ $p }}">{{ $p }}</a>
+            </li>
+            {{ end }}
+        </ul>
+    </nav>
+    <div class="has-text-centered is-size-7 has-text-grey mt-2">
+        Showing page {{ .currentPage }} of {{ .totalPages }} (Total: {{ .total }} items, {{ .pageSize }} rows per page)
+    </div>
+    {{ end }}
+</div>
+{{ end }}

@@ -14,6 +14,7 @@ func RegisterRoutes(
 	vcHandler *web.VehicleColorHandler,
 	vmHandler *web.VehicleMakeHandler,
 	vtHandler *web.VehicleTypeHandler,
+	vsHandler *web.VehicleStatusHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -22,6 +23,7 @@ func RegisterRoutes(
 	authAPI *api.AuthAPIHandler,
 	vcAPI *api.VehicleColorAPIHandler,
 	vmAPI *api.VehicleMakeAPIHandler,
+	vsAPI *api.VehicleStatusAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -36,7 +38,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -80,6 +82,20 @@ func RegisterRoutes(
 					vtGroup.POST("/:id", vtHandler.Update)
 					vtGroup.DELETE("/:id", vtHandler.Delete)
 					vtGroup.GET("/:id/delete", vtHandler.DeleteConfirm)
+				}
+			}
+
+			// Vehicle Statuses
+			if vsHandler != nil {
+				vsGroup := protected.Group("/vehicle-statuses")
+				{
+					vsGroup.GET("", vsHandler.List)
+					vsGroup.GET("/new", vsHandler.CreateForm)
+					vsGroup.POST("", vsHandler.Create)
+					vsGroup.GET("/:id/edit", vsHandler.EditForm)
+					vsGroup.POST("/:id", vsHandler.Update)
+					vsGroup.DELETE("/:id", vsHandler.Delete)
+					vsGroup.GET("/:id/delete", vsHandler.DeleteConfirm)
 				}
 			}
 
@@ -156,6 +172,15 @@ func RegisterRoutes(
 			apiGroup.POST("/vehicle-makes", vmAPI.Create)
 			apiGroup.PUT("/vehicle-makes/:id", vmAPI.Update)
 			apiGroup.DELETE("/vehicle-makes/:id", vmAPI.Delete)
+		}
+
+		if vsAPI != nil {
+			apiGroup.GET("/vehicle-statuses/all", vsAPI.ListAll)
+			apiGroup.GET("/vehicle-statuses", vsAPI.List)
+			apiGroup.GET("/vehicle-statuses/:id", vsAPI.Get)
+			apiGroup.POST("/vehicle-statuses", vsAPI.Create)
+			apiGroup.PUT("/vehicle-statuses/:id", vsAPI.Update)
+			apiGroup.DELETE("/vehicle-statuses/:id", vsAPI.Delete)
 		}
 	}
 }

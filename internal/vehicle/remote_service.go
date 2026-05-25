@@ -372,6 +372,161 @@ func (s *remoteVehicleMakeService) DeleteMake(id int64) error {
 	return nil
 }
 
+// remoteVehicleStatusService provides HTTP-based client for VehicleStatusService.
+
+type remoteVehicleStatusService struct {
+	client  *http.Client
+	baseURL string
+}
+
+func NewRemoteVehicleStatusService(baseURL string) VehicleStatusService {
+	return &remoteVehicleStatusService{
+		client:  &http.Client{Timeout: 10 * time.Second},
+		baseURL: strings.TrimRight(baseURL, "/"),
+	}
+}
+
+func (s *remoteVehicleStatusService) ListAll() ([]VehicleStatus, error) {
+	resp, err := s.client.Get(s.baseURL + "/api/vehicle-statuses/all")
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Statuses []VehicleStatus `json:"statuses"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.Statuses, nil
+}
+
+func (s *remoteVehicleStatusService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]VehicleStatus, int, error) {
+	q := url.Values{}
+	q.Set("page", strconv.Itoa(page))
+	q.Set("pageSize", strconv.Itoa(pageSize))
+	q.Set("sortBy", sortBy)
+	q.Set("sortOrder", sortOrder)
+	u := fmt.Sprintf("%s/api/vehicle-statuses?%s", s.baseURL, q.Encode())
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, 0, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, 0, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Statuses []VehicleStatus `json:"statuses"`
+		Total    int             `json:"total"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, 0, err
+	}
+	return data.Statuses, data.Total, nil
+}
+
+func (s *remoteVehicleStatusService) FindByID(id int64) (*VehicleStatus, error) {
+	u := fmt.Sprintf("%s/api/vehicle-statuses/%d", s.baseURL, id)
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var vs VehicleStatus
+	if err := json.NewDecoder(resp.Body).Decode(&vs); err != nil {
+		return nil, err
+	}
+	return &vs, nil
+}
+
+func (s *remoteVehicleStatusService) CreateStatus(substatus string, isActive bool) (*VehicleStatus, error) {
+	payload := map[string]interface{}{"substatus": substatus, "is_active": isActive}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Post(s.baseURL+"/api/vehicle-statuses", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var vs VehicleStatus
+	if err := json.NewDecoder(resp.Body).Decode(&vs); err != nil {
+		return nil, err
+	}
+	return &vs, nil
+}
+
+func (s *remoteVehicleStatusService) UpdateStatus(id int64, substatus string, isActive bool) (*VehicleStatus, error) {
+	payload := map[string]interface{}{"substatus": substatus, "is_active": isActive}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/api/vehicle-statuses/%d", s.baseURL, id), bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var vs VehicleStatus
+	if err := json.NewDecoder(resp.Body).Decode(&vs); err != nil {
+		return nil, err
+	}
+	return &vs, nil
+}
+
+func (s *remoteVehicleStatusService) DeleteStatus(id int64) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/vehicle-statuses/%d", s.baseURL, id), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return errors.New(msg)
+		}
+		return fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	return nil
+}
+
 // RemoteVehicleTypeService provides HTTP-based client for VehicleTypeService.
 
 type remoteVehicleTypeService struct {
