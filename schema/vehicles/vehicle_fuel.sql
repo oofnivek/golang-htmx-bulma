@@ -1,0 +1,21 @@
+CREATE TABLE `vehicle_fuel` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `status` tinyint(1) NOT NULL,
+  `vehicle_make_id` bigint NOT NULL,
+  `vehicle_model_id` bigint NOT NULL,
+  `fuel_type_id` bigint NOT NULL,
+  `fuel_tank_size` decimal(7,2) NOT NULL,
+  `fuel_consumption` decimal(7,2) NOT NULL,
+  `created_by` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `created_at` datetime(3) NOT NULL,
+  `updated_by` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  `old_id` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_vehicle_fuel_vehicle_model_id` (`vehicle_model_id`),
+  KEY `FK_vehicle_fuel_vehicle_make_id` (`vehicle_make_id`),
+  KEY `FK_vehicle_fuel_fuel_type_id` (`fuel_type_id`),
+  CONSTRAINT `FK_vehicle_fuel_fuel_type_id` FOREIGN KEY (`fuel_type_id`) REFERENCES `fuel_type` (`id`),
+  CONSTRAINT `FK_vehicle_fuel_vehicle_make_id` FOREIGN KEY (`vehicle_make_id`) REFERENCES `vehicle_make` (`id`),
+  CONSTRAINT `FK_vehicle_fuel_vehicle_model_id` FOREIGN KEY (`vehicle_model_id`) REFERENCES `vehicle_model` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

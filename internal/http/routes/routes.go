@@ -17,6 +17,7 @@ func RegisterRoutes(
 	vsHandler *web.VehicleStatusHandler,
 	ftHandler *web.FuelTypeHandler,
 	vmdlHandler *web.VehicleModelHandler,
+	vfHandler *web.VehicleFuelHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -28,6 +29,7 @@ func RegisterRoutes(
 	vsAPI *api.VehicleStatusAPIHandler,
 	ftAPI *api.FuelTypeAPIHandler,
 	vmdlAPI *api.VehicleModelAPIHandler,
+	vfAPI *api.VehicleFuelAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -42,7 +44,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -114,6 +116,20 @@ func RegisterRoutes(
 					vmdlGroup.POST("/:id", vmdlHandler.Update)
 					vmdlGroup.DELETE("/:id", vmdlHandler.Delete)
 					vmdlGroup.GET("/:id/delete", vmdlHandler.DeleteConfirm)
+				}
+			}
+
+			// Vehicle Fuels
+			if vfHandler != nil {
+				vfGroup := protected.Group("/vehicle-fuels")
+				{
+					vfGroup.GET("", vfHandler.List)
+					vfGroup.GET("/new", vfHandler.CreateForm)
+					vfGroup.POST("", vfHandler.Create)
+					vfGroup.GET("/:id/edit", vfHandler.EditForm)
+					vfGroup.POST("/:id", vfHandler.Update)
+					vfGroup.DELETE("/:id", vfHandler.Delete)
+					vfGroup.GET("/:id/delete", vfHandler.DeleteConfirm)
 				}
 			}
 
@@ -231,6 +247,15 @@ func RegisterRoutes(
 			apiGroup.POST("/vehicle-models", vmdlAPI.Create)
 			apiGroup.PUT("/vehicle-models/:id", vmdlAPI.Update)
 			apiGroup.DELETE("/vehicle-models/:id", vmdlAPI.Delete)
+		}
+
+		if vfAPI != nil {
+			apiGroup.GET("/vehicle-fuels/all", vfAPI.ListAll)
+			apiGroup.GET("/vehicle-fuels", vfAPI.List)
+			apiGroup.GET("/vehicle-fuels/:id", vfAPI.Get)
+			apiGroup.POST("/vehicle-fuels", vfAPI.Create)
+			apiGroup.PUT("/vehicle-fuels/:id", vfAPI.Update)
+			apiGroup.DELETE("/vehicle-fuels/:id", vfAPI.Delete)
 		}
 	}
 }

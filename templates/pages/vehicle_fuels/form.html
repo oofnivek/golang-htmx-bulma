@@ -1,0 +1,94 @@
+{{ define "content" }}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box">
+            <h1 class="title mb-5">{{ .title }}</h1>
+            <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+                <div class="field">
+                    <label class="label">Vehicle Make</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="vehicle_make_id" required autofocus>
+                                <option value="">-- Select Vehicle Make --</option>
+                                {{ range .vehicleMakes }}
+                                    <option value="{{ .ID }}" {{ if eq .ID $.currentMakeID }}selected{{ end }}>{{ .Name }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Vehicle Model</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="vehicle_model_id" required>
+                                <option value="">-- Select Vehicle Model --</option>
+                                {{ range .vehicleModels }}
+                                    <option value="{{ .ID }}" {{ if eq .ID $.currentModelID }}selected{{ end }}>{{ .Name }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Fuel Type</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="fuel_type_id" required>
+                                <option value="">-- Select Fuel Type --</option>
+                                {{ range .fuelTypes }}
+                                    <option value="{{ .ID }}" {{ if eq .ID $.currentFuelTypeID }}selected{{ end }}>{{ .Name }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Fuel Tank Size (L)</label>
+                    <div class="control">
+                        <input class="input" type="number" step="0.01" min="0" name="fuel_tank_size"
+                               placeholder="e.g. 60.00"
+                               value="{{ if .fuel }}{{ .fuel.FuelTankSize }}{{ end }}" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Fuel Consumption (L/100km)</label>
+                    <div class="control">
+                        <input class="input" type="number" step="0.01" min="0" name="fuel_consumption"
+                               placeholder="e.g. 8.50"
+                               value="{{ if .fuel }}{{ .fuel.FuelConsumption }}{{ end }}" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" name="status" {{ if or (not .fuel) .fuel.Status }}checked{{ end }}>
+                            Active
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field is-grouped is-grouped-right mt-5">
+                    <div class="control">
+                        <button type="submit" class="button is-link">
+                            <span class="icon">
+                                <i class="fas fa-save"></i>
+                            </span>
+                            <span>Save</span>
+                        </button>
+                    </div>
+                    <div class="control">
+                        <button type="button" class="button is-link is-light"
+                                hx-get="/vehicle-fuels" hx-target="body" hx-push-url="true">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}
