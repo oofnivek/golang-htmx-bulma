@@ -7,8 +7,8 @@ import (
 // UserRepository defines the database operations for User.
 type UserRepository interface {
 	GetAll() ([]User, error)
-	GetPaged(limit, offset int, sortBy, sortOrder, search string) ([]User, error)
-	Count(search string) (int, error)
+	GetPaged(limit, offset int, sortBy, sortOrder string) ([]User, error)
+	Count() (int, error)
 	GetByEmail(email string) (*User, error)
 	Create(user *User) error
 	Update(user *User) error
@@ -51,7 +51,7 @@ func (r *mysqlUserRepository) GetAll() ([]User, error) {
 	return users, nil
 }
 
-func (r *mysqlUserRepository) GetPaged(limit, offset int, sortBy, sortOrder, search string) ([]User, error) {
+func (r *mysqlUserRepository) GetPaged(limit, offset int, sortBy, sortOrder string) ([]User, error) {
 	validColumns := map[string]bool{
 		"email":          true,
 		"first_name":     true,
@@ -62,7 +62,7 @@ func (r *mysqlUserRepository) GetPaged(limit, offset int, sortBy, sortOrder, sea
 		"updated_at_utc": true,
 		"role_name":      true,
 	}
-	
+
 	sortCol := "u." + sortBy
 	if sortBy == "role_name" {
 		sortCol = "r.name"
@@ -75,21 +75,13 @@ func (r *mysqlUserRepository) GetPaged(limit, offset int, sortBy, sortOrder, sea
 	}
 
 	query := `
-		SELECT u.email, u.first_name, u.last_name, u.mobile, u.designation, u.department, u.is_enabled, 
+		SELECT u.email, u.first_name, u.last_name, u.mobile, u.designation, u.department, u.is_enabled,
 		       u.created_at_utc, u.updated_at_utc, u.role_id, u.password_hash, r.name as role_name
 		FROM users u
-		JOIN roles r ON u.role_id = r.id`
-	
-	var args []interface{}
-	if len(search) >= 2 {
-		query += " WHERE MATCH(u.email, u.first_name, u.last_name, u.mobile) AGAINST(? IN BOOLEAN MODE)"
-		args = append(args, search)
-	}
+		JOIN roles r ON u.role_id = r.id
+		ORDER BY ` + sortCol + ` ` + sortOrder + ` LIMIT ? OFFSET ?`
 
-	query += " ORDER BY " + sortCol + " " + sortOrder + " LIMIT ? OFFSET ?"
-	args = append(args, limit, offset)
-
-	rows, err := r.db.Query(query, args...)
+	rows, err := r.db.Query(query, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -108,16 +100,9 @@ func (r *mysqlUserRepository) GetPaged(limit, offset int, sortBy, sortOrder, sea
 	return users, nil
 }
 
-func (r *mysqlUserRepository) Count(search string) (int, error) {
-	query := "SELECT COUNT(*) FROM users u"
-	var args []interface{}
-	if len(search) >= 2 {
-		query += " WHERE MATCH(u.email, u.first_name, u.last_name, u.mobile) AGAINST(? IN BOOLEAN MODE)"
-		args = append(args, search)
-	}
-
+func (r *mysqlUserRepository) Count() (int, error) {
 	var count int
-	err := r.db.QueryRow(query, args...).Scan(&count)
+	err := r.db.QueryRow("SELECT COUNT(*) FROM users u").Scan(&count)
 	return count, err
 }
 

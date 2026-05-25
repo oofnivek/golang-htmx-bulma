@@ -6,7 +6,7 @@ import (
 
 type MockUserService struct {
 	ListAllFn    func() ([]user.User, error)
-	ListPagedFn  func(page, pageSize int, sortBy, sortOrder, search string) ([]user.User, int, error)
+	ListPagedFn  func(page, pageSize int, sortBy, sortOrder string) ([]user.User, int, error)
 	GetByEmailFn func(email string) (*user.User, error)
 	CreateUserFn func(u *user.User) error
 	UpdateUserFn func(u *user.User) error
@@ -17,8 +17,8 @@ func (m *MockUserService) ListAll() ([]user.User, error) {
 	return m.ListAllFn()
 }
 
-func (m *MockUserService) ListPaged(page, pageSize int, sortBy, sortOrder, search string) ([]user.User, int, error) {
-	return m.ListPagedFn(page, pageSize, sortBy, sortOrder, search)
+func (m *MockUserService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]user.User, int, error) {
+	return m.ListPagedFn(page, pageSize, sortBy, sortOrder)
 }
 
 func (m *MockUserService) GetByEmail(email string) (*user.User, error) {

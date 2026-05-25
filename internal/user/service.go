@@ -15,7 +15,7 @@ import (
 // UserService defines business operations on User.
 type UserService interface {
 	ListAll() ([]User, error)
-	ListPaged(page, pageSize int, sortBy, sortOrder, search string) ([]User, int, error)
+	ListPaged(page, pageSize int, sortBy, sortOrder string) ([]User, int, error)
 	GetByEmail(email string) (*User, error)
 	CreateUser(u *User) error
 	UpdateUser(u *User) error
@@ -35,7 +35,7 @@ func (s *localUserService) ListAll() ([]User, error) {
 	return s.repo.GetAll()
 }
 
-func (s *localUserService) ListPaged(page, pageSize int, sortBy, sortOrder, search string) ([]User, int, error) {
+func (s *localUserService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]User, int, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -44,12 +44,12 @@ func (s *localUserService) ListPaged(page, pageSize int, sortBy, sortOrder, sear
 	}
 	offset := (page - 1) * pageSize
 
-	users, err := s.repo.GetPaged(pageSize, offset, sortBy, sortOrder, search)
+	users, err := s.repo.GetPaged(pageSize, offset, sortBy, sortOrder)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	total, err := s.repo.Count(search)
+	total, err := s.repo.Count()
 	if err != nil {
 		return nil, 0, err
 	}

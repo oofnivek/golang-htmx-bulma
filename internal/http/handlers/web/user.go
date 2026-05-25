@@ -24,10 +24,9 @@ func (h *UserHandler) List(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 	sortBy := c.DefaultQuery("sortBy", "email")
 	sortOrder := c.DefaultQuery("sortOrder", "asc")
-	search := c.Query("search")
 	tz := c.DefaultQuery("tz", "UTC")
 
-	users, total, err := h.userSvc.ListPaged(page, pageSize, sortBy, sortOrder, search)
+	users, total, err := h.userSvc.ListPaged(page, pageSize, sortBy, sortOrder)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -47,7 +46,6 @@ func (h *UserHandler) List(c *gin.Context) {
 		"total":           total,
 		"sortBy":          sortBy,
 		"sortOrder":       sortOrder,
-		"search":          search,
 		"timezone":        tz,
 		"timezones":       timezones,
 	})

@@ -22,7 +22,7 @@ func setupUserTestRouter() *gin.Engine {
 func TestListUser(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		userSvc := &MockUserService{
-			ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]user.User, int, error) {
+			ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]user.User, int, error) {
 				return []user.User{{Email: "a@b.com", FirstName: "Alice"}}, 1, nil
 			},
 		}
@@ -42,7 +42,7 @@ func TestListUser(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		userSvc := &MockUserService{
-			ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]user.User, int, error) {
+			ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]user.User, int, error) {
 				return nil, 0, errors.New("fail")
 			},
 		}

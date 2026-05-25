@@ -22,9 +22,7 @@ func (h *UserAPIHandler) List(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 	sortBy := c.DefaultQuery("sortBy", "email")
 	sortOrder := c.DefaultQuery("sortOrder", "asc")
-	search := c.Query("search")
-
-	users, total, err := h.svc.ListPaged(page, pageSize, sortBy, sortOrder, search)
+	users, total, err := h.svc.ListPaged(page, pageSize, sortBy, sortOrder)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

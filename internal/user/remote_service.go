@@ -47,15 +47,12 @@ func (s *remoteUserService) ListAll() ([]User, error) {
 	return data.Users, nil
 }
 
-func (s *remoteUserService) ListPaged(page, pageSize int, sortBy, sortOrder, search string) ([]User, int, error) {
+func (s *remoteUserService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]User, int, error) {
 	q := url.Values{}
 	q.Set("page", strconv.Itoa(page))
 	q.Set("pageSize", strconv.Itoa(pageSize))
 	q.Set("sortBy", sortBy)
 	q.Set("sortOrder", sortOrder)
-	if search != "" {
-		q.Set("search", search)
-	}
 
 	u := fmt.Sprintf("%s/api/users?%s", s.baseURL, q.Encode())
 	resp, err := s.client.Get(u)
