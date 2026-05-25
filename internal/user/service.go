@@ -102,7 +102,7 @@ func (s *localUserService) DeleteUser(email string) error {
 // RoleService defines business operations on Role.
 type RoleService interface {
 	ListAll() ([]Role, error)
-	ListPaged(page, pageSize int, sortBy, sortOrder, search string) ([]Role, int, error)
+	ListPaged(page, pageSize int, sortBy, sortOrder string) ([]Role, int, error)
 	FindByID(id string) (*Role, error)
 	CreateRole(id, name string) (*Role, error)
 	UpdateRole(id, name string) (*Role, error)
@@ -122,7 +122,7 @@ func (s *localRoleService) ListAll() ([]Role, error) {
 	return s.repo.GetAll()
 }
 
-func (s *localRoleService) ListPaged(page, pageSize int, sortBy, sortOrder, search string) ([]Role, int, error) {
+func (s *localRoleService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]Role, int, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -131,12 +131,12 @@ func (s *localRoleService) ListPaged(page, pageSize int, sortBy, sortOrder, sear
 	}
 	offset := (page - 1) * pageSize
 
-	roles, err := s.repo.GetPaged(pageSize, offset, sortBy, sortOrder, search)
+	roles, err := s.repo.GetPaged(pageSize, offset, sortBy, sortOrder)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	total, err := s.repo.Count(search)
+	total, err := s.repo.Count()
 	if err != nil {
 		return nil, 0, err
 	}

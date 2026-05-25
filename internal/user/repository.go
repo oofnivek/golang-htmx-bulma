@@ -175,8 +175,8 @@ func (r *mysqlUserRepository) Delete(email string) error {
 // RoleRepository defines the database operations for Role.
 type RoleRepository interface {
 	GetAll() ([]Role, error)
-	GetPaged(limit, offset int, sortBy, sortOrder, search string) ([]Role, error)
-	Count(search string) (int, error)
+	GetPaged(limit, offset int, sortBy, sortOrder string) ([]Role, error)
+	Count() (int, error)
 	GetByID(id string) (*Role, error)
 	Create(role *Role) error
 	Update(role *Role) error
@@ -211,7 +211,7 @@ func (r *mysqlRoleRepository) GetAll() ([]Role, error) {
 	return roles, nil
 }
 
-func (r *mysqlRoleRepository) GetPaged(limit, offset int, sortBy, sortOrder, search string) ([]Role, error) {
+func (r *mysqlRoleRepository) GetPaged(limit, offset int, sortBy, sortOrder string) ([]Role, error) {
 	validColumns := map[string]bool{
 		"id":   true,
 		"name": true,
@@ -223,18 +223,8 @@ func (r *mysqlRoleRepository) GetPaged(limit, offset int, sortBy, sortOrder, sea
 		sortOrder = "asc"
 	}
 
-	query := "SELECT id, name FROM roles"
-	var args []interface{}
-
-	if len(search) >= 2 {
-		query += " WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE)"
-		args = append(args, search)
-	}
-
-	query += " ORDER BY " + sortBy + " " + sortOrder + " LIMIT ? OFFSET ?"
-	args = append(args, limit, offset)
-
-	rows, err := r.db.Query(query, args...)
+	query := "SELECT id, name FROM roles ORDER BY " + sortBy + " " + sortOrder + " LIMIT ? OFFSET ?"
+	rows, err := r.db.Query(query, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -252,16 +242,9 @@ func (r *mysqlRoleRepository) GetPaged(limit, offset int, sortBy, sortOrder, sea
 	return roles, nil
 }
 
-func (r *mysqlRoleRepository) Count(search string) (int, error) {
-	query := "SELECT COUNT(*) FROM roles"
-	var args []interface{}
-	if len(search) >= 2 {
-		query += " WHERE MATCH(name) AGAINST(? IN BOOLEAN MODE)"
-		args = append(args, search)
-	}
-
+func (r *mysqlRoleRepository) Count() (int, error) {
 	var count int
-	err := r.db.QueryRow(query, args...).Scan(&count)
+	err := r.db.QueryRow("SELECT COUNT(*) FROM roles").Scan(&count)
 	return count, err
 }
 

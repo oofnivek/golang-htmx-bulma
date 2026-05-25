@@ -210,15 +210,12 @@ func (s *remoteRoleService) ListAll() ([]Role, error) {
 	return data.Roles, nil
 }
 
-func (s *remoteRoleService) ListPaged(page, pageSize int, sortBy, sortOrder, search string) ([]Role, int, error) {
+func (s *remoteRoleService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]Role, int, error) {
 	q := url.Values{}
 	q.Set("page", strconv.Itoa(page))
 	q.Set("pageSize", strconv.Itoa(pageSize))
 	q.Set("sortBy", sortBy)
 	q.Set("sortOrder", sortOrder)
-	if search != "" {
-		q.Set("search", search)
-	}
 
 	u := fmt.Sprintf("%s/api/roles?%s", s.baseURL, q.Encode())
 	resp, err := s.client.Get(u)

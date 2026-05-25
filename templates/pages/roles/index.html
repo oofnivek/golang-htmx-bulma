@@ -2,25 +2,6 @@
 <div class="level">
     <div class="level-left">
         <h1 class="title mr-4">Roles</h1>
-        <div class="field has-addons">
-            <p class="control">
-                <input class="input" type="text" name="search" placeholder="Search roles..." 
-                       value="{{ .search }}"
-                       onkeydown="if(event.key === 'Enter') event.preventDefault()"
-                       hx-on:input="document.getElementById('search-btn').disabled = (this.value.length === 1)">
-            </p>
-            <p class="control">
-                <button class="button is-info" id="search-btn"
-                        hx-get="/roles"
-                        hx-include="[name='search'],[name='pageSize'],[name='sortBy'],[name='sortOrder']"
-                        hx-target="body"
-                        hx-push-url="true">
-                    <span class="icon is-small">
-                        <i class="fas fa-search"></i>
-                    </span>
-                </button>
-            </p>
-        </div>
     </div>
     <div class="level-right">
         <div class="field has-addons mr-3">
@@ -29,10 +10,10 @@
             </div>
             <div class="control">
                 <div class="select">
-                    <select name="pageSize" 
-                            hx-get="/roles" 
-                            hx-include="[name='sortBy'],[name='sortOrder'],[name='search']"
-                            hx-target="body" 
+                    <select name="pageSize"
+                            hx-get="/roles"
+                            hx-include="[name='sortBy'],[name='sortOrder']"
+                            hx-target="body"
                             hx-push-url="true">
                         {{ $currentSize := .pageSize }}
                         {{ range .pageSizeOptions }}
@@ -47,22 +28,21 @@
 </div>
 
 <div class="box">
-    <!-- Hidden inputs to preserve sort and search state in filters -->
+    <!-- Hidden inputs to preserve sort state in filters -->
     <input type="hidden" name="sortBy" value="{{ .sortBy }}">
     <input type="hidden" name="sortOrder" value="{{ .sortOrder }}">
-    <input type="hidden" name="search" value="{{ .search }}">
 
     <table class="table is-fullwidth is-striped">
         <thead>
             <tr>
                 <th>
-                    <a hx-get="/roles?sortBy=id&sortOrder={{ if and (eq .sortBy "id") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&pageSize={{ .pageSize }}&search={{ .search }}" 
+                    <a hx-get="/roles?sortBy=id&sortOrder={{ if and (eq .sortBy "id") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&pageSize={{ .pageSize }}"
                        hx-target="body" hx-push-url="true" class="has-text-dark">
                         ID {{ if eq .sortBy "id" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
                     </a>
                 </th>
                 <th>
-                    <a hx-get="/roles?sortBy=name&sortOrder={{ if and (eq .sortBy "name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&pageSize={{ .pageSize }}&search={{ .search }}" 
+                    <a hx-get="/roles?sortBy=name&sortOrder={{ if and (eq .sortBy "name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&pageSize={{ .pageSize }}"
                        hx-target="body" hx-push-url="true" class="has-text-dark">
                         Name {{ if eq .sortBy "name" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
                     </a>
@@ -81,36 +61,35 @@
     {{ if gt .totalPages 1 }}
     <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
         {{ if gt .currentPage 1 }}
-        <a class="pagination-previous" 
-           hx-get="/roles?page={{ sub .currentPage 1 }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}&search={{ .search }}" 
-           hx-target="body" 
+        <a class="pagination-previous"
+           hx-get="/roles?page={{ sub .currentPage 1 }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+           hx-target="body"
            hx-push-url="true">Previous</a>
         {{ else }}
         <a class="pagination-previous" disabled>Previous</a>
         {{ end }}
-        
+
         {{ if lt .currentPage .totalPages }}
-        <a class="pagination-next" 
-           hx-get="/roles?page={{ add .currentPage 1 }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}&search={{ .search }}" 
-           hx-target="body" 
+        <a class="pagination-next"
+           hx-get="/roles?page={{ add .currentPage 1 }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+           hx-target="body"
            hx-push-url="true">Next page</a>
         {{ else }}
         <a class="pagination-next" disabled>Next page</a>
         {{ end }}
-        
+
         <ul class="pagination-list">
             {{ $current := .currentPage }}
             {{ $total := .totalPages }}
             {{ $size := .pageSize }}
             {{ $sortBy := .sortBy }}
             {{ $sortOrder := .sortOrder }}
-            {{ $search := .search }}
-            
+
             {{ range $p := (seq 1 .totalPages) }}
             <li>
-                <a class="pagination-link {{ if eq $p $current }}is-current{{ end }}" 
-                   hx-get="/roles?page={{ $p }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}&search={{ $search }}" 
-                   hx-target="body" 
+                <a class="pagination-link {{ if eq $p $current }}is-current{{ end }}"
+                   hx-get="/roles?page={{ $p }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}"
+                   hx-target="body"
                    hx-push-url="true"
                    aria-label="Goto page {{ $p }}">{{ $p }}</a>
             </li>

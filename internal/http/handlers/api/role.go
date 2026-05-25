@@ -22,9 +22,7 @@ func (h *RoleAPIHandler) List(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 	sortBy := c.DefaultQuery("sortBy", "id")
 	sortOrder := c.DefaultQuery("sortOrder", "asc")
-	search := c.Query("search")
-
-	roles, total, err := h.svc.ListPaged(page, pageSize, sortBy, sortOrder, search)
+	roles, total, err := h.svc.ListPaged(page, pageSize, sortBy, sortOrder)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

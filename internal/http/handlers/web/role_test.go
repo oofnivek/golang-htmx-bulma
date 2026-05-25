@@ -21,7 +21,7 @@ func setupRoleTestRouter(svc *MockRoleService) *gin.Engine {
 
 func TestListRole(t *testing.T) {
 	mockSvc := &MockRoleService{
-		ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]user.Role, int, error) {
+		ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]user.Role, int, error) {
 			return []user.Role{{ID: "ADMIN", Name: "Administrator"}}, 1, nil
 		},
 	}
@@ -41,7 +41,7 @@ func TestListRole(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		errSvc := &MockRoleService{
-			ListPagedFn: func(page, pageSize int, sortBy, sortOrder, search string) ([]user.Role, int, error) {
+			ListPagedFn: func(page, pageSize int, sortBy, sortOrder string) ([]user.Role, int, error) {
 				return nil, 0, errors.New("fail")
 			},
 		}

@@ -23,10 +23,10 @@ func TestListAllRole(t *testing.T) {
 
 func TestListPagedRole(t *testing.T) {
 	mockRepo := &MockRoleRepository{
-		GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]Role, error) {
+		GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]Role, error) {
 			return []Role{{ID: "ADMIN", Name: "Administrator"}}, nil
 		},
-		CountFn: func(search string) (int, error) {
+		CountFn: func() (int, error) {
 			return 1, nil
 		},
 	}
@@ -34,7 +34,7 @@ func TestListPagedRole(t *testing.T) {
 	svc := NewLocalRoleService(mockRepo)
 
 	t.Run("Success", func(t *testing.T) {
-		roles, total, err := svc.ListPaged(1, 10, "id", "asc", "")
+		roles, total, err := svc.ListPaged(1, 10, "id", "asc")
 		if err != nil {
 			t.Fatalf("Unexpected error: %v", err)
 		}
@@ -44,7 +44,7 @@ func TestListPagedRole(t *testing.T) {
 	})
 
 	t.Run("Defaults", func(t *testing.T) {
-		roles, _, err := svc.ListPaged(0, 0, "id", "asc", "")
+		roles, _, err := svc.ListPaged(0, 0, "id", "asc")
 		if err != nil {
 			t.Fatalf("Unexpected error: %v", err)
 		}
@@ -55,12 +55,12 @@ func TestListPagedRole(t *testing.T) {
 
 	t.Run("GetPagedError", func(t *testing.T) {
 		failRepo := &MockRoleRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]Role, error) {
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]Role, error) {
 				return nil, errors.New("fail")
 			},
 		}
 		failSvc := NewLocalRoleService(failRepo)
-		_, _, err := failSvc.ListPaged(1, 10, "id", "asc", "")
+		_, _, err := failSvc.ListPaged(1, 10, "id", "asc")
 		if err == nil {
 			t.Error("Expected error, got nil")
 		}
@@ -68,15 +68,15 @@ func TestListPagedRole(t *testing.T) {
 
 	t.Run("CountError", func(t *testing.T) {
 		failRepo := &MockRoleRepository{
-			GetPagedFn: func(limit, offset int, sortBy, sortOrder, search string) ([]Role, error) {
+			GetPagedFn: func(limit, offset int, sortBy, sortOrder string) ([]Role, error) {
 				return []Role{}, nil
 			},
-			CountFn: func(search string) (int, error) {
+			CountFn: func() (int, error) {
 				return 0, errors.New("fail")
 			},
 		}
 		failSvc := NewLocalRoleService(failRepo)
-		_, _, err := failSvc.ListPaged(1, 10, "id", "asc", "")
+		_, _, err := failSvc.ListPaged(1, 10, "id", "asc")
 		if err == nil {
 			t.Error("Expected error, got nil")
 		}
