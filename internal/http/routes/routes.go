@@ -15,6 +15,7 @@ func RegisterRoutes(
 	vmHandler *web.VehicleMakeHandler,
 	vtHandler *web.VehicleTypeHandler,
 	vsHandler *web.VehicleStatusHandler,
+	ftHandler *web.FuelTypeHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -24,6 +25,7 @@ func RegisterRoutes(
 	vcAPI *api.VehicleColorAPIHandler,
 	vmAPI *api.VehicleMakeAPIHandler,
 	vsAPI *api.VehicleStatusAPIHandler,
+	ftAPI *api.FuelTypeAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -38,7 +40,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -82,6 +84,20 @@ func RegisterRoutes(
 					vtGroup.POST("/:id", vtHandler.Update)
 					vtGroup.DELETE("/:id", vtHandler.Delete)
 					vtGroup.GET("/:id/delete", vtHandler.DeleteConfirm)
+				}
+			}
+
+			// Fuel Types
+			if ftHandler != nil {
+				ftGroup := protected.Group("/fuel-types")
+				{
+					ftGroup.GET("", ftHandler.List)
+					ftGroup.GET("/new", ftHandler.CreateForm)
+					ftGroup.POST("", ftHandler.Create)
+					ftGroup.GET("/:id/edit", ftHandler.EditForm)
+					ftGroup.POST("/:id", ftHandler.Update)
+					ftGroup.DELETE("/:id", ftHandler.Delete)
+					ftGroup.GET("/:id/delete", ftHandler.DeleteConfirm)
 				}
 			}
 
@@ -181,6 +197,15 @@ func RegisterRoutes(
 			apiGroup.POST("/vehicle-statuses", vsAPI.Create)
 			apiGroup.PUT("/vehicle-statuses/:id", vsAPI.Update)
 			apiGroup.DELETE("/vehicle-statuses/:id", vsAPI.Delete)
+		}
+
+		if ftAPI != nil {
+			apiGroup.GET("/fuel-types/all", ftAPI.ListAll)
+			apiGroup.GET("/fuel-types", ftAPI.List)
+			apiGroup.GET("/fuel-types/:id", ftAPI.Get)
+			apiGroup.POST("/fuel-types", ftAPI.Create)
+			apiGroup.PUT("/fuel-types/:id", ftAPI.Update)
+			apiGroup.DELETE("/fuel-types/:id", ftAPI.Delete)
 		}
 	}
 }

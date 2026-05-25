@@ -1,0 +1,29 @@
+{{ define "fuel_types/table_row.html" }}
+<tr id="fuel-row-{{ .Fuel.ID }}">
+    <td>{{ .Fuel.ID }}</td>
+    <td>{{ .Fuel.Name }}</td>
+    <td>
+        {{ if .Fuel.Status }}
+            <span class="tag is-success">Active</span>
+        {{ else }}
+            <span class="tag is-danger">Inactive</span>
+        {{ end }}
+    </td>
+    <td>{{ if .Fuel.UpdatedBy }}{{ .Fuel.UpdatedBy }}{{ else }}-{{ end }}</td>
+    <td>{{ if .Fuel.UpdatedAt }}{{ in_timezone .Fuel.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
+    <td>
+        <div class="buttons are-small">
+            <button class="button is-link is-light" hx-get="/fuel-types/{{ .Fuel.ID }}/edit" hx-target="body" hx-push-url="true">
+                <span class="icon is-small">
+                    <i class="fas fa-edit"></i>
+                </span>
+            </button>
+            <button class="button is-danger is-light" hx-get="/fuel-types/{{ .Fuel.ID }}/delete" hx-target="#modal-container">
+                <span class="icon is-small">
+                    <i class="fas fa-trash"></i>
+                </span>
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}
