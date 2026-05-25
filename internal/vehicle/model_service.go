@@ -50,7 +50,7 @@ func (s *vehicleModelService) FindByID(id int64) (*VehicleModel, error) {
 }
 
 func (s *vehicleModelService) CreateModel(vehicleTypeID, vehicleMakeID int64, name string, status bool, user string) (*VehicleModel, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	m := &VehicleModel{
 		VehicleTypeID: vehicleTypeID,
 		VehicleMakeID: vehicleMakeID,
@@ -80,7 +80,7 @@ func (s *vehicleModelService) UpdateModel(id, vehicleTypeID, vehicleMakeID int64
 	m.VehicleMakeID = vehicleMakeID
 	m.Name = name
 	m.Status = status
-	now := time.Now()
+	now := time.Now().UTC()
 	m.UpdatedBy = &user
 	m.UpdatedAt = &now
 

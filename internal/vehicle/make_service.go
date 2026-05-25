@@ -52,7 +52,7 @@ func (s *vehicleMakeService) FindByID(id int64) (*VehicleMake, error) {
 }
 
 func (s *vehicleMakeService) CreateMake(name string, status bool, user string) (*VehicleMake, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	make := &VehicleMake{
 		Name:      name,
 		Status:    status,
@@ -79,7 +79,7 @@ func (s *vehicleMakeService) UpdateMake(id int64, name string, status bool, user
 
 	make.Name = name
 	make.Status = status
-	now := time.Now()
+	now := time.Now().UTC()
 	make.UpdatedBy = &user
 	make.UpdatedAt = &now
 

@@ -48,7 +48,7 @@ func (s *fuelTypeService) FindByID(id int64) (*FuelType, error) {
 }
 
 func (s *fuelTypeService) CreateFuelType(name string, status bool, user string) (*FuelType, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	f := &FuelType{
 		Name:      name,
 		Status:    status,
@@ -72,7 +72,7 @@ func (s *fuelTypeService) UpdateFuelType(id int64, name string, status bool, use
 		return nil, nil
 	}
 
-	now := time.Now()
+	now := time.Now().UTC()
 	f.Name = name
 	f.Status = status
 	f.UpdatedBy = &user

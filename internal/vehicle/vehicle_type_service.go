@@ -47,7 +47,7 @@ func (s *vehicleTypeService) FindByID(id int64) (*VehicleType, error) {
 }
 
 func (s *vehicleTypeService) Create(name string, status bool, user string) (*VehicleType, error) {
-    now := time.Now()
+    now := time.Now().UTC()
     vt := &VehicleType{
         Name:      name,
         Status:    status,
@@ -72,7 +72,7 @@ func (s *vehicleTypeService) Update(id int64, name string, status bool, user str
     }
     vt.Name = name
     vt.Status = status
-    now := time.Now()
+    now := time.Now().UTC()
     vt.UpdatedBy = &user
     vt.UpdatedAt = &now
     if err := s.repo.Update(vt); err != nil {

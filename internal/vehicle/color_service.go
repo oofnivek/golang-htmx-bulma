@@ -52,7 +52,7 @@ func (s *vehicleColorService) FindByID(id int64) (*VehicleColor, error) {
 }
 
 func (s *vehicleColorService) CreateColor(name string, status bool, user string) (*VehicleColor, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	color := &VehicleColor{
 		Name:      name,
 		Status:    status,
@@ -79,7 +79,7 @@ func (s *vehicleColorService) UpdateColor(id int64, name string, status bool, us
 
 	color.Name = name
 	color.Status = status
-	now := time.Now()
+	now := time.Now().UTC()
 	color.UpdatedBy = &user
 	color.UpdatedAt = &now
 

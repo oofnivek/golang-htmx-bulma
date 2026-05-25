@@ -48,7 +48,7 @@ func (s *vehicleFuelService) FindByID(id int64) (*VehicleFuel, error) {
 }
 
 func (s *vehicleFuelService) CreateFuel(vehicleMakeID, vehicleModelID, fuelTypeID int64, fuelTankSize, fuelConsumption float64, status bool, user string) (*VehicleFuel, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	f := &VehicleFuel{
 		Status:          status,
 		VehicleMakeID:   vehicleMakeID,
@@ -76,7 +76,7 @@ func (s *vehicleFuelService) UpdateFuel(id, vehicleMakeID, vehicleModelID, fuelT
 		return nil, nil
 	}
 
-	now := time.Now()
+	now := time.Now().UTC()
 	f.Status = status
 	f.VehicleMakeID = vehicleMakeID
 	f.VehicleModelID = vehicleModelID
