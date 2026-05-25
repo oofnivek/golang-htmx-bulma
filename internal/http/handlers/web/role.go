@@ -63,6 +63,25 @@ func (h *RoleHandler) Create(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/roles")
 }
 
+func (h *RoleHandler) View(c *gin.Context) {
+	id := c.Param("id")
+
+	role, err := h.svc.FindByID(id)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if role == nil {
+		c.String(http.StatusNotFound, "Role not found")
+		return
+	}
+
+	c.HTML(http.StatusOK, "pages/roles/view.html", gin.H{
+		"title": "View Role",
+		"role":  role,
+	})
+}
+
 func (h *RoleHandler) EditForm(c *gin.Context) {
 	id := c.Param("id")
 

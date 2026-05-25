@@ -4,6 +4,11 @@
     <td>{{ .Name }}</td>
     <td>
         <div class="buttons are-small">
+            <button class="button is-info is-light" hx-get="/roles/{{ .ID }}/view" hx-target="body" hx-push-url="true">
+                <span class="icon is-small">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </button>
             <button class="button is-link is-light" hx-get="/roles/{{ .ID }}/edit" hx-target="body" hx-push-url="true">
                 <span class="icon is-small">
                     <i class="fas fa-edit"></i>

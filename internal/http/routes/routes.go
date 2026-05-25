@@ -154,6 +154,7 @@ func RegisterRoutes(
 					roleGroup.GET("", roleHandler.List)
 					roleGroup.GET("/new", roleHandler.CreateForm)
 					roleGroup.POST("", roleHandler.Create)
+					roleGroup.GET("/:id/view", roleHandler.View)
 					roleGroup.GET("/:id/edit", roleHandler.EditForm)
 					roleGroup.POST("/:id", roleHandler.Update)
 					roleGroup.DELETE("/:id", roleHandler.Delete)
