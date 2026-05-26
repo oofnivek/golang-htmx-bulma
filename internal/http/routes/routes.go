@@ -98,6 +98,7 @@ func RegisterRoutes(
 					ftGroup.GET("", ftHandler.List)
 					ftGroup.GET("/new", ftHandler.CreateForm)
 					ftGroup.POST("", ftHandler.Create)
+					ftGroup.GET("/:id/view", ftHandler.View)
 					ftGroup.GET("/:id/edit", ftHandler.EditForm)
 					ftGroup.POST("/:id", ftHandler.Update)
 					ftGroup.DELETE("/:id", ftHandler.Delete)
