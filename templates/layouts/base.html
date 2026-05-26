@@ -6,84 +6,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .title }}</title>
-    <!-- Bulma CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
-    <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
-        <div class="container is-fluid">
-            <div class="navbar-brand">
-                <a class="navbar-item" href="/">
-                    <strong>Go-HTMX-Bulma</strong>
+    {{ if .hideSidebar }}
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)">
+        <div style="width:100%;max-width:420px;padding:24px">
+            {{ template "content" . }}
+        </div>
+    </div>
+    {{ else }}
+    <div class="app">
+
+        <!-- Sidebar -->
+        <aside class="sb">
+            <div class="sb-brand">
+                <div class="sb-brand-mark">FC</div>
+                <div>
+                    <div class="sb-brand-name">Fleet Console</div>
+                    <div class="sb-brand-sub">Management Platform</div>
+                </div>
+            </div>
+
+            <nav class="sb-nav">
+                <div class="sb-section">
+                    <div class="sb-section-h">Vehicle Management</div>
+                    <a href="/vehicle-makes" class="sb-item" data-href="/vehicle-makes">
+                        <span class="sb-ico"><i class="fa-solid fa-industry fa-sm"></i></span>
+                        Makes
+                    </a>
+                    <a href="/vehicle-colors" class="sb-item" data-href="/vehicle-colors">
+                        <span class="sb-ico"><i class="fa-solid fa-palette fa-sm"></i></span>
+                        Colors
+                    </a>
+                    <a href="/vehicle-types" class="sb-item" data-href="/vehicle-types">
+                        <span class="sb-ico"><i class="fa-solid fa-car fa-sm"></i></span>
+                        Types
+                    </a>
+                    <a href="/vehicle-models" class="sb-item" data-href="/vehicle-models">
+                        <span class="sb-ico"><i class="fa-solid fa-car-side fa-sm"></i></span>
+                        Models
+                    </a>
+                    <a href="/vehicle-fuels" class="sb-item" data-href="/vehicle-fuels">
+                        <span class="sb-ico"><i class="fa-solid fa-gas-pump fa-sm"></i></span>
+                        Vehicle Fuels
+                    </a>
+                    <a href="/vehicle-statuses" class="sb-item" data-href="/vehicle-statuses">
+                        <span class="sb-ico"><i class="fa-solid fa-circle-check fa-sm"></i></span>
+                        Statuses
+                    </a>
+                    <a href="/fuel-types" class="sb-item" data-href="/fuel-types">
+                        <span class="sb-ico"><i class="fa-solid fa-droplet fa-sm"></i></span>
+                        Fuel Types
+                    </a>
+                    <a href="/fuel-companies" class="sb-item" data-href="/fuel-companies">
+                        <span class="sb-ico"><i class="fa-solid fa-building fa-sm"></i></span>
+                        Fuel Companies
+                    </a>
+                </div>
+
+                <div class="sb-section">
+                    <div class="sb-section-h">Access Management</div>
+                    <a href="/roles" class="sb-item" data-href="/roles">
+                        <span class="sb-ico"><i class="fa-solid fa-shield-halved fa-sm"></i></span>
+                        Roles
+                    </a>
+                    <a href="/users" class="sb-item" data-href="/users">
+                        <span class="sb-ico"><i class="fa-solid fa-users fa-sm"></i></span>
+                        Users
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sb-foot">
+                <div class="av">U</div>
+                <div class="who">
+                    <div class="who-name">Account</div>
+                    <div class="who-role">Administrator</div>
+                </div>
+                <a href="/logout" title="Sign out" style="color:var(--ink-3);font-size:14px;padding:4px">
+                    <i class="fa-solid fa-right-from-bracket"></i>
                 </a>
             </div>
-        </div>
-    </nav>
+        </aside>
 
-    <section class="section">
-        <div class="container is-fluid">
-            <div class="columns">
-                {{ if not .hideSidebar }}
-                <aside class="column is-2">
-                    <nav class="menu">
-                        <p class="menu-label">Administration</p>
-                        <ul class="menu-list">
-                            <li><a href="/vehicle-makes">Vehicle Makes</a></li>
-                            <li><a href="/vehicle-colors">Vehicle Colors</a></li>
-                            <li><a href="/vehicle-types">Vehicle Types</a></li>
-                            <li><a href="/vehicle-models">Vehicle Models</a></li>
-                            <li><a href="/vehicle-fuels">Vehicle Fuels</a></li>
-                            <li><a href="/vehicle-statuses">Vehicle Statuses</a></li>
-                            <li><a href="/fuel-types">Fuel Types</a></li>
-                            <li><a href="/fuel-companies">Fuel Companies</a></li>
-                        </ul>
-                        <p class="menu-label">Account</p>
-                        <ul class="menu-list">
-                            <li><a href="/roles">Roles</a></li>
-                            <li><a href="/users">Users</a></li>
-                            <li><a href="/logout" class="has-text-danger">Sign Out</a></li>
-                        </ul>
-                    </nav>
-                </aside>
-                {{ end }}
-                <main class="column {{ if .hideSidebar }}is-4 is-offset-4{{ end }}">
-                    {{ template "content" . }}
-                </main>
+        <!-- Topbar -->
+        <header class="tb">
+            <div class="crumbs">
+                {{ block "breadcrumbs" . }}<b>{{ .title }}</b>{{ end }}
             </div>
-        </div>
-    </section>
+        </header>
 
-    <footer class="footer">
-        <div class="content has-text-centered">
-            <p>
-                <strong>Go-HTMX-Bulma</strong> by <a href="#">You</a>. Built with Go, Gin, HTMX, and Bulma.
-            </p>
-        </div>
-    </footer>
+        <!-- Main content -->
+        <main class="main">
+            {{ template "content" . }}
+        </main>
+
+    </div>
+    {{ end }}
 
     <!-- Modal Container -->
     <div id="modal-container"></div>
 
     <script>
+        // Set active sidebar item from current URL path
+        document.querySelectorAll('.sb-item[data-href]').forEach(function (el) {
+            var href = el.getAttribute('data-href');
+            var path = window.location.pathname;
+            if (path === href || path.startsWith(href + '/')) {
+                el.classList.add('active');
+            }
+        });
+
         function closeModal() {
-            const modal = document.querySelector('.modal');
+            var modal = document.querySelector('.modal');
             if (modal) {
                 modal.classList.remove('is-active');
-                setTimeout(() => {
+                setTimeout(function () {
                     document.getElementById('modal-container').innerHTML = '';
                 }, 200);
             }
         }
 
         function checkDeleteInput(input) {
-            const btn = document.getElementById('confirm-delete-btn');
+            var btn = document.getElementById('confirm-delete-btn');
             if (input.value.toLowerCase() === 'delete') {
                 btn.removeAttribute('disabled');
             } else {
@@ -91,8 +147,7 @@
             }
         }
 
-        // Close modal on ESC key
-        document.addEventListener('keydown', (event) => {
+        document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeModal();
             }

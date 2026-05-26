@@ -38,6 +38,15 @@ func (h *VehicleColorHandler) List(c *gin.Context) {
 
 	totalPages := (total + pageSize - 1) / pageSize
 
+	start := (page-1)*pageSize + 1
+	if total == 0 {
+		start = 0
+	}
+	end := page * pageSize
+	if end > total {
+		end = total
+	}
+
 	c.HTML(http.StatusOK, "pages/vehicle_colors/index.html", gin.H{
 		"title":           "Vehicle Colors",
 		"colors":          colors,
@@ -48,6 +57,8 @@ func (h *VehicleColorHandler) List(c *gin.Context) {
 		"pageSizeOptions": []int{5, 10, 20, 50},
 		"totalPages":      totalPages,
 		"total":           total,
+		"start":           start,
+		"end":             end,
 		"sortBy":          sortBy,
 		"sortOrder":       sortOrder,
 	})

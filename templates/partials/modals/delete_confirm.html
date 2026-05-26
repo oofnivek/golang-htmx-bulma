@@ -1,34 +1,44 @@
 {{ define "partials/modals/delete_confirm.html" }}
-<div class="modal is-active">
-    <div class="modal-background" onclick="closeModal()"></div>
-    <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title">Confirm Deletion</p>
-            <button class="delete" aria-label="close" onclick="closeModal()"></button>
-        </header>
-        <section class="modal-card-body">
-            <p>Are you sure you want to delete <strong>{{ .Name }}</strong>?</p>
-            <p class="mt-4">This action cannot be undone. Please type <span class="has-text-weight-bold">delete</span> to confirm:</p>
-            <div class="field mt-2">
-                <div class="control">
-                    <input class="input" type="text" id="confirm-input" placeholder="Type 'delete' here..." oninput="checkDeleteInput(this)" autocomplete="off" autofocus>
-                </div>
+<div style="position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;z-index:100" onclick="if(event.target===this)closeModal()">
+    <div style="background:#fff;border-radius:14px;width:480px;max-width:calc(100vw - 32px);box-shadow:0 30px 60px rgba(11,18,32,.25);overflow:hidden">
+
+        <!-- Header -->
+        <div style="padding:18px 20px 14px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--border-2)">
+            <div>
+                <h3 style="margin:0 0 4px;font-size:16px;font-weight:700;letter-spacing:-.01em;color:var(--ink)">Delete {{ .Name }}</h3>
+                <p style="margin:0;color:var(--ink-3);font-size:13px">This action cannot be undone.</p>
             </div>
-        </section>
-        <footer class="modal-card-foot">
-            <div class="buttons is-right">
-                <button class="button is-danger"
-                        id="confirm-delete-btn"
-                        disabled
-                        hx-delete="{{ .DeleteURL }}"
-                        hx-target="#{{ .RowID }}"
-                        hx-swap="outerHTML"
-                        hx-on::after-request="closeModal()">
-                    Delete
-                </button>
-                <button class="button" onclick="closeModal()">Cancel</button>
-            </div>
-        </footer>
+            <button onclick="closeModal()" style="background:transparent;border:0;cursor:pointer;color:var(--ink-3);padding:2px;font-size:16px;line-height:1;margin-left:12px">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div style="padding:16px 20px">
+            <p style="font-size:13.5px;color:var(--ink-2);margin:0 0 12px">
+                Type <strong>delete</strong> to confirm you want to permanently remove this record:
+            </p>
+            <input class="form-input" type="text" id="confirm-input"
+                placeholder="Type 'delete' here..."
+                oninput="checkDeleteInput(this)"
+                autocomplete="off" autofocus>
+        </div>
+
+        <!-- Footer -->
+        <div style="display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border-2);background:#fbfcfe">
+            <button class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-danger"
+                    id="confirm-delete-btn"
+                    disabled
+                    hx-delete="{{ .DeleteURL }}"
+                    hx-target="#{{ .RowID }}"
+                    hx-swap="outerHTML"
+                    hx-on::after-request="closeModal()">
+                <i class="fa-solid fa-trash" style="font-size:12px"></i>
+                Delete
+            </button>
+        </div>
+
     </div>
 </div>
 {{ end }}
