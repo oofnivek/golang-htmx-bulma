@@ -155,6 +155,28 @@ func (h *VehicleModelHandler) Delete(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+func (h *VehicleModelHandler) View(c *gin.Context) {
+	idStr := c.Param("id")
+	id, _ := strconv.ParseInt(idStr, 10, 64)
+	tz := c.DefaultQuery("tz", "UTC")
+
+	m, err := h.svc.FindByID(id)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if m == nil {
+		c.String(http.StatusNotFound, "Vehicle model not found")
+		return
+	}
+
+	c.HTML(http.StatusOK, "pages/vehicle_models/view.html", gin.H{
+		"title": "View Vehicle Model",
+		"model": m,
+		"tz":    tz,
+	})
+}
+
 func (h *VehicleModelHandler) DeleteConfirm(c *gin.Context) {
 	idStr := c.Param("id")
 	id, _ := strconv.ParseInt(idStr, 10, 64)

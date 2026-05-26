@@ -113,6 +113,7 @@ func RegisterRoutes(
 					vmdlGroup.GET("", vmdlHandler.List)
 					vmdlGroup.GET("/new", vmdlHandler.CreateForm)
 					vmdlGroup.POST("", vmdlHandler.Create)
+					vmdlGroup.GET("/:id/view", vmdlHandler.View)
 					vmdlGroup.GET("/:id/edit", vmdlHandler.EditForm)
 					vmdlGroup.POST("/:id", vmdlHandler.Update)
 					vmdlGroup.DELETE("/:id", vmdlHandler.Delete)

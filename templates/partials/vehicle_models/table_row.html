@@ -15,6 +15,11 @@
     <td>{{ if .Model.UpdatedAt }}{{ in_timezone .Model.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
     <td>
         <div class="buttons are-small">
+            <button class="button is-info is-light" hx-get="/vehicle-models/{{ .Model.ID }}/view" hx-target="body" hx-push-url="true" hx-include="[name='tz']">
+                <span class="icon is-small">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </button>
             <button class="button is-link is-light" hx-get="/vehicle-models/{{ .Model.ID }}/edit" hx-target="body" hx-push-url="true">
                 <span class="icon is-small">
                     <i class="fas fa-edit"></i>
