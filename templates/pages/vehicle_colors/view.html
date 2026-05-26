@@ -7,21 +7,21 @@
             <div class="field">
                 <label class="label">ID</label>
                 <div class="control">
-                    <input class="input" type="text" value="{{ .type.ID }}" readonly>
+                    <input class="input" type="text" value="{{ .color.ID }}" readonly>
                 </div>
             </div>
 
             <div class="field">
                 <label class="label">Name</label>
                 <div class="control">
-                    <input class="input" type="text" value="{{ .type.Name }}" readonly>
+                    <input class="input" type="text" value="{{ .color.Name }}" readonly>
                 </div>
             </div>
 
             <div class="field">
                 <label class="label">Status</label>
                 <div class="control">
-                    {{ if .type.Status }}
+                    {{ if .color.Status }}
                     <span class="tag is-success">Active</span>
                     {{ else }}
                     <span class="tag is-danger">Inactive</span>
@@ -32,17 +32,17 @@
             <div class="columns mt-5">
                 <div class="column">
                     <p class="is-size-7 has-text-grey">
-                        <strong>Created By:</strong> {{ .type.CreatedBy }}<br>
-                        <strong>Created:</strong> {{ in_timezone .type.CreatedAt .tz }}<br>
-                        {{ if .type.UpdatedBy }}<strong>Updated By:</strong> {{ .type.UpdatedBy }}<br>{{ end }}
-                        {{ if .type.UpdatedAt }}<strong>Updated:</strong> {{ in_timezone .type.UpdatedAt .tz }}{{ end }}
+                        <strong>Created By:</strong> {{ .color.CreatedBy }}<br>
+                        <strong>Created:</strong> {{ in_timezone .color.CreatedAt .tz }}<br>
+                        {{ if .color.UpdatedBy }}<strong>Updated By:</strong> {{ .color.UpdatedBy }}<br>{{ end }}
+                        {{ if .color.UpdatedAt }}<strong>Updated:</strong> {{ in_timezone .color.UpdatedAt .tz }}{{ end }}
                     </p>
                 </div>
             </div>
 
             <div class="field is-grouped is-grouped-right mt-5">
                 <div class="control">
-                    <button type="button" class="button is-link is-light" hx-get="/vehicle-types" hx-target="body" hx-push-url="true">
+                    <button type="button" class="button is-link is-light" hx-get="/vehicle-colors" hx-target="body" hx-push-url="true">
                         <span class="icon">
                             <i class="fas fa-arrow-left"></i>
                         </span>

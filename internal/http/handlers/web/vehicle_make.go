@@ -126,6 +126,28 @@ func (h *VehicleMakeHandler) Delete(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+func (h *VehicleMakeHandler) View(c *gin.Context) {
+	idStr := c.Param("id")
+	id, _ := strconv.ParseInt(idStr, 10, 64)
+	tz := c.DefaultQuery("tz", "UTC")
+
+	m, err := h.svc.FindByID(id)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if m == nil {
+		c.String(http.StatusNotFound, "Make not found")
+		return
+	}
+
+	c.HTML(http.StatusOK, "pages/vehicle_makes/view.html", gin.H{
+		"title": "View Vehicle Make",
+		"make":  m,
+		"tz":    tz,
+	})
+}
+
 func (h *VehicleMakeHandler) DeleteConfirm(c *gin.Context) {
 	idStr := c.Param("id")
 	id, _ := strconv.ParseInt(idStr, 10, 64)

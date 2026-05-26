@@ -108,10 +108,23 @@ func (h *VehicleTypeHandler) DeleteConfirm(c *gin.Context) {
 }
 
 func (h *VehicleTypeHandler) View(c *gin.Context) {
-    idStr := c.Param("id")
-    id, _ := strconv.ParseInt(idStr, 10, 64)
-    vt, err := h.svc.FindByID(id)
-    if err != nil { c.String(http.StatusInternalServerError, err.Error()); return }
-    if vt == nil { c.String(http.StatusNotFound, "Vehicle type not found"); return }
-    c.HTML(http.StatusOK, "pages/vehicle_type/view.html", gin.H{"title": "Vehicle Type", "type": vt})
+	idStr := c.Param("id")
+	id, _ := strconv.ParseInt(idStr, 10, 64)
+	tz := c.DefaultQuery("tz", "UTC")
+
+	vt, err := h.svc.FindByID(id)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if vt == nil {
+		c.String(http.StatusNotFound, "Vehicle type not found")
+		return
+	}
+
+	c.HTML(http.StatusOK, "pages/vehicle_type/view.html", gin.H{
+		"title": "View Vehicle Type",
+		"type":  vt,
+		"tz":    tz,
+	})
 }

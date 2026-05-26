@@ -180,7 +180,7 @@ Pass `thingHandler` and `thingAPI` to `routes.RegisterRoutes(...)`.
 Template conventions recap:
 - Index: `hx-target="body" hx-push-url="true"` on sort links, page links, and selectors.
 - Table row: `{{ define "things/table_row.html" }}` — called with `{{ template "things/table_row.html" . }}`.
-- Action button order: view (`is-info is-light`, eye), edit (`is-link is-light`, edit), delete (`is-danger is-light`, trash).
+- Action button order: all three buttons — view (`is-info is-light`, eye), edit (`is-link is-light`, pencil), delete (`is-danger is-light`, trash) — must always be present in the Actions column, in that order.
 - Form footer (right-aligned): Save button (`is-link`, `fa-save`) **left of** Cancel button (`is-link is-light`).
 - Delete modal target: `hx-target="#modal-container"`.
 
