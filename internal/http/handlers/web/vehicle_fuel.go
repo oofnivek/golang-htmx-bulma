@@ -174,6 +174,28 @@ func (h *VehicleFuelHandler) Delete(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+func (h *VehicleFuelHandler) View(c *gin.Context) {
+	idStr := c.Param("id")
+	id, _ := strconv.ParseInt(idStr, 10, 64)
+	tz := c.DefaultQuery("tz", "UTC")
+
+	f, err := h.svc.FindByID(id)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if f == nil {
+		c.String(http.StatusNotFound, "Vehicle fuel not found")
+		return
+	}
+
+	c.HTML(http.StatusOK, "pages/vehicle_fuels/view.html", gin.H{
+		"title": "View Vehicle Fuel",
+		"fuel":  f,
+		"tz":    tz,
+	})
+}
+
 func (h *VehicleFuelHandler) DeleteConfirm(c *gin.Context) {
 	idStr := c.Param("id")
 	id, _ := strconv.ParseInt(idStr, 10, 64)

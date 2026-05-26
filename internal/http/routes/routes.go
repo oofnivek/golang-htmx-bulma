@@ -127,6 +127,7 @@ func RegisterRoutes(
 					vfGroup.GET("", vfHandler.List)
 					vfGroup.GET("/new", vfHandler.CreateForm)
 					vfGroup.POST("", vfHandler.Create)
+					vfGroup.GET("/:id/view", vfHandler.View)
 					vfGroup.GET("/:id/edit", vfHandler.EditForm)
 					vfGroup.POST("/:id", vfHandler.Update)
 					vfGroup.DELETE("/:id", vfHandler.Delete)

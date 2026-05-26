@@ -97,18 +97,6 @@
                     </a>
                 </th>
                 <th>
-                    <a hx-get="/vehicle-fuels?sortBy=fuel_tank_size&sortOrder={{ if and (eq .sortBy "fuel_tank_size") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
-                       hx-target="body" hx-push-url="true" class="has-text-dark">
-                        Tank Size (L) {{ if eq .sortBy "fuel_tank_size" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
-                    </a>
-                </th>
-                <th>
-                    <a hx-get="/vehicle-fuels?sortBy=fuel_consumption&sortOrder={{ if and (eq .sortBy "fuel_consumption") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
-                       hx-target="body" hx-push-url="true" class="has-text-dark">
-                        Consumption (L/100km) {{ if eq .sortBy "fuel_consumption" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}
-                    </a>
-                </th>
-                <th>
                     <a hx-get="/vehicle-fuels?sortBy=status&sortOrder={{ if and (eq .sortBy "status") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
                        hx-target="body" hx-push-url="true" class="has-text-dark">
                         Status {{ if eq .sortBy "status" }}{{ if eq .sortOrder "asc" }}▴{{ else }}▾{{ end }}{{ end }}

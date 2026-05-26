@@ -4,8 +4,6 @@
     <td>{{ .Fuel.VehicleMakeName }}</td>
     <td>{{ .Fuel.VehicleModelName }}</td>
     <td>{{ .Fuel.FuelTypeName }}</td>
-    <td>{{ printf "%.2f" .Fuel.FuelTankSize }}</td>
-    <td>{{ printf "%.2f" .Fuel.FuelConsumption }}</td>
     <td>
         {{ if .Fuel.Status }}
             <span class="tag is-success">Active</span>
@@ -17,6 +15,11 @@
     <td>{{ if .Fuel.UpdatedAt }}{{ in_timezone .Fuel.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
     <td>
         <div class="buttons are-small">
+            <button class="button is-info is-light" hx-get="/vehicle-fuels/{{ .Fuel.ID }}/view" hx-target="body" hx-push-url="true" hx-include="[name='tz']">
+                <span class="icon is-small">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </button>
             <button class="button is-link is-light" hx-get="/vehicle-fuels/{{ .Fuel.ID }}/edit" hx-target="body" hx-push-url="true">
                 <span class="icon is-small">
                     <i class="fas fa-edit"></i>
