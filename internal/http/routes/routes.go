@@ -141,6 +141,7 @@ func RegisterRoutes(
 					vsGroup.GET("", vsHandler.List)
 					vsGroup.GET("/new", vsHandler.CreateForm)
 					vsGroup.POST("", vsHandler.Create)
+					vsGroup.GET("/:id/view", vsHandler.View)
 					vsGroup.GET("/:id/edit", vsHandler.EditForm)
 					vsGroup.POST("/:id", vsHandler.Update)
 					vsGroup.DELETE("/:id", vsHandler.Delete)

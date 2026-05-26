@@ -11,6 +11,11 @@
     </td>
     <td>
         <div class="buttons are-small">
+            <button class="button is-info is-light" hx-get="/vehicle-statuses/{{ .ID }}/view" hx-target="body" hx-push-url="true">
+                <span class="icon is-small">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </button>
             <button class="button is-link is-light" hx-get="/vehicle-statuses/{{ .ID }}/edit" hx-target="body" hx-push-url="true">
                 <span class="icon is-small">
                     <i class="fas fa-edit"></i>

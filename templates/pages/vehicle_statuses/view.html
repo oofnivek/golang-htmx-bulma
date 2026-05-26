@@ -1,0 +1,45 @@
+{{ define "content" }}
+<div class="columns is-centered">
+    <div class="column is-two-thirds-tablet is-half-desktop">
+        <div class="box">
+            <h1 class="title mb-5">{{ .title }}</h1>
+
+            <div class="field">
+                <label class="label">ID</label>
+                <div class="control">
+                    <input class="input" type="text" value="{{ .status.ID }}" readonly>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Substatus</label>
+                <div class="control">
+                    <input class="input" type="text" value="{{ .status.Substatus }}" readonly>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Active</label>
+                <div class="control">
+                    {{ if .status.IsActive }}
+                    <span class="tag is-success">Active</span>
+                    {{ else }}
+                    <span class="tag is-danger">Inactive</span>
+                    {{ end }}
+                </div>
+            </div>
+
+            <div class="field is-grouped is-grouped-right mt-5">
+                <div class="control">
+                    <button type="button" class="button is-link is-light" hx-get="/vehicle-statuses" hx-target="body" hx-push-url="true">
+                        <span class="icon">
+                            <i class="fas fa-arrow-left"></i>
+                        </span>
+                        <span>Back to List</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{ end }}

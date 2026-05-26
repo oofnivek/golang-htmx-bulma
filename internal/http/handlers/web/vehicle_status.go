@@ -112,6 +112,26 @@ func (h *VehicleStatusHandler) Delete(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+func (h *VehicleStatusHandler) View(c *gin.Context) {
+	idStr := c.Param("id")
+	id, _ := strconv.ParseInt(idStr, 10, 64)
+
+	vs, err := h.svc.FindByID(id)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if vs == nil {
+		c.String(http.StatusNotFound, "Status not found")
+		return
+	}
+
+	c.HTML(http.StatusOK, "pages/vehicle_statuses/view.html", gin.H{
+		"title":  "View Vehicle Status",
+		"status": vs,
+	})
+}
+
 func (h *VehicleStatusHandler) DeleteConfirm(c *gin.Context) {
 	idStr := c.Param("id")
 	id, _ := strconv.ParseInt(idStr, 10, 64)
