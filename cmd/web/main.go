@@ -73,6 +73,9 @@ func main() {
 		ftAPI    *api.FuelTypeAPIHandler
 		vmdlAPI  *api.VehicleModelAPIHandler
 		vfAPI    *api.VehicleFuelAPIHandler
+		fcAPI    *api.FuelCompanyAPIHandler
+
+		fcHandler *web.FuelCompanyHandler
 
 		port string = cfg.Port
 	)
@@ -141,6 +144,9 @@ func main() {
 		vfRepo := vehicle.NewVehicleFuelRepository(vehicleDatabase)
 		vfSvc := vehicle.NewVehicleFuelService(vfRepo)
 
+		fcRepo := vehicle.NewFuelCompanyRepository(vehicleDatabase)
+		fcSvc := vehicle.NewFuelCompanyService(fcRepo)
+
 		// Set up API handlers
 		vcAPI = api.NewVehicleColorAPIHandler(vcSvc)
 		vmAPI = api.NewVehicleMakeAPIHandler(vmSvc)
@@ -148,6 +154,7 @@ func main() {
 		ftAPI = api.NewFuelTypeAPIHandler(ftSvc)
 		vmdlAPI = api.NewVehicleModelAPIHandler(vmdlSvc)
 		vfAPI = api.NewVehicleFuelAPIHandler(vfSvc)
+		fcAPI = api.NewFuelCompanyAPIHandler(fcSvc)
 
 	case "web-view":
 		log.Println("Booting in WEB-VIEW role...")
@@ -200,6 +207,8 @@ func main() {
 
 		var ftSvc vehicle.FuelTypeService
 
+		var fcSvc vehicle.FuelCompanyService
+
 		vehicleServiceURL := os.Getenv("VEHICLE_SERVICE_URL")
 		if vehicleServiceURL != "" {
 			log.Printf("Using remote Vehicle Service at: %s\n", vehicleServiceURL)
@@ -210,6 +219,7 @@ func main() {
 			ftSvc = vehicle.NewRemoteFuelTypeService(vehicleServiceURL)
 			vmdlSvc = vehicle.NewRemoteVehicleModelService(vehicleServiceURL)
 			vfSvc = vehicle.NewRemoteVehicleFuelService(vehicleServiceURL)
+			fcSvc = vehicle.NewRemoteFuelCompanyService(vehicleServiceURL)
 		} else {
 			log.Println("WARNING: VEHICLE_SERVICE_URL is not set. Falling back to local Vehicle DB access.")
 			vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
@@ -238,6 +248,9 @@ func main() {
 
 			vfRepo := vehicle.NewVehicleFuelRepository(vehicleDatabase)
 			vfSvc = vehicle.NewVehicleFuelService(vfRepo)
+
+			fcRepo := vehicle.NewFuelCompanyRepository(vehicleDatabase)
+			fcSvc = vehicle.NewFuelCompanyService(fcRepo)
 		}
 
 		// Set up Web Handlers
@@ -248,6 +261,7 @@ func main() {
 		ftHandler = web.NewFuelTypeHandler(ftSvc)
 		vmdlHandler = web.NewVehicleModelHandler(vmdlSvc, vtSvc, vmSvc)
 		vfHandler = web.NewVehicleFuelHandler(vfSvc, vmSvc, vmdlSvc, ftSvc)
+		fcHandler = web.NewFuelCompanyHandler(fcSvc)
 		roleHandler = web.NewRoleHandler(roleSvc)
 		userHandler = web.NewUserHandler(userSvc, roleSvc)
 		authHandler = web.NewAuthHandler(authSvc)
@@ -302,6 +316,10 @@ func main() {
 		vfSvc := vehicle.NewVehicleFuelService(vfRepo)
 		vfHandler = web.NewVehicleFuelHandler(vfSvc, vmSvc, vmdlSvc, ftSvc)
 
+		fcRepo := vehicle.NewFuelCompanyRepository(vehicleDatabase)
+		fcSvc := vehicle.NewFuelCompanyService(fcRepo)
+		fcHandler = web.NewFuelCompanyHandler(fcSvc)
+
 		// Wire User services/handlers (local implementations)
 		userRepo := user.NewUserRepository(userDatabase)
 		userSvc := user.NewLocalUserService(userRepo)
@@ -326,6 +344,7 @@ func main() {
 		ftAPI = api.NewFuelTypeAPIHandler(ftSvc)
 		vmdlAPI = api.NewVehicleModelAPIHandler(vmdlSvc)
 		vfAPI = api.NewVehicleFuelAPIHandler(vfSvc)
+		fcAPI = api.NewFuelCompanyAPIHandler(fcSvc)
 
 		// Set up templates
 		r.HTMLRender = view.NewRenderer("templates")
@@ -341,6 +360,7 @@ func main() {
 		ftHandler,
 		vmdlHandler,
 		vfHandler,
+		fcHandler,
 		roleHandler,
 		userHandler,
 		authHandler,
@@ -353,6 +373,7 @@ func main() {
 		ftAPI,
 		vmdlAPI,
 		vfAPI,
+		fcAPI,
 		cfg.JWTSigningKey,
 	)
 

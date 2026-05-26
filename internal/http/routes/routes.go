@@ -18,6 +18,7 @@ func RegisterRoutes(
 	ftHandler *web.FuelTypeHandler,
 	vmdlHandler *web.VehicleModelHandler,
 	vfHandler *web.VehicleFuelHandler,
+	fcHandler *web.FuelCompanyHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -30,6 +31,7 @@ func RegisterRoutes(
 	ftAPI *api.FuelTypeAPIHandler,
 	vmdlAPI *api.VehicleModelAPIHandler,
 	vfAPI *api.VehicleFuelAPIHandler,
+	fcAPI *api.FuelCompanyAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -44,7 +46,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -150,6 +152,21 @@ func RegisterRoutes(
 					vsGroup.POST("/:id", vsHandler.Update)
 					vsGroup.DELETE("/:id", vsHandler.Delete)
 					vsGroup.GET("/:id/delete", vsHandler.DeleteConfirm)
+				}
+			}
+
+			// Fuel Companies
+			if fcHandler != nil {
+				fcGroup := protected.Group("/fuel-companies")
+				{
+					fcGroup.GET("", fcHandler.List)
+					fcGroup.GET("/new", fcHandler.CreateForm)
+					fcGroup.POST("", fcHandler.Create)
+					fcGroup.GET("/:id/view", fcHandler.View)
+					fcGroup.GET("/:id/edit", fcHandler.EditForm)
+					fcGroup.POST("/:id", fcHandler.Update)
+					fcGroup.DELETE("/:id", fcHandler.Delete)
+					fcGroup.GET("/:id/delete", fcHandler.DeleteConfirm)
 				}
 			}
 
@@ -263,6 +280,15 @@ func RegisterRoutes(
 			apiGroup.POST("/vehicle-fuels", vfAPI.Create)
 			apiGroup.PUT("/vehicle-fuels/:id", vfAPI.Update)
 			apiGroup.DELETE("/vehicle-fuels/:id", vfAPI.Delete)
+		}
+
+		if fcAPI != nil {
+			apiGroup.GET("/fuel-companies/all", fcAPI.ListAll)
+			apiGroup.GET("/fuel-companies", fcAPI.List)
+			apiGroup.GET("/fuel-companies/:id", fcAPI.Get)
+			apiGroup.POST("/fuel-companies", fcAPI.Create)
+			apiGroup.PUT("/fuel-companies/:id", fcAPI.Update)
+			apiGroup.DELETE("/fuel-companies/:id", fcAPI.Delete)
 		}
 	}
 }
