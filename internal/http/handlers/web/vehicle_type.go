@@ -97,7 +97,11 @@ func (h *VehicleTypeHandler) Delete(c *gin.Context) {
     err := h.svc.Delete(id)
     if err != nil {
         slog.Error("failed to delete vehicle type", "id", id, "error", err)
-        c.String(http.StatusInternalServerError, "Failed to delete vehicle type")
+        if isForeignKeyConstraintError(err) {
+            c.String(http.StatusConflict, "This vehicle type cannot be deleted because it is still in use by one or more vehicles.")
+        } else {
+            c.String(http.StatusInternalServerError, "Failed to delete vehicle type")
+        }
         return
     }
     c.Status(http.StatusOK)
