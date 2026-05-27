@@ -1,70 +1,66 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/vehicle-models" hx-target="body" hx-push-url="true" style="cursor:pointer">Vehicle Models</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
 {{ define "content" }}
-<div class="columns is-centered">
-    <div class="column is-half">
-        <div class="box">
-            <h1 class="title mb-5">{{ .title }}</h1>
-            <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
-                <div class="field">
-                    <label class="label">Vehicle Type</label>
-                    <div class="control">
-                        <div class="select is-fullwidth">
-                            <select name="vehicle_type_id" required autofocus>
-                                <option value="">-- Select Vehicle Type --</option>
-                                {{ range .vehicleTypes }}
-                                    <option value="{{ .ID }}" {{ if eq .ID $.currentTypeID }}selected{{ end }}>{{ .Name }}</option>
-                                {{ end }}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label class="label">Vehicle Make</label>
-                    <div class="control">
-                        <div class="select is-fullwidth">
-                            <select name="vehicle_make_id" required>
-                                <option value="">-- Select Vehicle Make --</option>
-                                {{ range .vehicleMakes }}
-                                    <option value="{{ .ID }}" {{ if eq .ID $.currentMakeID }}selected{{ end }}>{{ .Name }}</option>
-                                {{ end }}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label class="label">Name</label>
-                    <div class="control">
-                        <input class="input" type="text" name="name" placeholder="Model Name"
-                               value="{{ if .model }}{{ .model.Name }}{{ end }}" required>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <div class="control">
-                        <label class="checkbox">
-                            <input type="checkbox" name="status" {{ if or (not .model) .model.Status }}checked{{ end }}>
-                            Active
-                        </label>
-                    </div>
-                </div>
-
-                <div class="field is-grouped is-grouped-right mt-5">
-                    <div class="control">
-                        <button type="submit" class="button is-link">
-                            <span class="icon">
-                                <i class="fas fa-save"></i>
-                            </span>
-                            <span>Save</span>
-                        </button>
-                    </div>
-                    <div class="control">
-                        <button type="button" class="button is-link is-light"
-                                hx-get="/vehicle-models" hx-target="body" hx-push-url="true">Cancel</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .model }}Update the model details and active status.{{ else }}Add a new model to the fleet.{{ end }}</p>
     </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="vehicle_type_id">Vehicle Type</label>
+            <select id="vehicle_type_id" class="form-input" name="vehicle_type_id" required autofocus>
+                <option value="">-- Select Vehicle Type --</option>
+                {{ range .vehicleTypes }}
+                    <option value="{{ .ID }}" {{ if eq .ID $.currentTypeID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="vehicle_make_id">Vehicle Make</label>
+            <select id="vehicle_make_id" class="form-input" name="vehicle_make_id" required>
+                <option value="">-- Select Vehicle Make --</option>
+                {{ range .vehicleMakes }}
+                    <option value="{{ .ID }}" {{ if eq .ID $.currentMakeID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" class="form-input" type="text" name="name"
+                placeholder="e.g. Corolla"
+                value="{{ if .model }}{{ .model.Name }}{{ end }}"
+                required>
+        </div>
+
+        <div class="form-field">
+            <label class="form-check">
+                <input type="checkbox" name="status" {{ if or (not .model) .model.Status }}checked{{ end }}>
+                <span>Active</span>
+            </label>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/vehicle-models" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
 </div>
 {{ end }}

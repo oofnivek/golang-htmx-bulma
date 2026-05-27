@@ -1,147 +1,120 @@
+{{ define "breadcrumbs" }}
+<span>Access Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/users" hx-target="body" hx-push-url="true" style="cursor:pointer">Users</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
 {{ define "content" }}
-<div class="columns is-centered">
-    <div class="column is-two-thirds-tablet is-half-desktop">
-        <div class="box">
-            <h1 class="title mb-5">{{ .title }}</h1>
-
-            <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
-                <div class="field">
-                    <label class="label">Email (Username)</label>
-                    <div class="control has-icons-left">
-                        <input class="input" type="email" name="email" placeholder="email@example.com" required
-                            value="{{ if .user }}{{ .user.Email }}{{ end }}" {{ if .user }}readonly{{ else }}autofocus{{
-                            end }}>
-                        <span class="icon is-small is-left">
-                            <i class="fas fa-envelope"></i>
-                        </span>
-                    </div>
-                    {{ if .user }}
-                    <p class="help">Email cannot be changed after creation.</p>
-                    {{ end }}
-                </div>
-
-                <div class="columns">
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">First Name</label>
-                            <div class="control">
-                                <input class="input" type="text" name="first_name" placeholder="John" required
-                                    value="{{ if .user }}{{ .user.FirstName }}{{ end }}" {{ if .user }}autofocus{{ end
-                                    }}>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Last Name</label>
-                            <div class="control">
-                                <input class="input" type="text" name="last_name" placeholder="Doe" required
-                                    value="{{ if .user }}{{ .user.LastName }}{{ end }}">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="columns">
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Mobile</label>
-                            <div class="control has-icons-left">
-                                <input class="input" type="text" name="mobile" placeholder="+1234567890" required
-                                    value="{{ if .user }}{{ .user.Mobile }}{{ end }}">
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-phone"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Role</label>
-                            <div class="control">
-                                <div class="select is-fullwidth">
-                                    <select name="role_id" required>
-                                        <option value="">Select a role</option>
-                                        {{ $selectedRole := "" }}
-                                        {{ if .user }}{{ $selectedRole = .user.RoleID }}{{ end }}
-                                        {{ range .roles }}
-                                        <option value="{{ .ID }}" {{ if eq .ID $selectedRole }}selected{{ end }}>{{
-                                            .Name }}</option>
-                                        {{ end }}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="columns">
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Designation</label>
-                            <div class="control">
-                                <input class="input" type="text" name="designation" placeholder="Software Engineer"
-                                    required value="{{ if .user }}{{ .user.Designation }}{{ end }}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Department</label>
-                            <div class="control">
-                                <input class="input" type="text" name="department" placeholder="Engineering" required
-                                    value="{{ if .user }}{{ .user.Department }}{{ end }}">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <div class="control">
-                        <label class="checkbox">
-                            <input type="checkbox" name="is_enabled" {{ if or (not .user) .user.IsEnabled }}checked{{
-                                end }}>
-                            Account Enabled
-                        </label>
-                    </div>
-                </div>
-
-                <div id="password-section">
-                    {{ if not .user }}
-                        {{ template "partials/users/password_fields.html" . }}
-                    {{ else }}
-                        <div class="field mt-4">
-                            <div class="control">
-                                <button type="button" class="button is-warning is-light"
-                                        hx-get="/users/password-fields"
-                                        hx-target="#password-section"
-                                        hx-swap="innerHTML">
-                                    <span class="icon">
-                                        <i class="fas fa-key"></i>
-                                    </span>
-                                    <span>Reset Password</span>
-                                </button>
-                            </div>
-                        </div>
-                    {{ end }}
-                </div>
-
-                <div class="field is-grouped is-grouped-right mt-5">
-                    <div class="control">
-                        <button type="submit" class="button is-link">
-                            <span class="icon">
-                                <i class="fas fa-save"></i>
-                            </span>
-                            <span>Save</span>
-                        </button>
-                    </div>
-                    <div class="control">
-                        <button type="button" class="button is-link is-light" hx-get="/users" hx-target="body"
-                            hx-push-url="true">Cancel</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .user }}Update user account details.{{ else }}Create a new system user account.{{ end }}</p>
     </div>
+</div>
+
+<div class="form-card" style="max-width:600px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="email">Email (Username)</label>
+            <input id="email" class="form-input" type="email" name="email"
+                placeholder="email@example.com"
+                value="{{ if .user }}{{ .user.Email }}{{ end }}"
+                {{ if .user }}readonly{{ else }}required autofocus{{ end }}>
+            {{ if .user }}
+            <p style="font-size:12px;color:var(--ink-3);margin-top:4px">Email cannot be changed after creation.</p>
+            {{ end }}
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="first_name">First Name</label>
+                <input id="first_name" class="form-input" type="text" name="first_name"
+                    placeholder="John"
+                    value="{{ if .user }}{{ .user.FirstName }}{{ end }}"
+                    required {{ if .user }}autofocus{{ end }}>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="last_name">Last Name</label>
+                <input id="last_name" class="form-input" type="text" name="last_name"
+                    placeholder="Doe"
+                    value="{{ if .user }}{{ .user.LastName }}{{ end }}"
+                    required>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="mobile">Mobile</label>
+                <input id="mobile" class="form-input" type="text" name="mobile"
+                    placeholder="+1234567890"
+                    value="{{ if .user }}{{ .user.Mobile }}{{ end }}"
+                    required>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="role_id">Role</label>
+                <select id="role_id" class="form-input" name="role_id" required>
+                    <option value="">Select a role</option>
+                    {{ $selectedRole := "" }}
+                    {{ if .user }}{{ $selectedRole = .user.RoleID }}{{ end }}
+                    {{ range .roles }}
+                        <option value="{{ .ID }}" {{ if eq .ID $selectedRole }}selected{{ end }}>{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="designation">Designation</label>
+                <input id="designation" class="form-input" type="text" name="designation"
+                    placeholder="Software Engineer"
+                    value="{{ if .user }}{{ .user.Designation }}{{ end }}"
+                    required>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="department">Department</label>
+                <input id="department" class="form-input" type="text" name="department"
+                    placeholder="Engineering"
+                    value="{{ if .user }}{{ .user.Department }}{{ end }}"
+                    required>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-check">
+                <input type="checkbox" name="is_enabled" {{ if or (not .user) .user.IsEnabled }}checked{{ end }}>
+                <span>Account Enabled</span>
+            </label>
+        </div>
+
+        <div id="password-section">
+            {{ if not .user }}
+                {{ template "partials/users/password_fields.html" . }}
+            {{ else }}
+                <div class="form-field">
+                    <button type="button" class="btn"
+                        hx-get="/users/password-fields"
+                        hx-target="#password-section"
+                        hx-swap="innerHTML">
+                        <i class="fa-solid fa-key" style="font-size:12px"></i>
+                        Reset Password
+                    </button>
+                </div>
+            {{ end }}
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/users" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
 </div>
 {{ end }}

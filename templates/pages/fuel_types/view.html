@@ -1,56 +1,56 @@
+{{ define "breadcrumbs" }}
+<span>Fleet Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/fuel-types" hx-target="body" hx-push-url="true" style="cursor:pointer">Fuel Types</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .fuel.Name }}</b>
+{{ end }}
+
 {{ define "content" }}
-<div class="columns is-centered">
-    <div class="column is-two-thirds-tablet is-half-desktop">
-        <div class="box">
-            <h1 class="title mb-5">{{ .title }}</h1>
+<div class="ph">
+    <div>
+        <h1>{{ .fuel.Name }}</h1>
+        <p>Fuel type details</p>
+    </div>
+</div>
 
-            <div class="field">
-                <label class="label">ID</label>
-                <div class="control">
-                    <input class="input" type="text" value="{{ .fuel.ID }}" readonly>
-                </div>
-            </div>
+<div class="form-card" style="max-width:560px">
+    <div class="form-field">
+        <label class="form-label">ID</label>
+        <div class="form-readonly">{{ .fuel.ID }}</div>
+    </div>
 
-            <div class="field">
-                <label class="label">Name</label>
-                <div class="control">
-                    <input class="input" type="text" value="{{ .fuel.Name }}" readonly>
-                </div>
-            </div>
+    <div class="form-field">
+        <label class="form-label">Name</label>
+        <div class="form-readonly">{{ .fuel.Name }}</div>
+    </div>
 
-            <div class="field">
-                <label class="label">Status</label>
-                <div class="control">
-                    {{ if .fuel.Status }}
-                    <span class="tag is-success">Active</span>
-                    {{ else }}
-                    <span class="tag is-danger">Inactive</span>
-                    {{ end }}
-                </div>
-            </div>
-
-            <div class="columns mt-5">
-                <div class="column">
-                    <p class="is-size-7 has-text-grey">
-                        <strong>Created By:</strong> {{ .fuel.CreatedBy }}<br>
-                        <strong>Created:</strong> {{ in_timezone .fuel.CreatedAt .tz }}<br>
-                        {{ if .fuel.UpdatedBy }}<strong>Updated By:</strong> {{ .fuel.UpdatedBy }}<br>{{ end }}
-                        {{ if .fuel.UpdatedAt }}<strong>Updated:</strong> {{ in_timezone .fuel.UpdatedAt .tz }}{{ end }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="field is-grouped is-grouped-right mt-5">
-                <div class="control">
-                    <button type="button" class="button is-link is-light" hx-get="/fuel-types" hx-target="body" hx-push-url="true">
-                        <span class="icon">
-                            <i class="fas fa-arrow-left"></i>
-                        </span>
-                        <span>Back to List</span>
-                    </button>
-                </div>
-            </div>
+    <div class="form-field">
+        <label class="form-label">Status</label>
+        <div style="padding-top:4px">
+            {{ if .fuel.Status }}
+                <span class="pill pill-on"><span class="dot"></span>Active</span>
+            {{ else }}
+                <span class="pill pill-off"><span class="dot"></span>Inactive</span>
+            {{ end }}
         </div>
+    </div>
+
+    <div class="form-meta">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div><strong>Created By:</strong> {{ .fuel.CreatedBy }}</div>
+            <div><strong>Created:</strong> {{ in_timezone .fuel.CreatedAt .tz }}</div>
+            {{ if .fuel.UpdatedBy }}<div><strong>Updated By:</strong> {{ .fuel.UpdatedBy }}</div>{{ end }}
+            {{ if .fuel.UpdatedAt }}<div><strong>Updated:</strong> {{ in_timezone .fuel.UpdatedAt .tz }}</div>{{ end }}
+        </div>
+    </div>
+
+    <div class="form-footer">
+        <button type="button" class="btn"
+            hx-get="/fuel-types" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
     </div>
 </div>
 {{ end }}

@@ -1,94 +1,78 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/vehicle-fuels" hx-target="body" hx-push-url="true" style="cursor:pointer">Vehicle Fuels</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
 {{ define "content" }}
-<div class="columns is-centered">
-    <div class="column is-two-thirds-tablet is-half-desktop">
-        <div class="box">
-            <h1 class="title mb-5">{{ .title }}</h1>
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>Vehicle fuel details</p>
+    </div>
+</div>
 
-            <div class="field">
-                <label class="label">ID</label>
-                <div class="control">
-                    <input class="input" type="text" value="{{ .fuel.ID }}" readonly>
-                </div>
-            </div>
+<div class="form-card" style="max-width:560px">
+    <div class="form-field">
+        <label class="form-label">ID</label>
+        <div class="form-readonly">{{ .fuel.ID }}</div>
+    </div>
 
-            <div class="columns">
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Vehicle Make</label>
-                        <div class="control">
-                            <input class="input" type="text" value="{{ .fuel.VehicleMakeName }}" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Vehicle Model</label>
-                        <div class="control">
-                            <input class="input" type="text" value="{{ .fuel.VehicleModelName }}" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="field">
-                <label class="label">Fuel Type</label>
-                <div class="control">
-                    <input class="input" type="text" value="{{ .fuel.FuelTypeName }}" readonly>
-                </div>
-            </div>
-
-            <div class="columns">
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Tank Size (L)</label>
-                        <div class="control">
-                            <input class="input" type="text" value="{{ printf "%.2f" .fuel.FuelTankSize }}" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Consumption (L/100km)</label>
-                        <div class="control">
-                            <input class="input" type="text" value="{{ printf "%.2f" .fuel.FuelConsumption }}" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="field">
-                <label class="label">Status</label>
-                <div class="control">
-                    {{ if .fuel.Status }}
-                    <span class="tag is-success">Active</span>
-                    {{ else }}
-                    <span class="tag is-danger">Inactive</span>
-                    {{ end }}
-                </div>
-            </div>
-
-            <div class="columns mt-5">
-                <div class="column">
-                    <p class="is-size-7 has-text-grey">
-                        <strong>Created By:</strong> {{ .fuel.CreatedBy }}<br>
-                        <strong>Created:</strong> {{ in_timezone .fuel.CreatedAt .tz }}<br>
-                        {{ if .fuel.UpdatedBy }}<strong>Updated By:</strong> {{ .fuel.UpdatedBy }}<br>{{ end }}
-                        {{ if .fuel.UpdatedAt }}<strong>Updated:</strong> {{ in_timezone .fuel.UpdatedAt .tz }}{{ end }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="field is-grouped is-grouped-right mt-5">
-                <div class="control">
-                    <button type="button" class="button is-link is-light" hx-get="/vehicle-fuels" hx-target="body" hx-push-url="true">
-                        <span class="icon">
-                            <i class="fas fa-arrow-left"></i>
-                        </span>
-                        <span>Back to List</span>
-                    </button>
-                </div>
-            </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Vehicle Make</label>
+            <div class="form-readonly">{{ .fuel.VehicleMakeName }}</div>
         </div>
+        <div class="form-field">
+            <label class="form-label">Vehicle Model</label>
+            <div class="form-readonly">{{ .fuel.VehicleModelName }}</div>
+        </div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Fuel Type</label>
+        <div class="form-readonly">{{ .fuel.FuelTypeName }}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Tank Size (L)</label>
+            <div class="form-readonly">{{ printf "%.2f" .fuel.FuelTankSize }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Consumption (L/100km)</label>
+            <div class="form-readonly">{{ printf "%.2f" .fuel.FuelConsumption }}</div>
+        </div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Status</label>
+        <div style="padding-top:4px">
+            {{ if .fuel.Status }}
+                <span class="pill pill-on"><span class="dot"></span>Active</span>
+            {{ else }}
+                <span class="pill pill-off"><span class="dot"></span>Inactive</span>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="form-meta">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div><strong>Created By:</strong> {{ .fuel.CreatedBy }}</div>
+            <div><strong>Created:</strong> {{ in_timezone .fuel.CreatedAt .tz }}</div>
+            {{ if .fuel.UpdatedBy }}<div><strong>Updated By:</strong> {{ .fuel.UpdatedBy }}</div>{{ end }}
+            {{ if .fuel.UpdatedAt }}<div><strong>Updated:</strong> {{ in_timezone .fuel.UpdatedAt .tz }}</div>{{ end }}
+        </div>
+    </div>
+
+    <div class="form-footer">
+        <button type="button" class="btn"
+            hx-get="/vehicle-fuels" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
     </div>
 </div>
 {{ end }}

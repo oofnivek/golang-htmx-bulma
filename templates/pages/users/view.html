@@ -1,110 +1,82 @@
+{{ define "breadcrumbs" }}
+<span>Access Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/users" hx-target="body" hx-push-url="true" style="cursor:pointer">Users</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .user.Email }}</b>
+{{ end }}
+
 {{ define "content" }}
-<div class="columns is-centered">
-    <div class="column is-two-thirds-tablet is-half-desktop">
-        <div class="box">
-            <h1 class="title mb-5">{{ .title }}</h1>
+<div class="ph">
+    <div>
+        <h1>{{ .user.FirstName }} {{ .user.LastName }}</h1>
+        <p>User account details</p>
+    </div>
+</div>
 
-            <div class="field">
-                <label class="label">Email (Username)</label>
-                <div class="control has-icons-left">
-                    <input class="input" type="email" value="{{ .user.Email }}" readonly>
-                    <span class="icon is-small is-left">
-                        <i class="fas fa-envelope"></i>
-                    </span>
-                </div>
-            </div>
+<div class="form-card" style="max-width:600px">
+    <div class="form-field">
+        <label class="form-label">Email (Username)</label>
+        <div class="form-readonly">{{ .user.Email }}</div>
+    </div>
 
-            <div class="columns">
-                <div class="column">
-                    <div class="field">
-                        <label class="label">First Name</label>
-                        <div class="control">
-                            <input class="input" type="text" value="{{ .user.FirstName }}" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Last Name</label>
-                        <div class="control">
-                            <input class="input" type="text" value="{{ .user.LastName }}" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="columns">
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Mobile</label>
-                        <div class="control has-icons-left">
-                            <input class="input" type="text" value="{{ .user.Mobile }}" readonly>
-                            <span class="icon is-small is-left">
-                                <i class="fas fa-phone"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Role</label>
-                        <div class="control">
-                            <input class="input" type="text" value="{{ .user.RoleName }}" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="columns">
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Designation</label>
-                        <div class="control">
-                            <input class="input" type="text" value="{{ .user.Designation }}" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Department</label>
-                            <div class="control">
-                                <input class="input" type="text" value="{{ .user.Department }}" readonly>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="control">
-                    <label class="checkbox">
-                        <input type="checkbox" {{ if .user.IsEnabled }}checked{{ end }} disabled>
-                        Account Enabled
-                    </label>
-                </div>
-            </div>
-
-            <div class="columns mt-5">
-                <div class="column">
-                    <p class="is-size-7 has-text-grey">
-                        <strong>Created:</strong> {{ in_timezone .user.CreatedAt .tz }}<br>
-                        <strong>Updated:</strong> {{ in_timezone .user.UpdatedAt .tz }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="field is-grouped is-grouped-right mt-5">
-                <div class="control">
-                    <button type="button" class="button is-link is-light" hx-get="/users" hx-target="body" hx-push-url="true">
-                        <span class="icon">
-                            <i class="fas fa-arrow-left"></i>
-                        </span>
-                        <span>Back to List</span>
-                    </button>
-                </div>
-            </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">First Name</label>
+            <div class="form-readonly">{{ .user.FirstName }}</div>
         </div>
+        <div class="form-field">
+            <label class="form-label">Last Name</label>
+            <div class="form-readonly">{{ .user.LastName }}</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Mobile</label>
+            <div class="form-readonly">{{ .user.Mobile }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Role</label>
+            <div class="form-readonly">{{ .user.RoleName }}</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Designation</label>
+            <div class="form-readonly">{{ .user.Designation }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Department</label>
+            <div class="form-readonly">{{ .user.Department }}</div>
+        </div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Status</label>
+        <div style="padding-top:4px">
+            {{ if .user.IsEnabled }}
+                <span class="pill pill-on"><span class="dot"></span>Enabled</span>
+            {{ else }}
+                <span class="pill pill-off"><span class="dot"></span>Disabled</span>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="form-meta">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div><strong>Created:</strong> {{ in_timezone .user.CreatedAt .tz }}</div>
+            <div><strong>Updated:</strong> {{ in_timezone .user.UpdatedAt .tz }}</div>
+        </div>
+    </div>
+
+    <div class="form-footer">
+        <button type="button" class="btn"
+            hx-get="/users" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
     </div>
 </div>
 {{ end }}

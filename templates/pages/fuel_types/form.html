@@ -1,40 +1,46 @@
+{{ define "breadcrumbs" }}
+<span>Fleet Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/fuel-types" hx-target="body" hx-push-url="true" style="cursor:pointer">Fuel Types</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
 {{ define "content" }}
-<div class="columns is-centered">
-    <div class="column is-half">
-        <div class="box">
-            <h1 class="title mb-5">{{ .title }}</h1>
-            <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
-                <div class="field">
-                    <label class="label">Name</label>
-                    <div class="control">
-                        <input class="input" type="text" name="name" placeholder="Fuel Type Name" value="{{ if .fuel }}{{ .fuel.Name }}{{ end }}" required autofocus>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <div class="control">
-                        <label class="checkbox">
-                            <input type="checkbox" name="status" {{ if or (not .fuel) .fuel.Status }}checked{{ end }}>
-                            Active
-                        </label>
-                    </div>
-                </div>
-
-                <div class="field is-grouped is-grouped-right mt-5">
-                    <div class="control">
-                        <button type="submit" class="button is-link">
-                            <span class="icon">
-                                <i class="fas fa-save"></i>
-                            </span>
-                            <span>Save</span>
-                        </button>
-                    </div>
-                    <div class="control">
-                        <button type="button" class="button is-link is-light" hx-get="/fuel-types" hx-target="body" hx-push-url="true">Cancel</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .fuel }}Update the fuel type name and active status.{{ else }}Add a new fuel type to the fleet.{{ end }}</p>
     </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" class="form-input" type="text" name="name"
+                placeholder="e.g. Diesel"
+                value="{{ if .fuel }}{{ .fuel.Name }}{{ end }}"
+                required autofocus>
+        </div>
+
+        <div class="form-field">
+            <label class="form-check">
+                <input type="checkbox" name="status" {{ if or (not .fuel) .fuel.Status }}checked{{ end }}>
+                <span>Active</span>
+            </label>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/fuel-types" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
 </div>
 {{ end }}

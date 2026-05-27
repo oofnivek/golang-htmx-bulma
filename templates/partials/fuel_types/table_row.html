@@ -1,32 +1,37 @@
 {{ define "fuel_types/table_row.html" }}
 <tr id="fuel-row-{{ .Fuel.ID }}">
-    <td>{{ .Fuel.ID }}</td>
-    <td>{{ .Fuel.Name }}</td>
+    <td style="color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:13px">{{ .Fuel.ID }}</td>
+    <td><span style="font-weight:500">{{ .Fuel.Name }}</span></td>
     <td>
         {{ if .Fuel.Status }}
-            <span class="tag is-success">Active</span>
+            <span class="pill pill-on"><span class="dot"></span>Active</span>
         {{ else }}
-            <span class="tag is-danger">Inactive</span>
+            <span class="pill pill-off"><span class="dot"></span>Inactive</span>
         {{ end }}
     </td>
-    <td>{{ if .Fuel.UpdatedBy }}{{ .Fuel.UpdatedBy }}{{ else }}-{{ end }}</td>
-    <td>{{ if .Fuel.UpdatedAt }}{{ in_timezone .Fuel.UpdatedAt .Timezone }}{{ else }}-{{ end }}</td>
-    <td>
-        <div class="buttons are-small">
-            <button class="button is-info is-light" hx-get="/fuel-types/{{ .Fuel.ID }}/view" hx-target="body" hx-push-url="true" hx-include="[name='tz']">
-                <span class="icon is-small">
-                    <i class="fas fa-eye"></i>
-                </span>
+    <td style="color:var(--ink-2);font-size:13px">
+        {{ if .Fuel.UpdatedBy }}{{ .Fuel.UpdatedBy }}{{ else }}&mdash;{{ end }}
+    </td>
+    <td style="color:var(--ink-2);font-size:13px">
+        {{ if .Fuel.UpdatedAt }}{{ in_timezone .Fuel.UpdatedAt .Timezone }}{{ else }}&mdash;{{ end }}
+    </td>
+    <td class="col-act">
+        <div class="row-act">
+            <button class="ra-btn" title="View"
+                hx-get="/fuel-types/{{ .Fuel.ID }}/view"
+                hx-target="body" hx-push-url="true"
+                hx-include="[name='tz']">
+                <i class="fa-regular fa-eye" style="font-size:14px"></i>
             </button>
-            <button class="button is-link is-light" hx-get="/fuel-types/{{ .Fuel.ID }}/edit" hx-target="body" hx-push-url="true">
-                <span class="icon is-small">
-                    <i class="fas fa-edit"></i>
-                </span>
+            <button class="ra-btn" title="Edit"
+                hx-get="/fuel-types/{{ .Fuel.ID }}/edit"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-regular fa-pen-to-square" style="font-size:13px"></i>
             </button>
-            <button class="button is-danger is-light" hx-get="/fuel-types/{{ .Fuel.ID }}/delete" hx-target="#modal-container">
-                <span class="icon is-small">
-                    <i class="fas fa-trash"></i>
-                </span>
+            <button class="ra-btn danger" title="Delete"
+                hx-get="/fuel-types/{{ .Fuel.ID }}/delete"
+                hx-target="#modal-container">
+                <i class="fa-regular fa-trash-can" style="font-size:13px"></i>
             </button>
         </div>
     </td>

@@ -1,41 +1,50 @@
+{{ define "breadcrumbs" }}
+<span>Access Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/roles" hx-target="body" hx-push-url="true" style="cursor:pointer">Roles</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
 {{ define "content" }}
-<div class="columns is-centered">
-    <div class="column is-half">
-        <div class="box">
-            <h1 class="title mb-5">{{ .title }}</h1>
-            <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
-                <div class="field">
-                    <label class="label">ID</label>
-                    <div class="control">
-                        <input class="input" type="text" name="id" placeholder="Role ID (e.g. ADMIN)" value="{{ if .role }}{{ .role.ID }}{{ end }}" {{ if .role }}readonly{{ else }}required autofocus{{ end }}>
-                    </div>
-                    {{ if not .role }}
-                    <p class="help">Max 10 characters.</p>
-                    {{ end }}
-                </div>
-
-                <div class="field">
-                    <label class="label">Name</label>
-                    <div class="control">
-                        <input class="input" type="text" name="name" placeholder="Role Name" value="{{ if .role }}{{ .role.Name }}{{ end }}" required {{ if .role }}autofocus{{ end }}>
-                    </div>
-                </div>
-
-                <div class="field is-grouped is-grouped-right mt-5">
-                    <div class="control">
-                        <button type="submit" class="button is-link">
-                            <span class="icon">
-                                <i class="fas fa-save"></i>
-                            </span>
-                            <span>Save</span>
-                        </button>
-                    </div>
-                    <div class="control">
-                        <button type="button" class="button is-link is-light" hx-get="/roles" hx-target="body" hx-push-url="true">Cancel</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .role }}Update the role name.{{ else }}Add a new access role.{{ end }}</p>
     </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="id">ID</label>
+            <input id="id" class="form-input" type="text" name="id"
+                placeholder="e.g. ADMIN"
+                value="{{ if .role }}{{ .role.ID }}{{ end }}"
+                {{ if .role }}readonly{{ else }}required autofocus{{ end }}>
+            {{ if not .role }}
+            <p style="font-size:12px;color:var(--ink-3);margin-top:4px">Max 10 characters.</p>
+            {{ end }}
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" class="form-input" type="text" name="name"
+                placeholder="e.g. Administrator"
+                value="{{ if .role }}{{ .role.Name }}{{ end }}"
+                required {{ if .role }}autofocus{{ end }}>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/roles" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
 </div>
 {{ end }}
