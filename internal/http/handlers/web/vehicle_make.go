@@ -35,20 +35,29 @@ func (h *VehicleMakeHandler) List(c *gin.Context) {
 		return
 	}
 
-	timezones := Timezones
-
 	totalPages := (total + pageSize - 1) / pageSize
+
+	start := (page-1)*pageSize + 1
+	if total == 0 {
+		start = 0
+	}
+	end := page * pageSize
+	if end > total {
+		end = total
+	}
 
 	c.HTML(http.StatusOK, "pages/vehicle_makes/index.html", gin.H{
 		"title":           "Vehicle Makes",
 		"makes":           makes,
 		"timezone":        tz,
-		"timezones":       timezones,
+		"timezones":       Timezones,
 		"currentPage":     page,
 		"pageSize":        pageSize,
 		"pageSizeOptions": []int{5, 10, 20, 50},
 		"totalPages":      totalPages,
 		"total":           total,
+		"start":           start,
+		"end":             end,
 		"sortBy":          sortBy,
 		"sortOrder":       sortOrder,
 	})
@@ -121,7 +130,11 @@ func (h *VehicleMakeHandler) Delete(c *gin.Context) {
 	err := h.svc.DeleteMake(id)
 	if err != nil {
 		slog.Error("failed to delete vehicle make", "id", id, "error", err)
-		c.String(http.StatusInternalServerError, "Failed to delete vehicle make")
+		if isForeignKeyConstraintError(err) {
+			c.String(http.StatusConflict, "This make cannot be deleted because it is still in use by one or more vehicles.")
+		} else {
+			c.String(http.StatusInternalServerError, "Failed to delete vehicle make")
+		}
 		return
 	}
 

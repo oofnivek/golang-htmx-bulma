@@ -24,6 +24,17 @@
                 autocomplete="off" autofocus>
         </div>
 
+        <!-- Error message (shown on delete failure) -->
+        <div id="delete-error" style="display:none;padding:0 20px 12px">
+            <div class="form-error" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <span><i class="fa-solid fa-circle-exclamation"></i> <span id="delete-error-msg"></span></span>
+                <button type="button" onclick="document.getElementById('delete-error').style.display='none'"
+                        style="background:transparent;border:0;cursor:pointer;color:inherit;padding:0;font-size:14px;line-height:1;flex-shrink:0">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
         <!-- Footer -->
         <div style="display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border-2);background:#fbfcfe">
             <button class="btn" onclick="closeModal()">Cancel</button>
@@ -33,7 +44,7 @@
                     hx-delete="{{ .DeleteURL }}"
                     hx-target="#{{ .RowID }}"
                     hx-swap="outerHTML"
-                    hx-on::after-request="closeModal()">
+                    hx-on::after-request="if(event.detail.successful){closeModal()}else{document.getElementById('delete-error-msg').textContent=event.detail.xhr.responseText||'An error occurred. Please try again.';document.getElementById('delete-error').style.display='block'}">
                 <i class="fa-solid fa-trash" style="font-size:12px"></i>
                 Delete
             </button>

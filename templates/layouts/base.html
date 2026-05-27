@@ -129,13 +129,7 @@
         });
 
         function closeModal() {
-            var modal = document.querySelector('.modal');
-            if (modal) {
-                modal.classList.remove('is-active');
-                setTimeout(function () {
-                    document.getElementById('modal-container').innerHTML = '';
-                }, 200);
-            }
+            document.getElementById('modal-container').innerHTML = '';
         }
 
         function checkDeleteInput(input) {
