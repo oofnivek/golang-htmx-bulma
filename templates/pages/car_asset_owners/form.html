@@ -1,0 +1,46 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/car-asset-owners" hx-target="body" hx-push-url="true" style="cursor:pointer">Car Asset Owners</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .owner }}Update the owner name and active status.{{ else }}Add a new car asset owner.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" class="form-input" type="text" name="name"
+                placeholder="e.g. Acme Corporation"
+                value="{{ if .owner }}{{ .owner.Name }}{{ end }}"
+                required autofocus>
+        </div>
+
+        <div class="form-field">
+            <label class="form-check">
+                <input type="checkbox" name="status" {{ if or (not .owner) .owner.Status }}checked{{ end }}>
+                <span>Active</span>
+            </label>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/car-asset-owners" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}

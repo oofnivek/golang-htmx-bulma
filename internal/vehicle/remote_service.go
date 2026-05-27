@@ -1304,3 +1304,158 @@ func (s *remoteVehicleModelService) DeleteModel(id int64) error {
 	}
 	return nil
 }
+
+// remoteCarAssetOwnerService provides HTTP-based client for CarAssetOwnerService.
+
+type remoteCarAssetOwnerService struct {
+	client  *http.Client
+	baseURL string
+}
+
+func NewRemoteCarAssetOwnerService(baseURL string) CarAssetOwnerService {
+	return &remoteCarAssetOwnerService{
+		client:  &http.Client{Timeout: 10 * time.Second},
+		baseURL: strings.TrimRight(baseURL, "/"),
+	}
+}
+
+func (s *remoteCarAssetOwnerService) ListAll() ([]CarAssetOwner, error) {
+	resp, err := s.client.Get(s.baseURL + "/api/car-asset-owners/all")
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Owners []CarAssetOwner `json:"owners"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.Owners, nil
+}
+
+func (s *remoteCarAssetOwnerService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]CarAssetOwner, int, error) {
+	q := url.Values{}
+	q.Set("page", strconv.Itoa(page))
+	q.Set("pageSize", strconv.Itoa(pageSize))
+	q.Set("sortBy", sortBy)
+	q.Set("sortOrder", sortOrder)
+	u := fmt.Sprintf("%s/api/car-asset-owners?%s", s.baseURL, q.Encode())
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, 0, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, 0, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Owners []CarAssetOwner `json:"owners"`
+		Total  int             `json:"total"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, 0, err
+	}
+	return data.Owners, data.Total, nil
+}
+
+func (s *remoteCarAssetOwnerService) FindByID(id int64) (*CarAssetOwner, error) {
+	u := fmt.Sprintf("%s/api/car-asset-owners/%d", s.baseURL, id)
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var o CarAssetOwner
+	if err := json.NewDecoder(resp.Body).Decode(&o); err != nil {
+		return nil, err
+	}
+	return &o, nil
+}
+
+func (s *remoteCarAssetOwnerService) CreateOwner(name string, status bool, user string) (*CarAssetOwner, error) {
+	payload := map[string]interface{}{"name": name, "status": status, "user": user}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Post(s.baseURL+"/api/car-asset-owners", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var o CarAssetOwner
+	if err := json.NewDecoder(resp.Body).Decode(&o); err != nil {
+		return nil, err
+	}
+	return &o, nil
+}
+
+func (s *remoteCarAssetOwnerService) UpdateOwner(id int64, name string, status bool, user string) (*CarAssetOwner, error) {
+	payload := map[string]interface{}{"name": name, "status": status, "user": user}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/api/car-asset-owners/%d", s.baseURL, id), bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var o CarAssetOwner
+	if err := json.NewDecoder(resp.Body).Decode(&o); err != nil {
+		return nil, err
+	}
+	return &o, nil
+}
+
+func (s *remoteCarAssetOwnerService) DeleteOwner(id int64) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/car-asset-owners/%d", s.baseURL, id), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return errors.New(msg)
+		}
+		return fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	return nil
+}

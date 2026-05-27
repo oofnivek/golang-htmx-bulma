@@ -19,6 +19,7 @@ func RegisterRoutes(
 	vmdlHandler *web.VehicleModelHandler,
 	vfHandler *web.VehicleFuelHandler,
 	fcHandler *web.FuelCompanyHandler,
+	caoHandler *web.CarAssetOwnerHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -32,6 +33,7 @@ func RegisterRoutes(
 	vmdlAPI *api.VehicleModelAPIHandler,
 	vfAPI *api.VehicleFuelAPIHandler,
 	fcAPI *api.FuelCompanyAPIHandler,
+	caoAPI *api.CarAssetOwnerAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -46,7 +48,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -170,6 +172,21 @@ func RegisterRoutes(
 				}
 			}
 
+			// Car Asset Owners
+			if caoHandler != nil {
+				caoGroup := protected.Group("/car-asset-owners")
+				{
+					caoGroup.GET("", caoHandler.List)
+					caoGroup.GET("/new", caoHandler.CreateForm)
+					caoGroup.POST("", caoHandler.Create)
+					caoGroup.GET("/:id/view", caoHandler.View)
+					caoGroup.GET("/:id/edit", caoHandler.EditForm)
+					caoGroup.POST("/:id", caoHandler.Update)
+					caoGroup.DELETE("/:id", caoHandler.Delete)
+					caoGroup.GET("/:id/delete", caoHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -289,6 +306,15 @@ func RegisterRoutes(
 			apiGroup.POST("/fuel-companies", fcAPI.Create)
 			apiGroup.PUT("/fuel-companies/:id", fcAPI.Update)
 			apiGroup.DELETE("/fuel-companies/:id", fcAPI.Delete)
+		}
+
+		if caoAPI != nil {
+			apiGroup.GET("/car-asset-owners/all", caoAPI.ListAll)
+			apiGroup.GET("/car-asset-owners", caoAPI.List)
+			apiGroup.GET("/car-asset-owners/:id", caoAPI.Get)
+			apiGroup.POST("/car-asset-owners", caoAPI.Create)
+			apiGroup.PUT("/car-asset-owners/:id", caoAPI.Update)
+			apiGroup.DELETE("/car-asset-owners/:id", caoAPI.Delete)
 		}
 	}
 }
