@@ -1,11 +1,11 @@
 # AGENTS.md
 
 ## Project overview
-This project is a full-stack web application built with Go, Gin, HTMX, Bulma CSS, and MySQL.
+This project is a full-stack web application built with Go, Gin, HTMX, and MySQL, using a custom Claude design template for styling.
 
 - Backend framework: Gin
 - Frontend: server-rendered HTML templates enhanced with HTMX
-- CSS framework: Bulma
+- CSS framework: Claude design template (custom)
 - Database: MySQL only (connects to existing databases — no migrations run from this repo)
 - Goal: keep the app simple, server-driven, and easy to maintain
 
@@ -17,7 +17,7 @@ DDL for all tables is in `schema/`, organized by database name:
 ## Core principles
 - Prefer server-rendered HTML over heavy frontend JavaScript.
 - Use HTMX for progressive enhancement, partial updates, and simple interactivity.
-- Use Bulma components and classes before adding custom CSS.
+- Use Claude design template components and classes before adding custom CSS.
 - Keep dependencies small unless there is a clear reason.
 - Prefer clarity and maintainability over clever abstractions.
 - Make small, focused changes instead of large rewrites.
@@ -180,12 +180,12 @@ Pass `thingHandler` and `thingAPI` to `routes.RegisterRoutes(...)`.
 Template conventions recap:
 - Index: `hx-target="body" hx-push-url="true"` on sort links, page links, and selectors.
 - Table row: `{{ define "things/table_row.html" }}` — called with `{{ template "things/table_row.html" . }}`.
-- Action button order: all three buttons — view (`is-info is-light`, eye), edit (`is-link is-light`, pencil), delete (`is-danger is-light`, trash) — must always be present in the Actions column, in that order.
-- Form footer (right-aligned): Save button (`is-link`, `fa-save`) **left of** Cancel button (`is-link is-light`).
+- Action button order: all three buttons — view (`ra-btn`, eye), edit (`ra-btn`, pencil), delete (`ra-btn danger`, trash) — must always be present in the Actions column, in that order. Wrap in a `row-act` div.
+- Form footer: Save button (`btn btn-primary`, `fa-floppy-disk`) **left of** Cancel button (`btn`). Wrap in a `form-footer` div.
 - Delete modal target: `hx-target="#modal-container"`.
 
 ### Layer 10 — Sidebar nav  
-File: `templates/layouts/base.html` — add `<li><a href="/things">Things</a></li>` under the correct `<p class="menu-label">` section.
+File: `templates/layouts/base.html` — add an `<a href="/things" class="sb-item">` link with the appropriate FontAwesome icon inside a `<span class="sb-ico">` under the correct `<div class="sb-section">` section.
 
 ---
 
@@ -321,9 +321,9 @@ Each role wires only the required internal packages, keeping the other domain pa
 ## Technology rules
 - Prefer the Go standard library unless an external package clearly improves maintainability.
 - Use the current project templating approach consistently.
-- Use Bulma classes consistently for layout, forms, buttons, tables, notifications, and modals.
+- Use Claude design template classes consistently for layout, forms, buttons, tables, notifications, and modals.
 - Add custom JavaScript only when HTMX cannot reasonably solve the interaction.
-- Add custom CSS only when Bulma cannot reasonably handle the styling.
+- Add custom CSS only when the Claude design template cannot reasonably handle the styling.
 
 ## Database rules
 - MySQL is the only supported database.
@@ -385,18 +385,18 @@ Each role wires only the required internal packages, keeping the other domain pa
 - Keep templates organized into layouts, pages, and partials.
 - Reuse partials for repeated UI such as forms, flash messages, table rows, and modals.
 - **Autofocus**: When creating "new", "edit", or "delete" (modal) views, always add the `autofocus` attribute to the first or most relevant input field to improve UX.
-- **Cancel Button**: Form pages ("new" and "edit") must include a "Cancel" button in the footer area (using `is-grouped-right`) that redirects back to the index page using HTMX. The "Save" button must be on the left of the "Cancel" button, use the `is-link` class, and include a FontAwesome save icon. The "Cancel" button must use the `is-link is-light` class.
-- **View Page**: Modules with extensive details must provide a read-only view page. This page should mirror the edit form's layout but with all inputs in `readonly` or `disabled` mode. The footer must only contain a "Back to List" button (using `is-link is-light` and right-aligned).
-- **Action Buttons**: The "Actions" column in index tables must use icon-only buttons (FontAwesome) rather than text. Standard colors: `is-info is-light` for view (eye icon), `is-link is-light` for edit (edit icon), `is-danger is-light` for delete (trash icon). Use the `buttons are-small` container.
+- **Cancel Button**: Form pages ("new" and "edit") must include a "Cancel" button in the `form-footer` area that redirects back to the index page using HTMX. The "Save" button must be on the left of the "Cancel" button, use the `btn btn-primary` class, and include a FontAwesome `fa-floppy-disk` icon. The "Cancel" button must use the `btn` class.
+- **View Page**: Modules with extensive details must provide a read-only view page. This page should mirror the edit form's layout but with all inputs in `readonly` or `disabled` mode. The footer must only contain a "Back to List" button (using `btn` and right-aligned).
+- **Action Buttons**: The "Actions" column in index tables must use icon-only buttons (FontAwesome) rather than text. Use `ra-btn` for view (eye icon) and edit (pencil icon), and `ra-btn danger` for delete (trash icon). Wrap in a `row-act` div.
 - **Timezone selector**: Use the shared `web.Timezones` constant when populating timezone dropdowns in index pages (e.g., vehicle_colors, vehicle_makes, users) to keep the list consistent across the application.
 - Keep conditional logic in templates minimal.
 - Format HTML clearly so partials are easy to update.
 - Keep HTMX-targeted fragments small and reusable.
 
-## Bulma conventions
-- Prefer Bulma-native components and naming.
-- Keep styling consistent with Bulma defaults unless the project defines a custom design system.
-- Avoid large custom CSS overrides that fight Bulma.
+## Claude design template conventions
+- Use the custom design template's component classes (`btn`, `btn-primary`, `card`, `tbl`, `form-card`, `form-field`, `form-label`, `form-input`, `form-footer`, `ph`, `ra-btn`, `row-act`, `pill`, etc.) consistently.
+- Keep styling consistent with the design template's CSS custom properties (`var(--bg)`, `var(--ink-2)`, `var(--ink-3)`, etc.).
+- Avoid large custom CSS overrides that conflict with the design template.
 - If custom CSS is necessary, keep it small, scoped, and documented.
 
 ## Commands
@@ -448,7 +448,7 @@ Ask before doing any of the following:
 - adding or removing dependencies
 - changing schema in a destructive way
 - changing the folder structure significantly
-- replacing Gin, HTMX, Bulma, or MySQL
+- replacing Gin, HTMX, the Claude design template, or MySQL
 - introducing a client-side frontend framework
 - modifying authentication or authorization behavior significantly
 
@@ -459,7 +459,7 @@ When implementing a feature or fix:
 3. Keep full-page routes, HTMX partial routes, and API routes clearly separated when practical.
 4. Reuse existing patterns before introducing new ones.
 5. Update or add tests when behavior changes.
-6. Ensure the result matches the Go + Gin + HTMX + Bulma + MySQL style used in this repo.
+6. Ensure the result matches the Go + Gin + HTMX + Claude design template + MySQL style used in this repo.
 
 ## Good defaults for this project
 - Gin for routing and middleware
@@ -469,7 +469,7 @@ When implementing a feature or fix:
 - Repository-based data access
 - Reusable HTML partials
 - Minimal JavaScript
-- Bulma-first styling
+- Claude design template styling
 - MySQL-only data model (this app connects to an existing database — no migrations are run from this repo)
 - `cmd/` for entrypoints and `internal/` for app code
 - **Time Handling**: UTC in database, local/selected timezone in UI
