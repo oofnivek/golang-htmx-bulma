@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -119,7 +120,8 @@ func (h *VehicleMakeHandler) Delete(c *gin.Context) {
 
 	err := h.svc.DeleteMake(id)
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		slog.Error("failed to delete vehicle make", "id", id, "error", err)
+		c.String(http.StatusInternalServerError, "Failed to delete vehicle make")
 		return
 	}
 

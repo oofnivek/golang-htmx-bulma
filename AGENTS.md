@@ -355,7 +355,13 @@ Each role wires only the required internal packages, keeping the other domain pa
 - **Structured JSON Logging**: Do not use `log.Printf`, `log.Println`, or `fmt.Printf` for application logging. All logging must use standard Go's structured logger `log/slog`.
 - **Vendor Neutrality**: Keep the codebase free from proprietary vendor SDKs (e.g. Datadog SDKs). Use OTel standard exporters to ship logs to OTel-compliant backends.
 - **Rich Context/Attributes**: Always include useful structured attributes as key-value pairs (e.g., `email`, `client_ip`, `error`) so they are indexed automatically as searchable facets in log backends.
-- **Secure Server Logs**: Use `slog.Error` to log actual database/system failures securely on the server-side, while returning safe, user-friendly error messages to the client.
+- **Secure Server Logs**: Use `slog.Error` to log actual database/system failures securely on the server-side, while returning safe, user-friendly error messages to the client. Never pass `err.Error()` directly to `c.String(500, ...)` — that leaks internal details to the browser.
+- **Handler error logging**: Every handler path that returns a 5xx must call `slog.Error` before returning. Always include the operation context and the structured `"error"` attribute:
+  ```go
+  slog.Error("failed to delete vehicle color", "id", id, "error", err)
+  c.String(http.StatusInternalServerError, "Failed to delete vehicle color")
+  ```
+  Include the record ID (or other identifying field) so log entries are actionable without a database query. Use a consistent message format: `"failed to <verb> <entity>"` (e.g. `"failed to list vehicle makes"`, `"failed to create fuel type"`).
 
 ## Code style
 - Write idiomatic Go.

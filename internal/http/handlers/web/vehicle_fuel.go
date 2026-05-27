@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -167,7 +168,8 @@ func (h *VehicleFuelHandler) Delete(c *gin.Context) {
 	id, _ := strconv.ParseInt(idStr, 10, 64)
 
 	if err := h.svc.DeleteFuel(id); err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		slog.Error("failed to delete vehicle fuel", "id", id, "error", err)
+		c.String(http.StatusInternalServerError, "Failed to delete vehicle fuel")
 		return
 	}
 

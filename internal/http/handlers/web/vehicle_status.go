@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -105,7 +106,8 @@ func (h *VehicleStatusHandler) Delete(c *gin.Context) {
 	id, _ := strconv.ParseInt(idStr, 10, 64)
 
 	if err := h.svc.DeleteStatus(id); err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		slog.Error("failed to delete vehicle status", "id", id, "error", err)
+		c.String(http.StatusInternalServerError, "Failed to delete vehicle status")
 		return
 	}
 

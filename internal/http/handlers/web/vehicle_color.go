@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -74,7 +75,7 @@ func (h *VehicleColorHandler) CreateForm(c *gin.Context) {
 func (h *VehicleColorHandler) Create(c *gin.Context) {
 	name := c.PostForm("name")
 	statusStr := c.PostForm("status")
-	status := statusStr == "on" // Bulma checkbox or select? Let's assume checkbox for now.
+	status := statusStr == "on"
 
 	userEmail := c.GetString("user_email")
 	_, err := h.svc.CreateColor(name, status, userEmail)
@@ -130,7 +131,8 @@ func (h *VehicleColorHandler) Delete(c *gin.Context) {
 
 	err := h.svc.DeleteColor(id)
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		slog.Error("failed to delete vehicle color", "id", id, "error", err)
+		c.String(http.StatusInternalServerError, "Failed to delete vehicle color")
 		return
 	}
 
