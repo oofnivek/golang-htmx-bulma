@@ -62,6 +62,7 @@ func main() {
 		vfHandler   *web.VehicleFuelHandler
 		fcHandler   *web.FuelCompanyHandler
 		caoHandler  *web.CarAssetOwnerHandler
+		cpoHandler  *web.CarParkOwnerHandler
 		roleHandler *web.RoleHandler
 		userHandler *web.UserHandler
 		authHandler *web.AuthHandler
@@ -76,7 +77,8 @@ func main() {
 		vmdlAPI  *api.VehicleModelAPIHandler
 		vfAPI    *api.VehicleFuelAPIHandler
 		fcAPI    *api.FuelCompanyAPIHandler
-		caoAPI   *api.CarAssetOwnerAPIHandler
+		caoAPI  *api.CarAssetOwnerAPIHandler
+		cpoAPI  *api.CarParkOwnerAPIHandler
 
 		port string = cfg.Port
 	)
@@ -151,6 +153,9 @@ func main() {
 		caoRepo := vehicle.NewCarAssetOwnerRepository(vehicleDatabase)
 		caoSvc := vehicle.NewCarAssetOwnerService(caoRepo)
 
+		cpoRepo := vehicle.NewCarParkOwnerRepository(vehicleDatabase)
+		cpoSvc := vehicle.NewCarParkOwnerService(cpoRepo)
+
 		// Set up API handlers
 		vcAPI = api.NewVehicleColorAPIHandler(vcSvc)
 		vmAPI = api.NewVehicleMakeAPIHandler(vmSvc)
@@ -160,6 +165,7 @@ func main() {
 		vfAPI = api.NewVehicleFuelAPIHandler(vfSvc)
 		fcAPI = api.NewFuelCompanyAPIHandler(fcSvc)
 		caoAPI = api.NewCarAssetOwnerAPIHandler(caoSvc)
+		cpoAPI = api.NewCarParkOwnerAPIHandler(cpoSvc)
 
 	case "web-view":
 		log.Println("Booting in WEB-VIEW role...")
@@ -216,6 +222,8 @@ func main() {
 
 		var caoSvc vehicle.CarAssetOwnerService
 
+		var cpoSvc vehicle.CarParkOwnerService
+
 		vehicleServiceURL := os.Getenv("VEHICLE_SERVICE_URL")
 		if vehicleServiceURL != "" {
 			log.Printf("Using remote Vehicle Service at: %s\n", vehicleServiceURL)
@@ -228,6 +236,7 @@ func main() {
 			vfSvc = vehicle.NewRemoteVehicleFuelService(vehicleServiceURL)
 			fcSvc = vehicle.NewRemoteFuelCompanyService(vehicleServiceURL)
 			caoSvc = vehicle.NewRemoteCarAssetOwnerService(vehicleServiceURL)
+			cpoSvc = vehicle.NewRemoteCarParkOwnerService(vehicleServiceURL)
 		} else {
 			log.Println("WARNING: VEHICLE_SERVICE_URL is not set. Falling back to local Vehicle DB access.")
 			vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
@@ -262,6 +271,9 @@ func main() {
 
 			caoRepo := vehicle.NewCarAssetOwnerRepository(vehicleDatabase)
 			caoSvc = vehicle.NewCarAssetOwnerService(caoRepo)
+
+			cpoRepo := vehicle.NewCarParkOwnerRepository(vehicleDatabase)
+			cpoSvc = vehicle.NewCarParkOwnerService(cpoRepo)
 		}
 
 		// Set up Web Handlers
@@ -274,6 +286,7 @@ func main() {
 		vfHandler = web.NewVehicleFuelHandler(vfSvc, vmSvc, vmdlSvc, ftSvc)
 		fcHandler = web.NewFuelCompanyHandler(fcSvc)
 		caoHandler = web.NewCarAssetOwnerHandler(caoSvc)
+		cpoHandler = web.NewCarParkOwnerHandler(cpoSvc)
 		roleHandler = web.NewRoleHandler(roleSvc)
 		userHandler = web.NewUserHandler(userSvc, roleSvc)
 		authHandler = web.NewAuthHandler(authSvc)
@@ -336,6 +349,10 @@ func main() {
 		caoSvc := vehicle.NewCarAssetOwnerService(caoRepo)
 		caoHandler = web.NewCarAssetOwnerHandler(caoSvc)
 
+		cpoRepo := vehicle.NewCarParkOwnerRepository(vehicleDatabase)
+		cpoSvc := vehicle.NewCarParkOwnerService(cpoRepo)
+		cpoHandler = web.NewCarParkOwnerHandler(cpoSvc)
+
 		// Wire User services/handlers (local implementations)
 		userRepo := user.NewUserRepository(userDatabase)
 		userSvc := user.NewLocalUserService(userRepo)
@@ -362,6 +379,7 @@ func main() {
 		vfAPI = api.NewVehicleFuelAPIHandler(vfSvc)
 		fcAPI = api.NewFuelCompanyAPIHandler(fcSvc)
 		caoAPI = api.NewCarAssetOwnerAPIHandler(caoSvc)
+		cpoAPI = api.NewCarParkOwnerAPIHandler(cpoSvc)
 
 		// Set up templates
 		r.HTMLRender = view.NewRenderer("templates")
@@ -379,6 +397,7 @@ func main() {
 		vfHandler,
 		fcHandler,
 		caoHandler,
+		cpoHandler,
 		roleHandler,
 		userHandler,
 		authHandler,
@@ -393,6 +412,7 @@ func main() {
 		vfAPI,
 		fcAPI,
 		caoAPI,
+		cpoAPI,
 		cfg.JWTSigningKey,
 	)
 

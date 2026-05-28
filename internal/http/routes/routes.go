@@ -19,7 +19,8 @@ func RegisterRoutes(
 	vmdlHandler *web.VehicleModelHandler,
 	vfHandler *web.VehicleFuelHandler,
 	fcHandler *web.FuelCompanyHandler,
-	caoHandler *web.CarAssetOwnerHandler,
+	caoHandler  *web.CarAssetOwnerHandler,
+	cpoHandler  *web.CarParkOwnerHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -34,6 +35,7 @@ func RegisterRoutes(
 	vfAPI *api.VehicleFuelAPIHandler,
 	fcAPI *api.FuelCompanyAPIHandler,
 	caoAPI *api.CarAssetOwnerAPIHandler,
+	cpoAPI *api.CarParkOwnerAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -48,7 +50,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -187,6 +189,21 @@ func RegisterRoutes(
 				}
 			}
 
+			// Car Park Owners
+			if cpoHandler != nil {
+				cpoGroup := protected.Group("/car-park-owners")
+				{
+					cpoGroup.GET("", cpoHandler.List)
+					cpoGroup.GET("/new", cpoHandler.CreateForm)
+					cpoGroup.POST("", cpoHandler.Create)
+					cpoGroup.GET("/:id/view", cpoHandler.View)
+					cpoGroup.GET("/:id/edit", cpoHandler.EditForm)
+					cpoGroup.POST("/:id", cpoHandler.Update)
+					cpoGroup.DELETE("/:id", cpoHandler.Delete)
+					cpoGroup.GET("/:id/delete", cpoHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -315,6 +332,15 @@ func RegisterRoutes(
 			apiGroup.POST("/car-asset-owners", caoAPI.Create)
 			apiGroup.PUT("/car-asset-owners/:id", caoAPI.Update)
 			apiGroup.DELETE("/car-asset-owners/:id", caoAPI.Delete)
+		}
+
+		if cpoAPI != nil {
+			apiGroup.GET("/car-park-owners/all", cpoAPI.ListAll)
+			apiGroup.GET("/car-park-owners", cpoAPI.List)
+			apiGroup.GET("/car-park-owners/:id", cpoAPI.Get)
+			apiGroup.POST("/car-park-owners", cpoAPI.Create)
+			apiGroup.PUT("/car-park-owners/:id", cpoAPI.Update)
+			apiGroup.DELETE("/car-park-owners/:id", cpoAPI.Delete)
 		}
 	}
 }
