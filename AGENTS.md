@@ -447,7 +447,11 @@ Before finishing changes, always do the relevant checks:
 
 ## Legacy / ignored fields
 
-- `VehicleType.OldID` (`old_id` column) — legacy migration artifact. The column exists in the database and on the struct but must not be exposed in forms, API responses, or new features.
+The `old_id` column exists in some database tables as a legacy migration artifact and will be removed in the future. Rules:
+
+- **Schema files** (`schema/**/*.sql`): `old_id` may appear in DDL synced from the database — this is acceptable and should be left as-is to accurately reflect the database state.
+- **Application code**: `old_id` must be completely ignored. Do not include it in domain structs, SELECT queries, Scan calls, INSERT statements, UPDATE statements, API responses, or forms.
+- **Current scope**: This rule is fully enforced in the **vehicle service** (`internal/vehicle/`). Apply the same rule to any other service or domain as new features are added.
 
 ## Ask first
 Ask before doing any of the following:

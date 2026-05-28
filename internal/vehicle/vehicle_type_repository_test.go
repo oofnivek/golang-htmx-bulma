@@ -10,7 +10,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 )
 
-var typeColumns = []string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at", "old_id"}
+var typeColumns = []string{"id", "name", "status", "created_by", "created_at", "updated_by", "updated_at"}
 
 func TestNewVehicleTypeRepository(t *testing.T) {
 	db, _, _ := sqlmock.New()
@@ -32,9 +32,9 @@ func TestVehicleTypeGetAll(t *testing.T) {
 
 	t.Run("Success", func(t *testing.T) {
 		rows := sqlmock.NewRows(typeColumns).
-			AddRow(1, "Sedan", true, "user1", now, "user2", now, nil).
-			AddRow(2, "SUV", false, "user1", now, nil, nil, nil)
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type ORDER BY id DESC")).
+			AddRow(1, "Sedan", true, "user1", now, "user2", now).
+			AddRow(2, "SUV", false, "user1", now, nil, nil)
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type ORDER BY id DESC")).
 			WillReturnRows(rows)
 
 		types, err := repo.GetAll()
@@ -47,7 +47,7 @@ func TestVehicleTypeGetAll(t *testing.T) {
 	})
 
 	t.Run("DBError", func(t *testing.T) {
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type ORDER BY id DESC")).
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type ORDER BY id DESC")).
 			WillReturnError(errors.New("query failed"))
 		_, err := repo.GetAll()
 		if err == nil {
@@ -57,8 +57,8 @@ func TestVehicleTypeGetAll(t *testing.T) {
 
 	t.Run("ScanError", func(t *testing.T) {
 		rows := sqlmock.NewRows(typeColumns).
-			AddRow("not-an-int", "Sedan", true, "user1", now, nil, nil, nil)
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type ORDER BY id DESC")).
+			AddRow("not-an-int", "Sedan", true, "user1", now, nil, nil)
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type ORDER BY id DESC")).
 			WillReturnRows(rows)
 		_, err := repo.GetAll()
 		if err == nil {
@@ -78,8 +78,8 @@ func TestVehicleTypeGetPaged(t *testing.T) {
 
 	t.Run("Success", func(t *testing.T) {
 		rows := sqlmock.NewRows(typeColumns).
-			AddRow(1, "Sedan", true, "user1", now, nil, nil, nil)
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type ORDER BY id desc LIMIT ? OFFSET ?")).
+			AddRow(1, "Sedan", true, "user1", now, nil, nil)
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type ORDER BY id desc LIMIT ? OFFSET ?")).
 			WithArgs(10, 0).
 			WillReturnRows(rows)
 		types, err := repo.GetPaged(10, 0, "id", "desc")
@@ -92,7 +92,7 @@ func TestVehicleTypeGetPaged(t *testing.T) {
 	})
 
 	t.Run("InvalidSortBy", func(t *testing.T) {
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type ORDER BY id desc LIMIT ? OFFSET ?")).
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type ORDER BY id desc LIMIT ? OFFSET ?")).
 			WithArgs(10, 0).
 			WillReturnRows(sqlmock.NewRows(typeColumns))
 		_, err := repo.GetPaged(10, 0, "invalid", "desc")
@@ -102,7 +102,7 @@ func TestVehicleTypeGetPaged(t *testing.T) {
 	})
 
 	t.Run("InvalidSortOrder", func(t *testing.T) {
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type ORDER BY id desc LIMIT ? OFFSET ?")).
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type ORDER BY id desc LIMIT ? OFFSET ?")).
 			WithArgs(10, 0).
 			WillReturnRows(sqlmock.NewRows(typeColumns))
 		_, err := repo.GetPaged(10, 0, "id", "invalid")
@@ -121,8 +121,8 @@ func TestVehicleTypeGetPaged(t *testing.T) {
 
 	t.Run("ScanError", func(t *testing.T) {
 		rows := sqlmock.NewRows(typeColumns).
-			AddRow("not-an-int", "Sedan", true, "user1", now, nil, nil, nil)
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type ORDER BY id desc LIMIT ? OFFSET ?")).
+			AddRow("not-an-int", "Sedan", true, "user1", now, nil, nil)
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type ORDER BY id desc LIMIT ? OFFSET ?")).
 			WithArgs(10, 0).
 			WillReturnRows(rows)
 		_, err := repo.GetPaged(10, 0, "id", "desc")
@@ -173,8 +173,8 @@ func TestVehicleTypeGetByID(t *testing.T) {
 
 	t.Run("Found", func(t *testing.T) {
 		rows := sqlmock.NewRows(typeColumns).
-			AddRow(1, "Sedan", true, "user1", now, nil, nil, nil)
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type WHERE id = ?")).
+			AddRow(1, "Sedan", true, "user1", now, nil, nil)
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type WHERE id = ?")).
 			WithArgs(int64(1)).
 			WillReturnRows(rows)
 		vt, err := repo.GetByID(1)
@@ -187,7 +187,7 @@ func TestVehicleTypeGetByID(t *testing.T) {
 	})
 
 	t.Run("NotFound", func(t *testing.T) {
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type WHERE id = ?")).
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type WHERE id = ?")).
 			WithArgs(int64(99)).
 			WillReturnError(sql.ErrNoRows)
 		vt, err := repo.GetByID(99)
@@ -200,7 +200,7 @@ func TestVehicleTypeGetByID(t *testing.T) {
 	})
 
 	t.Run("DBError", func(t *testing.T) {
-		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at, old_id FROM vehicle_type WHERE id = ?")).
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, status, created_by, created_at, updated_by, updated_at FROM vehicle_type WHERE id = ?")).
 			WithArgs(int64(1)).
 			WillReturnError(errors.New("db error"))
 		_, err := repo.GetByID(1)
@@ -229,8 +229,8 @@ func TestVehicleTypeCreate(t *testing.T) {
 	}
 
 	t.Run("Success", func(t *testing.T) {
-		mock.ExpectExec(regexp.QuoteMeta("INSERT INTO vehicle_type (name, status, created_by, created_at, updated_by, updated_at, old_id) VALUES (?,?,?,?,?,?,?)")).
-			WithArgs(vt.Name, vt.Status, vt.CreatedBy, vt.CreatedAt, vt.UpdatedBy, vt.UpdatedAt, vt.OldID).
+		mock.ExpectExec(regexp.QuoteMeta("INSERT INTO vehicle_type (name, status, created_by, created_at, updated_by, updated_at) VALUES (?,?,?,?,?,?)")).
+			WithArgs(vt.Name, vt.Status, vt.CreatedBy, vt.CreatedAt, vt.UpdatedBy, vt.UpdatedAt).
 			WillReturnResult(sqlmock.NewResult(42, 1))
 		err := repo.Create(vt)
 		if err != nil {
@@ -242,7 +242,7 @@ func TestVehicleTypeCreate(t *testing.T) {
 	})
 
 	t.Run("ExecError", func(t *testing.T) {
-		mock.ExpectExec(regexp.QuoteMeta("INSERT INTO vehicle_type (name, status, created_by, created_at, updated_by, updated_at, old_id) VALUES (?,?,?,?,?,?,?)")).
+		mock.ExpectExec(regexp.QuoteMeta("INSERT INTO vehicle_type (name, status, created_by, created_at, updated_by, updated_at) VALUES (?,?,?,?,?,?)")).
 			WillReturnError(errors.New("insert failed"))
 		err := repo.Create(vt)
 		if err == nil {
@@ -251,7 +251,7 @@ func TestVehicleTypeCreate(t *testing.T) {
 	})
 
 	t.Run("LastInsertIDError", func(t *testing.T) {
-		mock.ExpectExec(regexp.QuoteMeta("INSERT INTO vehicle_type (name, status, created_by, created_at, updated_by, updated_at, old_id) VALUES (?,?,?,?,?,?,?)")).
+		mock.ExpectExec(regexp.QuoteMeta("INSERT INTO vehicle_type (name, status, created_by, created_at, updated_by, updated_at) VALUES (?,?,?,?,?,?)")).
 			WillReturnResult(sqlmock.NewErrorResult(errors.New("last insert id error")))
 		err := repo.Create(vt)
 		if err == nil {
@@ -278,8 +278,8 @@ func TestVehicleTypeUpdate(t *testing.T) {
 	}
 
 	t.Run("Success", func(t *testing.T) {
-		mock.ExpectExec(regexp.QuoteMeta("UPDATE vehicle_type SET name = ?, status = ?, updated_by = ?, updated_at = ?, old_id = ? WHERE id = ?")).
-			WithArgs(vt.Name, vt.Status, vt.UpdatedBy, vt.UpdatedAt, vt.OldID, vt.ID).
+		mock.ExpectExec(regexp.QuoteMeta("UPDATE vehicle_type SET name = ?, status = ?, updated_by = ?, updated_at = ? WHERE id = ?")).
+			WithArgs(vt.Name, vt.Status, vt.UpdatedBy, vt.UpdatedAt, vt.ID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		err := repo.Update(vt)
 		if err != nil {
@@ -288,7 +288,7 @@ func TestVehicleTypeUpdate(t *testing.T) {
 	})
 
 	t.Run("DBError", func(t *testing.T) {
-		mock.ExpectExec(regexp.QuoteMeta("UPDATE vehicle_type SET name = ?, status = ?, updated_by = ?, updated_at = ?, old_id = ? WHERE id = ?")).
+		mock.ExpectExec(regexp.QuoteMeta("UPDATE vehicle_type SET name = ?, status = ?, updated_by = ?, updated_at = ? WHERE id = ?")).
 			WillReturnError(errors.New("update failed"))
 		err := repo.Update(vt)
 		if err == nil {

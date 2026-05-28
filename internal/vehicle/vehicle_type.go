@@ -10,5 +10,4 @@ type VehicleType struct {
     CreatedAt time.Time  `json:"created_at"`
     UpdatedBy *string    `json:"updated_by,omitempty"`
     UpdatedAt *time.Time `json:"updated_at,omitempty"`
-    OldID     *string    `json:"old_id,omitempty"`
 }
