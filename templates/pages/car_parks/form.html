@@ -1,0 +1,108 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/car-parks" hx-target="body" hx-push-url="true" style="cursor:pointer">Car Parks</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .park }}Update the car park details.{{ else }}Add a new car park.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:640px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" class="form-input" type="text" name="name"
+                placeholder="e.g. Central Car Park"
+                value="{{ if .park }}{{ .park.Name }}{{ end }}"
+                required autofocus>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="description">Description</label>
+            <textarea id="description" class="form-input" name="description"
+                placeholder="Optional description" rows="3">{{ if .park }}{{ if .park.Description }}{{ .park.Description }}{{ end }}{{ end }}</textarea>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="postal_code">Postal Code</label>
+            <input id="postal_code" class="form-input" type="text" name="postal_code"
+                placeholder="e.g. 123456"
+                value="{{ if .park }}{{ .park.PostalCode }}{{ end }}"
+                required>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="address">Address</label>
+            <input id="address" class="form-input" type="text" name="address"
+                placeholder="e.g. 10 Ang Mo Kio Street 1"
+                value="{{ if .park }}{{ .park.Address }}{{ end }}"
+                required>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="latitude">Latitude</label>
+                <input id="latitude" class="form-input" type="number" name="latitude"
+                    step="any" placeholder="e.g. 1.3521"
+                    value="{{ if .park }}{{ .park.Latitude }}{{ end }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="longitude">Longitude</label>
+                <input id="longitude" class="form-input" type="number" name="longitude"
+                    step="any" placeholder="e.g. 103.8198"
+                    value="{{ if .park }}{{ .park.Longitude }}{{ end }}">
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="car_park_owner_id">Car Park Owner</label>
+            <select id="car_park_owner_id" class="form-input" name="car_park_owner_id">
+                <option value="0">— Select owner —</option>
+                {{ $currentOwnerID := 0 }}
+                {{ if .park }}{{ $currentOwnerID = .park.CarParkOwnerID }}{{ end }}
+                {{ range .owners }}
+                <option value="{{ .ID }}" {{ if eq .ID $currentOwnerID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="active_from">Active From</label>
+                <input id="active_from" class="form-input" type="datetime-local" name="active_from"
+                    value="{{ .activeFromStr }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="active_to">Active To</label>
+                <input id="active_to" class="form-input" type="datetime-local" name="active_to"
+                    value="{{ .activeToStr }}">
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-check">
+                <input type="checkbox" name="status" {{ if or (not .park) .park.Status }}checked{{ end }}>
+                <span>Active</span>
+            </label>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/car-parks" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}

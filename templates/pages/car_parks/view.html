@@ -1,0 +1,100 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/car-parks" hx-target="body" hx-push-url="true" style="cursor:pointer">Car Parks</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .park.Name }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .park.Name }}</h1>
+        <p>Car park details</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:640px">
+    <div class="form-field">
+        <label class="form-label">ID</label>
+        <div class="form-readonly">{{ .park.ID }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Name</label>
+        <div class="form-readonly">{{ .park.Name }}</div>
+    </div>
+
+    {{ if .park.Description }}
+    <div class="form-field">
+        <label class="form-label">Description</label>
+        <div class="form-readonly">{{ .park.Description }}</div>
+    </div>
+    {{ end }}
+
+    <div class="form-field">
+        <label class="form-label">Postal Code</label>
+        <div class="form-readonly">{{ .park.PostalCode }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Address</label>
+        <div class="form-readonly">{{ .park.Address }}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Latitude</label>
+            <div class="form-readonly">{{ .park.Latitude }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Longitude</label>
+            <div class="form-readonly">{{ .park.Longitude }}</div>
+        </div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Car Park Owner</label>
+        <div class="form-readonly">{{ if .park.CarParkOwnerName }}{{ .park.CarParkOwnerName }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Active From</label>
+            <div class="form-readonly">{{ if .park.ActiveFrom }}{{ in_timezone .park.ActiveFrom .tz }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Active To</label>
+            <div class="form-readonly">{{ if .park.ActiveTo }}{{ in_timezone .park.ActiveTo .tz }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Status</label>
+        <div style="padding-top:4px">
+            {{ if .park.Status }}
+                <span class="pill pill-on"><span class="dot"></span>Active</span>
+            {{ else }}
+                <span class="pill pill-off"><span class="dot"></span>Inactive</span>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="form-meta">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div><strong>Created By:</strong> {{ .park.CreatedBy }}</div>
+            <div><strong>Created:</strong> {{ in_timezone .park.CreatedAt .tz }}</div>
+            {{ if .park.UpdatedBy }}<div><strong>Updated By:</strong> {{ .park.UpdatedBy }}</div>{{ end }}
+            {{ if .park.UpdatedAt }}<div><strong>Updated:</strong> {{ in_timezone .park.UpdatedAt .tz }}</div>{{ end }}
+        </div>
+    </div>
+
+    <div class="form-footer" style="justify-content:flex-end">
+        <button type="button" class="btn"
+            hx-get="/car-parks" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
+    </div>
+</div>
+{{ end }}

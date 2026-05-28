@@ -1,0 +1,21 @@
+CREATE TABLE `car_park` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `postal_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `latitude` double NOT NULL DEFAULT '0',
+  `longitude` double NOT NULL DEFAULT '0',
+  `car_park_owner_id` bigint NOT NULL DEFAULT '0',
+  `active_from` datetime(3) DEFAULT NULL,
+  `active_to` datetime(3) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL,
+  `created_by` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `created_at` datetime(3) NOT NULL,
+  `updated_by` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `updated_at` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IX_car_park_car_park_owner_id` (`car_park_owner_id`),
+  KEY `IX_car_park_postal_code` (`postal_code`),
+  CONSTRAINT `FK_car_park_car_park_owner_car_park_owner_id` FOREIGN KEY (`car_park_owner_id`) REFERENCES `car_park_owner` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

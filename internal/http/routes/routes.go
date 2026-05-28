@@ -21,6 +21,7 @@ func RegisterRoutes(
 	fcHandler *web.FuelCompanyHandler,
 	caoHandler  *web.CarAssetOwnerHandler,
 	cpoHandler  *web.CarParkOwnerHandler,
+	cpHandler   *web.CarParkHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -36,6 +37,7 @@ func RegisterRoutes(
 	fcAPI *api.FuelCompanyAPIHandler,
 	caoAPI *api.CarAssetOwnerAPIHandler,
 	cpoAPI *api.CarParkOwnerAPIHandler,
+	cpAPI  *api.CarParkAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -50,7 +52,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -204,6 +206,21 @@ func RegisterRoutes(
 				}
 			}
 
+			// Car Parks
+			if cpHandler != nil {
+				cpGroup := protected.Group("/car-parks")
+				{
+					cpGroup.GET("", cpHandler.List)
+					cpGroup.GET("/new", cpHandler.CreateForm)
+					cpGroup.POST("", cpHandler.Create)
+					cpGroup.GET("/:id/view", cpHandler.View)
+					cpGroup.GET("/:id/edit", cpHandler.EditForm)
+					cpGroup.POST("/:id", cpHandler.Update)
+					cpGroup.DELETE("/:id", cpHandler.Delete)
+					cpGroup.GET("/:id/delete", cpHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -341,6 +358,15 @@ func RegisterRoutes(
 			apiGroup.POST("/car-park-owners", cpoAPI.Create)
 			apiGroup.PUT("/car-park-owners/:id", cpoAPI.Update)
 			apiGroup.DELETE("/car-park-owners/:id", cpoAPI.Delete)
+		}
+
+		if cpAPI != nil {
+			apiGroup.GET("/car-parks/all", cpAPI.ListAll)
+			apiGroup.GET("/car-parks", cpAPI.List)
+			apiGroup.GET("/car-parks/:id", cpAPI.Get)
+			apiGroup.POST("/car-parks", cpAPI.Create)
+			apiGroup.PUT("/car-parks/:id", cpAPI.Update)
+			apiGroup.DELETE("/car-parks/:id", cpAPI.Delete)
 		}
 	}
 }

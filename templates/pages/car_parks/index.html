@@ -1,0 +1,222 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>Car Parks</b>
+{{ end }}
+
+{{ define "content" }}
+<!-- Page header -->
+<div class="ph">
+    <div>
+        <h1>Car Parks</h1>
+        <p>Manage car parks for fleet vehicles &middot; {{ .total }} total</p>
+    </div>
+    <div class="ph-actions">
+        <a href="/car-parks/new" class="btn btn-primary">
+            <i class="fa-solid fa-plus" style="font-size:12px"></i>
+            Add new car park
+        </a>
+    </div>
+</div>
+
+<!-- Hidden sort state -->
+<input type="hidden" name="sortBy" value="{{ .sortBy }}">
+<input type="hidden" name="sortOrder" value="{{ .sortOrder }}">
+
+<!-- Table card -->
+<div class="card">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <span style="font-size:13px;color:var(--ink-3)">{{ .total }} car park{{ if ne .total 1 }}s{{ end }}</span>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>
+                        <span class="sort"
+                            hx-get="/car-parks?sortBy=id&sortOrder={{ if and (eq .sortBy "id") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            ID
+                            {{ if eq .sortBy "id" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/car-parks?sortBy=name&sortOrder={{ if and (eq .sortBy "name") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Name
+                            {{ if eq .sortBy "name" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>Owner</th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/car-parks?sortBy=postal_code&sortOrder={{ if and (eq .sortBy "postal_code") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Postal Code
+                            {{ if eq .sortBy "postal_code" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/car-parks?sortBy=status&sortOrder={{ if and (eq .sortBy "status") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Status
+                            {{ if eq .sortBy "status" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/car-parks?sortBy=updated_by&sortOrder={{ if and (eq .sortBy "updated_by") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Updated By
+                            {{ if eq .sortBy "updated_by" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/car-parks?sortBy=updated_at&sortOrder={{ if and (eq .sortBy "updated_at") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Updated At
+                            {{ if eq .sortBy "updated_at" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ $tz := .timezone }}
+                {{ range .parks }}
+                    {{ template "car_parks/table_row.html" (dict "Park" . "Timezone" $tz) }}
+                {{ end }}
+                {{ if eq (len .parks) 0 }}
+                <tr>
+                    <td colspan="8" style="padding:48px 16px;text-align:center;color:var(--ink-3)">
+                        No car parks found.
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination footer -->
+    <div class="pag">
+        <div class="pag-left">
+            <span>
+                Showing <b style="color:var(--ink)">{{ .start }}&ndash;{{ .end }}</b>
+                of <b style="color:var(--ink)">{{ .total }}</b>
+            </span>
+
+            <span style="display:inline-flex;align-items:center;gap:6px">
+                Rows
+                <select class="pag-select" name="pageSize"
+                    hx-get="/car-parks"
+                    hx-include="[name='tz'],[name='sortBy'],[name='sortOrder']"
+                    hx-target="body"
+                    hx-push-url="true">
+                    {{ $currentSize := .pageSize }}
+                    {{ range .pageSizeOptions }}
+                        <option value="{{ . }}" {{ if eq . $currentSize }}selected{{ end }}>{{ . }}</option>
+                    {{ end }}
+                </select>
+            </span>
+
+            <span style="display:inline-flex;align-items:center;gap:6px">
+                <i class="fa-solid fa-globe" style="font-size:12px;opacity:.6"></i>
+                Timezone
+                <select class="pag-select" name="tz"
+                    hx-get="/car-parks"
+                    hx-include="[name='pageSize'],[name='sortBy'],[name='sortOrder']"
+                    hx-target="body"
+                    hx-push-url="true"
+                    id="tz-select">
+                    {{ $currentTz := .timezone }}
+                    {{ range .timezones }}
+                        <option value="{{ . }}" {{ if eq . $currentTz }}selected{{ end }}>{{ . }}</option>
+                    {{ end }}
+                </select>
+            </span>
+        </div>
+
+        <div class="pg-ctrls">
+            {{ if gt .currentPage 1 }}
+            <button class="pag-btn" title="First page"
+                hx-get="/car-parks?page=1&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angles-left" style="font-size:11px"></i>
+            </button>
+            <button class="pag-btn" title="Previous page"
+                hx-get="/car-parks?page={{ sub .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angle-left" style="font-size:11px"></i>
+            </button>
+            {{ else }}
+            <button class="pag-btn" disabled><i class="fa-solid fa-angles-left" style="font-size:11px"></i></button>
+            <button class="pag-btn" disabled><i class="fa-solid fa-angle-left" style="font-size:11px"></i></button>
+            {{ end }}
+
+            {{ $current := .currentPage }}
+            {{ $tz := .timezone }}
+            {{ $size := .pageSize }}
+            {{ $sortBy := .sortBy }}
+            {{ $sortOrder := .sortOrder }}
+            {{ range $p := (seq 1 .totalPages) }}
+            <button class="pag-btn{{ if eq $p $current }} on{{ end }}"
+                hx-get="/car-parks?page={{ $p }}&tz={{ $tz }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}"
+                hx-target="body" hx-push-url="true">{{ $p }}</button>
+            {{ end }}
+
+            {{ if lt .currentPage .totalPages }}
+            <button class="pag-btn" title="Next page"
+                hx-get="/car-parks?page={{ add .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angle-right" style="font-size:11px"></i>
+            </button>
+            <button class="pag-btn" title="Last page"
+                hx-get="/car-parks?page={{ .totalPages }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angles-right" style="font-size:11px"></i>
+            </button>
+            {{ else }}
+            <button class="pag-btn" disabled><i class="fa-solid fa-angle-right" style="font-size:11px"></i></button>
+            <button class="pag-btn" disabled><i class="fa-solid fa-angles-right" style="font-size:11px"></i></button>
+            {{ end }}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Auto-detect browser timezone on first visit
+    var urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('tz')) {
+        var browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        var sel = document.getElementById('tz-select');
+        if (sel) {
+            for (var i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].value === browserTz) {
+                    window.location.search = '?tz=' + browserTz;
+                    break;
+                }
+            }
+        }
+    }
+</script>
+{{ end }}
