@@ -22,6 +22,7 @@ func RegisterRoutes(
 	caoHandler  *web.CarAssetOwnerHandler,
 	cpoHandler  *web.CarParkOwnerHandler,
 	cpHandler   *web.CarParkHandler,
+	cplHandler  *web.CarParkLotHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -38,6 +39,7 @@ func RegisterRoutes(
 	caoAPI *api.CarAssetOwnerAPIHandler,
 	cpoAPI *api.CarParkOwnerAPIHandler,
 	cpAPI  *api.CarParkAPIHandler,
+	cplAPI *api.CarParkLotAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -52,7 +54,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -221,6 +223,21 @@ func RegisterRoutes(
 				}
 			}
 
+			// Car Park Lots
+			if cplHandler != nil {
+				cplGroup := protected.Group("/car-park-lots")
+				{
+					cplGroup.GET("", cplHandler.List)
+					cplGroup.GET("/new", cplHandler.CreateForm)
+					cplGroup.POST("", cplHandler.Create)
+					cplGroup.GET("/:id/view", cplHandler.View)
+					cplGroup.GET("/:id/edit", cplHandler.EditForm)
+					cplGroup.POST("/:id", cplHandler.Update)
+					cplGroup.DELETE("/:id", cplHandler.Delete)
+					cplGroup.GET("/:id/delete", cplHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -367,6 +384,15 @@ func RegisterRoutes(
 			apiGroup.POST("/car-parks", cpAPI.Create)
 			apiGroup.PUT("/car-parks/:id", cpAPI.Update)
 			apiGroup.DELETE("/car-parks/:id", cpAPI.Delete)
+		}
+
+		if cplAPI != nil {
+			apiGroup.GET("/car-park-lots/all", cplAPI.ListAll)
+			apiGroup.GET("/car-park-lots", cplAPI.List)
+			apiGroup.GET("/car-park-lots/:id", cplAPI.Get)
+			apiGroup.POST("/car-park-lots", cplAPI.Create)
+			apiGroup.PUT("/car-park-lots/:id", cplAPI.Update)
+			apiGroup.DELETE("/car-park-lots/:id", cplAPI.Delete)
 		}
 	}
 }

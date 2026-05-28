@@ -1793,3 +1793,170 @@ func (s *remoteCarParkService) DeleteCarPark(id int64) error {
 	}
 	return nil
 }
+
+// remoteCarParkLotService provides HTTP-based client for CarParkLotService.
+
+type remoteCarParkLotService struct {
+	client  *http.Client
+	baseURL string
+}
+
+func NewRemoteCarParkLotService(baseURL string) CarParkLotService {
+	return &remoteCarParkLotService{
+		client:  &http.Client{Timeout: 10 * time.Second},
+		baseURL: strings.TrimRight(baseURL, "/"),
+	}
+}
+
+func (s *remoteCarParkLotService) ListAll() ([]CarParkLot, error) {
+	resp, err := s.client.Get(s.baseURL + "/api/car-park-lots/all")
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Lots []CarParkLot `json:"lots"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.Lots, nil
+}
+
+func (s *remoteCarParkLotService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]CarParkLot, int, error) {
+	q := url.Values{}
+	q.Set("page", strconv.Itoa(page))
+	q.Set("pageSize", strconv.Itoa(pageSize))
+	q.Set("sortBy", sortBy)
+	q.Set("sortOrder", sortOrder)
+	u := fmt.Sprintf("%s/api/car-park-lots?%s", s.baseURL, q.Encode())
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, 0, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, 0, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Lots  []CarParkLot `json:"lots"`
+		Total int          `json:"total"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, 0, err
+	}
+	return data.Lots, data.Total, nil
+}
+
+func (s *remoteCarParkLotService) FindByID(id int64) (*CarParkLot, error) {
+	u := fmt.Sprintf("%s/api/car-park-lots/%d", s.baseURL, id)
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var l CarParkLot
+	if err := json.NewDecoder(resp.Body).Decode(&l); err != nil {
+		return nil, err
+	}
+	return &l, nil
+}
+
+func (s *remoteCarParkLotService) CreateCarParkLot(carParkID int64, lotNumber, level string, status bool, user string) (*CarParkLot, error) {
+	payload := map[string]interface{}{
+		"car_park_id": carParkID,
+		"lot_number":  lotNumber,
+		"level":       level,
+		"status":      status,
+		"user":        user,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Post(s.baseURL+"/api/car-park-lots", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var l CarParkLot
+	if err := json.NewDecoder(resp.Body).Decode(&l); err != nil {
+		return nil, err
+	}
+	return &l, nil
+}
+
+func (s *remoteCarParkLotService) UpdateCarParkLot(id, carParkID int64, lotNumber, level string, status bool, user string) (*CarParkLot, error) {
+	payload := map[string]interface{}{
+		"car_park_id": carParkID,
+		"lot_number":  lotNumber,
+		"level":       level,
+		"status":      status,
+		"user":        user,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/api/car-park-lots/%d", s.baseURL, id), bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var l CarParkLot
+	if err := json.NewDecoder(resp.Body).Decode(&l); err != nil {
+		return nil, err
+	}
+	return &l, nil
+}
+
+func (s *remoteCarParkLotService) DeleteCarParkLot(id int64) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/car-park-lots/%d", s.baseURL, id), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return errors.New(msg)
+		}
+		return fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	return nil
+}

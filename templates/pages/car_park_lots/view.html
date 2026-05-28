@@ -1,0 +1,66 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/car-park-lots" hx-target="body" hx-push-url="true" style="cursor:pointer">Car Park Lots</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .lot.LotNumber }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .lot.LotNumber }}</h1>
+        <p>Car park lot details</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:480px">
+    <div class="form-field">
+        <label class="form-label">ID</label>
+        <div class="form-readonly">{{ .lot.ID }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Car Park</label>
+        <div class="form-readonly">{{ if .lot.CarParkName }}{{ .lot.CarParkName }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Lot Number</label>
+        <div class="form-readonly">{{ .lot.LotNumber }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Level</label>
+        <div class="form-readonly">{{ .lot.Level }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Status</label>
+        <div style="padding-top:4px">
+            {{ if .lot.Status }}
+                <span class="pill pill-on"><span class="dot"></span>Active</span>
+            {{ else }}
+                <span class="pill pill-off"><span class="dot"></span>Inactive</span>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="form-meta">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div><strong>Created By:</strong> {{ .lot.CreatedBy }}</div>
+            <div><strong>Created:</strong> {{ in_timezone .lot.CreatedAt .tz }}</div>
+            {{ if .lot.UpdatedBy }}<div><strong>Updated By:</strong> {{ .lot.UpdatedBy }}</div>{{ end }}
+            {{ if .lot.UpdatedAt }}<div><strong>Updated:</strong> {{ in_timezone .lot.UpdatedAt .tz }}</div>{{ end }}
+        </div>
+    </div>
+
+    <div class="form-footer" style="justify-content:flex-end">
+        <button type="button" class="btn"
+            hx-get="/car-park-lots" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
+    </div>
+</div>
+{{ end }}

@@ -1,0 +1,66 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/car-park-lots" hx-target="body" hx-push-url="true" style="cursor:pointer">Car Park Lots</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .lot }}Update the car park lot details.{{ else }}Add a new car park lot.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:480px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="car_park_id">Car Park</label>
+            <select id="car_park_id" class="form-input" name="car_park_id" autofocus>
+                <option value="0">— Select car park —</option>
+                {{ $currentID := 0 }}
+                {{ if .lot }}{{ $currentID = .lot.CarParkID }}{{ end }}
+                {{ range .parks }}
+                <option value="{{ .ID }}" {{ if eq .ID $currentID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="lot_number">Lot Number</label>
+            <input id="lot_number" class="form-input" type="text" name="lot_number"
+                placeholder="e.g. A01"
+                value="{{ if .lot }}{{ .lot.LotNumber }}{{ end }}"
+                required>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="level">Level</label>
+            <input id="level" class="form-input" type="text" name="level"
+                placeholder="e.g. B1"
+                value="{{ if .lot }}{{ .lot.Level }}{{ end }}"
+                required>
+        </div>
+
+        <div class="form-field">
+            <label class="form-check">
+                <input type="checkbox" name="status" {{ if or (not .lot) .lot.Status }}checked{{ end }}>
+                <span>Active</span>
+            </label>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/car-park-lots" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}

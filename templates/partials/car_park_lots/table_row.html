@@ -1,0 +1,43 @@
+{{ define "car_park_lots/table_row.html" }}
+<tr id="car-park-lot-row-{{ .Lot.ID }}">
+    <td style="color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:13px">{{ .Lot.ID }}</td>
+    <td style="color:var(--ink-2);font-size:13px">
+        {{ if .Lot.CarParkName }}{{ .Lot.CarParkName }}{{ else }}&mdash;{{ end }}
+    </td>
+    <td><span style="font-weight:500">{{ .Lot.LotNumber }}</span></td>
+    <td style="color:var(--ink-2);font-size:13px">{{ .Lot.Level }}</td>
+    <td>
+        {{ if .Lot.Status }}
+            <span class="pill pill-on"><span class="dot"></span>Active</span>
+        {{ else }}
+            <span class="pill pill-off"><span class="dot"></span>Inactive</span>
+        {{ end }}
+    </td>
+    <td style="color:var(--ink-2);font-size:13px">
+        {{ if .Lot.UpdatedBy }}{{ .Lot.UpdatedBy }}{{ else }}&mdash;{{ end }}
+    </td>
+    <td style="color:var(--ink-2);font-size:13px">
+        {{ if .Lot.UpdatedAt }}{{ in_timezone .Lot.UpdatedAt .Timezone }}{{ else }}&mdash;{{ end }}
+    </td>
+    <td class="col-act">
+        <div class="row-act">
+            <button class="ra-btn" title="View"
+                hx-get="/car-park-lots/{{ .Lot.ID }}/view"
+                hx-target="body" hx-push-url="true"
+                hx-include="[name='tz']">
+                <i class="fa-regular fa-eye" style="font-size:14px"></i>
+            </button>
+            <button class="ra-btn" title="Edit"
+                hx-get="/car-park-lots/{{ .Lot.ID }}/edit"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-regular fa-pen-to-square" style="font-size:13px"></i>
+            </button>
+            <button class="ra-btn danger" title="Delete"
+                hx-get="/car-park-lots/{{ .Lot.ID }}/delete"
+                hx-target="#modal-container">
+                <i class="fa-regular fa-trash-can" style="font-size:13px"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}
