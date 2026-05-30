@@ -342,6 +342,7 @@ a { color: inherit; text-decoration: none; }
 .pag-btn:hover:not(:disabled) { background: #f5f7fb; }
 .pag-btn:disabled { opacity: .4; cursor: default; }
 .pag-btn.on { background: var(--primary); color: #fff; border-color: var(--primary); }
+.pag-ellipsis { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; font-size: 13px; color: var(--ink-3); user-select: none; }
 
 .pag-select {
   height: 28px;

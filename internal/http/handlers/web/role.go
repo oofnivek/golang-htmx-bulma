@@ -37,6 +37,7 @@ func (h *RoleHandler) List(c *gin.Context) {
 		"pageSize":        pageSize,
 		"pageSizeOptions": []int{5, 10, 20, 50},
 		"totalPages":      totalPages,
+"pageWindow":      paginationWindow(page, totalPages),
 		"total":           total,
 		"sortBy":          sortBy,
 		"sortOrder":       sortOrder,

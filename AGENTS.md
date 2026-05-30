@@ -298,6 +298,7 @@ Each role wires only the required internal packages, keeping the other domain pa
   - The number of rows per page must be customizable by the user.
   - Every column must be sortable (ascending/descending), except for the "Actions" column.
   - Sorting and pagination state (including timezone) must be preserved across interactions using HTMX.
+  - **Pagination controls**: Never render all page-number buttons when there are many pages. Use the `paginationWindow(page, totalPages int) []int` helper (defined in `internal/http/handlers/web/constants.go`) to compute the window and pass it as `"pageWindow"` in the handler's `gin.H{}` map. In the template, `range` over `.pageWindow`; when the value is `-1`, render `<span class="pag-ellipsis">…</span>` instead of a button. This produces at most ~9 slots: first page, current ± 2 neighbours, last page, with ellipsis for gaps (e.g. `1 … 13 14 15 16 17 … 352`).
   - **Searching**: Searching must NOT be auto-triggered on every keyup. It must only be triggered when the user clicks the search button. Searching via the Enter key must be disabled. The search button must be disabled when the search term is exactly 1 character long, and enabled when it is 0 characters (to reset) or 2+ characters long.
 
 ## Auth conventions

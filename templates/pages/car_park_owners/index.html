@@ -166,10 +166,14 @@
             {{ $size := .pageSize }}
             {{ $sortBy := .sortBy }}
             {{ $sortOrder := .sortOrder }}
-            {{ range $p := (seq 1 .totalPages) }}
+            {{ range $p := .pageWindow }}
+            {{ if eq $p -1 }}
+            <span class="pag-ellipsis">…</span>
+            {{ else }}
             <button class="pag-btn{{ if eq $p $current }} on{{ end }}"
                 hx-get="/car-park-owners?page={{ $p }}&tz={{ $tz }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}"
                 hx-target="body" hx-push-url="true">{{ $p }}</button>
+            {{ end }}
             {{ end }}
 
             {{ if lt .currentPage .totalPages }}

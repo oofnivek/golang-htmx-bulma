@@ -61,6 +61,7 @@ func (h *CarParkLotHandler) List(c *gin.Context) {
 		"end":             end,
 		"sortBy":          sortBy,
 		"sortOrder":       sortOrder,
+		"pageWindow":      paginationWindow(page, totalPages),
 	})
 }
 
