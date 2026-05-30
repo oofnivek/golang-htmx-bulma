@@ -23,6 +23,7 @@ func RegisterRoutes(
 	cpoHandler  *web.CarParkOwnerHandler,
 	cpHandler   *web.CarParkHandler,
 	cplHandler  *web.CarParkLotHandler,
+	estateHandler *web.EstateHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -40,6 +41,7 @@ func RegisterRoutes(
 	cpoAPI *api.CarParkOwnerAPIHandler,
 	cpAPI  *api.CarParkAPIHandler,
 	cplAPI *api.CarParkLotAPIHandler,
+	estateAPI *api.EstateAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -54,7 +56,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -238,6 +240,21 @@ func RegisterRoutes(
 				}
 			}
 
+			// Estates
+			if estateHandler != nil {
+				estateGroup := protected.Group("/estates")
+				{
+					estateGroup.GET("", estateHandler.List)
+					estateGroup.GET("/new", estateHandler.CreateForm)
+					estateGroup.POST("", estateHandler.Create)
+					estateGroup.GET("/:id/view", estateHandler.View)
+					estateGroup.GET("/:id/edit", estateHandler.EditForm)
+					estateGroup.POST("/:id", estateHandler.Update)
+					estateGroup.DELETE("/:id", estateHandler.Delete)
+					estateGroup.GET("/:id/delete", estateHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -393,6 +410,15 @@ func RegisterRoutes(
 			apiGroup.POST("/car-park-lots", cplAPI.Create)
 			apiGroup.PUT("/car-park-lots/:id", cplAPI.Update)
 			apiGroup.DELETE("/car-park-lots/:id", cplAPI.Delete)
+		}
+
+		if estateAPI != nil {
+			apiGroup.GET("/estates/all", estateAPI.ListAll)
+			apiGroup.GET("/estates", estateAPI.List)
+			apiGroup.GET("/estates/:id", estateAPI.Get)
+			apiGroup.POST("/estates", estateAPI.Create)
+			apiGroup.PUT("/estates/:id", estateAPI.Update)
+			apiGroup.DELETE("/estates/:id", estateAPI.Delete)
 		}
 	}
 }

@@ -1,0 +1,5 @@
+CREATE TABLE `estate` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `estate_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

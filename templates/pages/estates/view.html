@@ -1,0 +1,36 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/estates" hx-target="body" hx-push-url="true" style="cursor:pointer">Estates</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .estate.Name }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .estate.Name }}</h1>
+        <p>Estate details</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <div class="form-field">
+        <label class="form-label">ID</label>
+        <div class="form-readonly">{{ .estate.ID }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Name</label>
+        <div class="form-readonly">{{ .estate.Name }}</div>
+    </div>
+
+    <div class="form-footer">
+        <button type="button" class="btn"
+            hx-get="/estates" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
+    </div>
+</div>
+{{ end }}

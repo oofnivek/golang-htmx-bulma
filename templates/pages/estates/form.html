@@ -1,0 +1,39 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/estates" hx-target="body" hx-push-url="true" style="cursor:pointer">Estates</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .estate }}Update the estate name.{{ else }}Add a new estate.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" class="form-input" type="text" name="name"
+                placeholder="e.g. Punggol"
+                value="{{ if .estate }}{{ .estate.Name }}{{ end }}"
+                required autofocus>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/estates" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}
