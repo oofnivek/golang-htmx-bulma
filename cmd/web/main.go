@@ -85,6 +85,8 @@ func main() {
 		cplAPI  *api.CarParkLotAPIHandler
 		estateHandler *web.EstateHandler
 		estateAPI     *api.EstateAPIHandler
+		riHandler     *web.RegionalInfoHandler
+		riAPI         *api.RegionalInfoAPIHandler
 
 		port string = cfg.Port
 	)
@@ -171,6 +173,9 @@ func main() {
 		estateRepo := vehicle.NewEstateRepository(vehicleDatabase)
 		estateSvc := vehicle.NewEstateService(estateRepo)
 
+		riRepo := vehicle.NewRegionalInfoRepository(vehicleDatabase)
+		riSvc := vehicle.NewRegionalInfoService(riRepo)
+
 		// Set up API handlers
 		vcAPI = api.NewVehicleColorAPIHandler(vcSvc)
 		vmAPI = api.NewVehicleMakeAPIHandler(vmSvc)
@@ -184,6 +189,7 @@ func main() {
 		cpAPI = api.NewCarParkAPIHandler(cpSvc)
 		cplAPI = api.NewCarParkLotAPIHandler(cplSvc)
 		estateAPI = api.NewEstateAPIHandler(estateSvc)
+		riAPI = api.NewRegionalInfoAPIHandler(riSvc)
 
 	case "web-view":
 		log.Println("Booting in WEB-VIEW role...")
@@ -248,6 +254,8 @@ func main() {
 
 		var estateSvc vehicle.EstateService
 
+		var riSvc vehicle.RegionalInfoService
+
 		vehicleServiceURL := os.Getenv("VEHICLE_SERVICE_URL")
 		if vehicleServiceURL != "" {
 			log.Printf("Using remote Vehicle Service at: %s\n", vehicleServiceURL)
@@ -264,6 +272,7 @@ func main() {
 			cpSvc = vehicle.NewRemoteCarParkService(vehicleServiceURL)
 			cplSvc = vehicle.NewRemoteCarParkLotService(vehicleServiceURL)
 			estateSvc = vehicle.NewRemoteEstateService(vehicleServiceURL)
+			riSvc = vehicle.NewRemoteRegionalInfoService(vehicleServiceURL)
 		} else {
 			log.Println("WARNING: VEHICLE_SERVICE_URL is not set. Falling back to local Vehicle DB access.")
 			vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
@@ -310,6 +319,9 @@ func main() {
 
 			estateRepo := vehicle.NewEstateRepository(vehicleDatabase)
 			estateSvc = vehicle.NewEstateService(estateRepo)
+
+			riRepo := vehicle.NewRegionalInfoRepository(vehicleDatabase)
+			riSvc = vehicle.NewRegionalInfoService(riRepo)
 		}
 
 		// Set up Web Handlers
@@ -326,6 +338,7 @@ func main() {
 		cpHandler = web.NewCarParkHandler(cpSvc, cpoSvc)
 		cplHandler = web.NewCarParkLotHandler(cplSvc, cpSvc)
 		estateHandler = web.NewEstateHandler(estateSvc)
+		riHandler = web.NewRegionalInfoHandler(riSvc, estateSvc)
 		roleHandler = web.NewRoleHandler(roleSvc)
 		userHandler = web.NewUserHandler(userSvc, roleSvc)
 		authHandler = web.NewAuthHandler(authSvc)
@@ -404,6 +417,10 @@ func main() {
 		estateSvc := vehicle.NewEstateService(estateRepo)
 		estateHandler = web.NewEstateHandler(estateSvc)
 
+		riRepo := vehicle.NewRegionalInfoRepository(vehicleDatabase)
+		riSvc := vehicle.NewRegionalInfoService(riRepo)
+		riHandler = web.NewRegionalInfoHandler(riSvc, estateSvc)
+
 		// Wire User services/handlers (local implementations)
 		userRepo := user.NewUserRepository(userDatabase)
 		userSvc := user.NewLocalUserService(userRepo)
@@ -434,6 +451,7 @@ func main() {
 		cpAPI = api.NewCarParkAPIHandler(cpSvc)
 		cplAPI = api.NewCarParkLotAPIHandler(cplSvc)
 		estateAPI = api.NewEstateAPIHandler(estateSvc)
+		riAPI = api.NewRegionalInfoAPIHandler(riSvc)
 
 		// Set up templates
 		r.HTMLRender = view.NewRenderer("templates")
@@ -455,6 +473,7 @@ func main() {
 		cpHandler,
 		cplHandler,
 		estateHandler,
+		riHandler,
 		roleHandler,
 		userHandler,
 		authHandler,
@@ -473,6 +492,7 @@ func main() {
 		cpAPI,
 		cplAPI,
 		estateAPI,
+		riAPI,
 		cfg.JWTSigningKey,
 	)
 

@@ -1,0 +1,64 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/regional-infos" hx-target="body" hx-push-url="true" style="cursor:pointer">Regional Info</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .item }}Update the regional info details.{{ else }}Add a new regional info record.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:480px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="postal_code">Postal Code</label>
+            {{ if .item }}
+            <input id="postal_code" class="form-input" type="text" name="postal_code"
+                value="{{ .item.PostalCode }}" readonly autofocus>
+            {{ else }}
+            <input id="postal_code" class="form-input" type="text" name="postal_code"
+                placeholder="e.g. 123456"
+                maxlength="6"
+                required autofocus>
+            {{ end }}
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="region">Region</label>
+            <input id="region" class="form-input" type="text" name="region"
+                placeholder="e.g. North"
+                value="{{ if .item }}{{ .item.Region }}{{ end }}"
+                required>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="estate_id">Estate</label>
+            <select id="estate_id" class="form-input" name="estate_id">
+                <option value="0">— Select estate —</option>
+                {{ $currentID := 0 }}
+                {{ if .item }}{{ $currentID = .item.EstateID }}{{ end }}
+                {{ range .estates }}
+                <option value="{{ .ID }}" {{ if eq .ID $currentID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/regional-infos" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}

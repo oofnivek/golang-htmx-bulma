@@ -1,0 +1,41 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/regional-infos" hx-target="body" hx-push-url="true" style="cursor:pointer">Regional Info</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .item.PostalCode }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .item.PostalCode }}</h1>
+        <p>Regional info details</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:480px">
+    <div class="form-field">
+        <label class="form-label">Postal Code</label>
+        <div class="form-readonly">{{ .item.PostalCode }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Region</label>
+        <div class="form-readonly">{{ .item.Region }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Estate</label>
+        <div class="form-readonly">{{ .item.EstateName }}</div>
+    </div>
+
+    <div class="form-footer">
+        <button type="button" class="btn"
+            hx-get="/regional-infos" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
+    </div>
+</div>
+{{ end }}

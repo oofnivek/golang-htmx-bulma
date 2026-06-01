@@ -24,6 +24,7 @@ func RegisterRoutes(
 	cpHandler   *web.CarParkHandler,
 	cplHandler  *web.CarParkLotHandler,
 	estateHandler *web.EstateHandler,
+	riHandler     *web.RegionalInfoHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -42,6 +43,7 @@ func RegisterRoutes(
 	cpAPI  *api.CarParkAPIHandler,
 	cplAPI *api.CarParkLotAPIHandler,
 	estateAPI *api.EstateAPIHandler,
+	riAPI     *api.RegionalInfoAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -56,7 +58,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || riHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -255,6 +257,21 @@ func RegisterRoutes(
 				}
 			}
 
+			// Regional Infos
+			if riHandler != nil {
+				riGroup := protected.Group("/regional-infos")
+				{
+					riGroup.GET("", riHandler.List)
+					riGroup.GET("/new", riHandler.CreateForm)
+					riGroup.POST("", riHandler.Create)
+					riGroup.GET("/:id/view", riHandler.View)
+					riGroup.GET("/:id/edit", riHandler.EditForm)
+					riGroup.POST("/:id", riHandler.Update)
+					riGroup.DELETE("/:id", riHandler.Delete)
+					riGroup.GET("/:id/delete", riHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -419,6 +436,15 @@ func RegisterRoutes(
 			apiGroup.POST("/estates", estateAPI.Create)
 			apiGroup.PUT("/estates/:id", estateAPI.Update)
 			apiGroup.DELETE("/estates/:id", estateAPI.Delete)
+		}
+
+		if riAPI != nil {
+			apiGroup.GET("/regional-infos/all", riAPI.ListAll)
+			apiGroup.GET("/regional-infos", riAPI.List)
+			apiGroup.GET("/regional-infos/:id", riAPI.Get)
+			apiGroup.POST("/regional-infos", riAPI.Create)
+			apiGroup.PUT("/regional-infos/:id", riAPI.Update)
+			apiGroup.DELETE("/regional-infos/:id", riAPI.Delete)
 		}
 	}
 }

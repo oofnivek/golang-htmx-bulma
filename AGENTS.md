@@ -26,6 +26,9 @@ DDL for all tables is in `schema/`, organized by database name:
 
 Use this checklist when adding a new CRUD feature. Work in layer order — each layer's interface is the contract the next layer depends on. Replace `Thing` / `thing` / `things` with the real name.
 
+> **Canonical examples**: simple table (no joins) → `internal/vehicle/estate*`; FK joins + form dropdown → `internal/vehicle/car_park_lot*`.  
+> **Get table DDL**: `/opt/homebrew/opt/mysql-client@8.0/bin/mysql -uroot -ppassword -h127.0.0.1 -P3306 vehicles -e 'SHOW CREATE TABLE <name>\G'` (credentials from `.env` `VEHICLE_DB_DSN`).
+
 ### Layer 1 — Domain model  
 File: `internal/<domain>/<thing>.go`
 ```go
@@ -61,7 +64,8 @@ type ThingRepository interface {
 Implementation struct: `mysqlThingRepository` wrapping `*sql.DB`.  
 Constructor: `NewThingRepository(db *sql.DB) ThingRepository`.  
 Use named `const` for SELECT columns and FROM/JOIN clauses; extract a `scanThing()` helper.  
-`GetPaged`: apply a `sortableColumns` allowlist map before interpolating `sortBy`/`sortOrder` into the query.
+`GetPaged`: apply a `sortableColumns` allowlist map before interpolating `sortBy`/`sortOrder` into the query.  
+**String PKs** (e.g. `postal_code`, `email`): `GetByID`/`Delete` take `string` instead of `int64`; `Create` skips `LastInsertId`; route `/:id` param is read as a string directly.
 
 ### Layer 3 — Service  
 File: `internal/<domain>/<thing>_service.go`
@@ -190,43 +194,6 @@ File: `templates/layouts/base.html` — add an `<a href="/things" class="sb-item
 ---
 
 ## Go project structure
-Use idiomatic Go project structure with `cmd/` for the executable entrypoint and `internal/` for application-specific code that should not be imported by other modules.
-
-Preferred layout:
-
-```text
-.
-├── cmd/
-│   └── web/
-│       └── main.go
-├── internal/
-│   ├── config/
-│   ├── db/
-│   ├── model/
-│   ├── repository/
-│   ├── service/
-│   ├── view/
-│   └── http/
-│       ├── handlers/
-│       │   ├── web/
-│       │   └── api/
-│       ├── middleware/
-│       └── routes/
-├── templates/
-│   ├── layouts/
-│   ├── pages/
-│   └── partials/
-├── static/
-│   ├── css/
-│   ├── js/
-│   └── img/
-├── migrations/
-├── .env.example
-├── go.mod
-├── go.sum
-├── README.md
-└── AGENTS.md
-```
 
 Structure rules:
 - Put the application entrypoint in `cmd/web/main.go`.
@@ -248,12 +215,6 @@ Structure rules:
 - Put CSS, JavaScript, and images in `static/`.
 - Put schema migrations in `migrations/`.
 - Keep the structure simple; only add new packages when there is clear complexity that justifies them.
-
-## Why `internal/` is used
-- `internal/` is used to mark application code as private to this module.
-- Packages under `internal/` are implementation details, not public library APIs.
-- Authentication rules are not controlled by `internal/`; authentication is controlled by Gin middleware and route groups.
-- Do not use `internal/` to separate authenticated routes from unauthenticated routes.
 
 ## Architecture rules
 - Gin handlers should stay thin; handlers should parse input, call services, and return responses.
@@ -365,17 +326,9 @@ Each role wires only the required internal packages, keeping the other domain pa
   Include the record ID (or other identifying field) so log entries are actionable without a database query. Use a consistent message format: `"failed to <verb> <entity>"` (e.g. `"failed to list vehicle makes"`, `"failed to create fuel type"`).
 
 ## Code style
-- Write idiomatic Go.
 - **Language**: Always use US English for variable names, database fields, and UI text (e.g., "color" instead of "colour").
-- Keep packages focused and cohesive.
-- Keep functions small and focused.
-- Prefer descriptive names over short clever names.
-- Use short, lowercase package names.
-- Keep interfaces small and define them where they are used.
-- Return errors explicitly; do not ignore them.
-- Wrap errors with useful context.
-- Avoid global mutable state unless clearly justified.
-- Prefer composition over unnecessary abstraction.
+- Return errors explicitly; do not ignore them. Wrap errors with useful context.
+- Write idiomatic Go: small focused functions, descriptive names, short lowercase package names.
 
 ## Package design rules and Modular Monolith Boundaries
 - **Encapsulated Domain Packages**: Group related domain features (e.g., models, repositories, and services) into self-contained packages under `internal/` (such as `internal/vehicle`).

@@ -1,0 +1,26 @@
+{{ define "regional_infos/table_row.html" }}
+<tr id="regional-info-row-{{ .Item.PostalCode }}">
+    <td style="font-weight:500;font-variant-numeric:tabular-nums">{{ .Item.PostalCode }}</td>
+    <td>{{ .Item.Region }}</td>
+    <td>{{ .Item.EstateName }}</td>
+    <td class="col-act">
+        <div class="row-act">
+            <button class="ra-btn" title="View"
+                hx-get="/regional-infos/{{ .Item.PostalCode }}/view"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-regular fa-eye" style="font-size:14px"></i>
+            </button>
+            <button class="ra-btn" title="Edit"
+                hx-get="/regional-infos/{{ .Item.PostalCode }}/edit"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-regular fa-pen-to-square" style="font-size:13px"></i>
+            </button>
+            <button class="ra-btn danger" title="Delete"
+                hx-get="/regional-infos/{{ .Item.PostalCode }}/delete"
+                hx-target="#modal-container">
+                <i class="fa-regular fa-trash-can" style="font-size:13px"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

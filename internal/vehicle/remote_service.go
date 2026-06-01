@@ -2115,3 +2115,156 @@ func (s *remoteEstateService) DeleteEstate(id int64) error {
 	}
 	return nil
 }
+
+// remoteRegionalInfoService provides HTTP-based client for RegionalInfoService.
+type remoteRegionalInfoService struct {
+	baseURL string
+	client  *http.Client
+}
+
+func NewRemoteRegionalInfoService(baseURL string) RegionalInfoService {
+	return &remoteRegionalInfoService{
+		baseURL: baseURL,
+		client:  &http.Client{},
+	}
+}
+
+func (s *remoteRegionalInfoService) ListAll() ([]RegionalInfo, error) {
+	resp, err := s.client.Get(s.baseURL + "/api/regional-infos/all")
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	var data struct {
+		RegionalInfos []RegionalInfo `json:"regional_infos"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.RegionalInfos, nil
+}
+
+func (s *remoteRegionalInfoService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]RegionalInfo, int, error) {
+	q := url.Values{}
+	q.Set("page", fmt.Sprintf("%d", page))
+	q.Set("pageSize", fmt.Sprintf("%d", pageSize))
+	q.Set("sortBy", sortBy)
+	q.Set("sortOrder", sortOrder)
+	u := fmt.Sprintf("%s/api/regional-infos?%s", s.baseURL, q.Encode())
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, 0, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	var data struct {
+		RegionalInfos []RegionalInfo `json:"regional_infos"`
+		Total         int            `json:"total"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, 0, err
+	}
+	return data.RegionalInfos, data.Total, nil
+}
+
+func (s *remoteRegionalInfoService) FindByID(postalCode string) (*RegionalInfo, error) {
+	u := fmt.Sprintf("%s/api/regional-infos/%s", s.baseURL, postalCode)
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	var ri RegionalInfo
+	if err := json.NewDecoder(resp.Body).Decode(&ri); err != nil {
+		return nil, err
+	}
+	return &ri, nil
+}
+
+func (s *remoteRegionalInfoService) CreateRegionalInfo(postalCode, region string, estateID int64) (*RegionalInfo, error) {
+	body, err := json.Marshal(map[string]any{
+		"postal_code": postalCode,
+		"region":      region,
+		"estate_id":   estateID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Post(s.baseURL+"/api/regional-infos", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var ri RegionalInfo
+	if err := json.NewDecoder(resp.Body).Decode(&ri); err != nil {
+		return nil, err
+	}
+	return &ri, nil
+}
+
+func (s *remoteRegionalInfoService) UpdateRegionalInfo(postalCode, region string, estateID int64) (*RegionalInfo, error) {
+	body, err := json.Marshal(map[string]any{
+		"region":    region,
+		"estate_id": estateID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/api/regional-infos/%s", s.baseURL, postalCode), bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var ri RegionalInfo
+	if err := json.NewDecoder(resp.Body).Decode(&ri); err != nil {
+		return nil, err
+	}
+	return &ri, nil
+}
+
+func (s *remoteRegionalInfoService) DeleteRegionalInfo(postalCode string) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/regional-infos/%s", s.baseURL, postalCode), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return errors.New(msg)
+		}
+		return fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	return nil
+}
