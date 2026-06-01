@@ -1,0 +1,237 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/vehicles" hx-target="body" hx-push-url="true" style="cursor:pointer">Vehicles</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .vehicle }}Update the vehicle details.{{ else }}Add a new vehicle to the fleet.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:720px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+
+        <!-- Classification -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="vehicle_make_id">Make</label>
+                <select id="vehicle_make_id" class="form-input" name="vehicle_make_id" autofocus>
+                    <option value="0">— Select make —</option>
+                    {{ $currentMakeID := 0 }}
+                    {{ if .vehicle }}{{ $currentMakeID = .vehicle.VehicleMakeID }}{{ end }}
+                    {{ range .makes }}
+                    <option value="{{ .ID }}" {{ if eq .ID $currentMakeID }}selected{{ end }}>{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="vehicle_model_id">Model</label>
+                <select id="vehicle_model_id" class="form-input" name="vehicle_model_id">
+                    <option value="0">— Select model —</option>
+                    {{ $currentModelID := 0 }}
+                    {{ if .vehicle }}{{ $currentModelID = .vehicle.VehicleModelID }}{{ end }}
+                    {{ range .models }}
+                    <option value="{{ .ID }}" {{ if eq .ID $currentModelID }}selected{{ end }}>{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="vehicle_type_id">Type</label>
+                <select id="vehicle_type_id" class="form-input" name="vehicle_type_id">
+                    <option value="0">— Select type —</option>
+                    {{ $currentTypeID := 0 }}
+                    {{ if .vehicle }}{{ $currentTypeID = .vehicle.VehicleTypeID }}{{ end }}
+                    {{ range .types }}
+                    <option value="{{ .ID }}" {{ if eq .ID $currentTypeID }}selected{{ end }}>{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="vehicle_color_id">Color</label>
+                <select id="vehicle_color_id" class="form-input" name="vehicle_color_id">
+                    <option value="0">— Select color —</option>
+                    {{ $currentColorID := 0 }}
+                    {{ if .vehicle }}{{ $currentColorID = .vehicle.VehicleColorID }}{{ end }}
+                    {{ range .colors }}
+                    <option value="{{ .ID }}" {{ if eq .ID $currentColorID }}selected{{ end }}>{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="fuel_type_id">Fuel Type</label>
+                <select id="fuel_type_id" class="form-input" name="fuel_type_id">
+                    <option value="0">— Select fuel type —</option>
+                    {{ $currentFuelID := 0 }}
+                    {{ if .vehicle }}{{ $currentFuelID = .vehicle.FuelTypeID }}{{ end }}
+                    {{ range .fuels }}
+                    <option value="{{ .ID }}" {{ if eq .ID $currentFuelID }}selected{{ end }}>{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="vehicle_status_id">Status</label>
+                <select id="vehicle_status_id" class="form-input" name="vehicle_status_id">
+                    <option value="0">— Select status —</option>
+                    {{ $currentStatusID := 0 }}
+                    {{ if .vehicle }}{{ $currentStatusID = .vehicle.VehicleStatusID }}{{ end }}
+                    {{ range .statuses }}
+                    <option value="{{ .ID }}" {{ if eq .ID $currentStatusID }}selected{{ end }}>{{ .Substatus }}</option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        <!-- Identifiers -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="plate_number">Plate Number</label>
+                <input id="plate_number" class="form-input" type="text" name="plate_number"
+                    placeholder="e.g. SBA1234A"
+                    value="{{ if .vehicle }}{{ if .vehicle.PlateNumber }}{{ .vehicle.PlateNumber }}{{ end }}{{ end }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="iu_number">IU Number</label>
+                <input id="iu_number" class="form-input" type="text" name="iu_number"
+                    placeholder="e.g. 1234567890"
+                    value="{{ if .vehicle }}{{ if .vehicle.IUNumber }}{{ .vehicle.IUNumber }}{{ end }}{{ end }}">
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="chassis_number">Chassis Number</label>
+                <input id="chassis_number" class="form-input" type="text" name="chassis_number"
+                    placeholder="e.g. VIN123456789"
+                    value="{{ if .vehicle }}{{ if .vehicle.ChassisNumber }}{{ .vehicle.ChassisNumber }}{{ end }}{{ end }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="engine_number">Engine Number</label>
+                <input id="engine_number" class="form-input" type="text" name="engine_number"
+                    placeholder="e.g. ENG123456"
+                    value="{{ if .vehicle }}{{ if .vehicle.EngineNumber }}{{ .vehicle.EngineNumber }}{{ end }}{{ end }}">
+            </div>
+        </div>
+
+        <!-- Details -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="num_seats">Number of Seats</label>
+                <input id="num_seats" class="form-input" type="number" name="num_seats"
+                    min="1" placeholder="e.g. 5"
+                    value="{{ if .vehicle }}{{ .vehicle.NumSeats }}{{ end }}"
+                    required>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="boot_space">Boot Space</label>
+                <input id="boot_space" class="form-input" type="text" name="boot_space"
+                    placeholder="e.g. 450L"
+                    value="{{ if .vehicle }}{{ if .vehicle.BootSpace }}{{ .vehicle.BootSpace }}{{ end }}{{ end }}">
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="description">Description</label>
+            <textarea id="description" class="form-input" name="description"
+                placeholder="Optional notes about this vehicle" rows="2">{{ if .vehicle }}{{ if .vehicle.Description }}{{ .vehicle.Description }}{{ end }}{{ end }}</textarea>
+        </div>
+
+        <!-- Assignment -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="car_park_id">Car Park</label>
+                <select id="car_park_id" class="form-input" name="car_park_id">
+                    <option value="0">— Select car park —</option>
+                    {{ $currentParkID := 0 }}
+                    {{ if .vehicle }}{{ $currentParkID = .vehicle.CarParkID }}{{ end }}
+                    {{ range .parks }}
+                    <option value="{{ .ID }}" {{ if eq .ID $currentParkID }}selected{{ end }}>{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="asset_owner_id">Asset Owner</label>
+                <select id="asset_owner_id" class="form-input" name="asset_owner_id">
+                    <option value="0">— Select owner —</option>
+                    {{ $currentOwnerID := 0 }}
+                    {{ if .vehicle }}{{ $currentOwnerID = .vehicle.AssetOwnerID }}{{ end }}
+                    {{ range .owners }}
+                    <option value="{{ .ID }}" {{ if eq .ID $currentOwnerID }}selected{{ end }}>{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        <!-- Dates -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="last_service_date">Last Service Date</label>
+                <input id="last_service_date" class="form-input" type="datetime-local" name="last_service_date"
+                    value="{{ .lastServiceDateStr }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="last_cleaned_date">Last Cleaned Date</label>
+                <input id="last_cleaned_date" class="form-input" type="datetime-local" name="last_cleaned_date"
+                    value="{{ .lastCleanedDateStr }}">
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="active_from">Active From</label>
+                <input id="active_from" class="form-input" type="datetime-local" name="active_from"
+                    value="{{ .activeFromStr }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="active_to">Active To</label>
+                <input id="active_to" class="form-input" type="datetime-local" name="active_to"
+                    value="{{ .activeToStr }}">
+            </div>
+        </div>
+
+        <!-- Operational readings -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px">
+            <div class="form-field">
+                <label class="form-label" for="last_service_mileage">Last Service Mileage</label>
+                <input id="last_service_mileage" class="form-input" type="number" name="last_service_mileage"
+                    min="0" placeholder="km"
+                    value="{{ if .vehicle }}{{ if .vehicle.LastServiceMileage }}{{ .vehicle.LastServiceMileage }}{{ end }}{{ end }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="current_mileage">Current Mileage</label>
+                <input id="current_mileage" class="form-input" type="number" name="current_mileage"
+                    min="0" placeholder="km"
+                    value="{{ if .vehicle }}{{ if .vehicle.CurrentMileage }}{{ .vehicle.CurrentMileage }}{{ end }}{{ end }}">
+            </div>
+            <div class="form-field">
+                <label class="form-label" for="current_fuel_level">Current Fuel Level</label>
+                <input id="current_fuel_level" class="form-input" type="number" name="current_fuel_level"
+                    min="0" max="100" placeholder="%"
+                    value="{{ if .vehicle }}{{ if .vehicle.CurrentFuelLevel }}{{ .vehicle.CurrentFuelLevel }}{{ end }}{{ end }}">
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/vehicles" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}

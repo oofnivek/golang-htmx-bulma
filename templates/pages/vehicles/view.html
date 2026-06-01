@@ -1,0 +1,166 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/vehicles" hx-target="body" hx-push-url="true" style="cursor:pointer">Vehicles</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ if .vehicle.PlateNumber }}{{ .vehicle.PlateNumber }}{{ else }}Vehicle #{{ .vehicle.ID }}{{ end }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ if .vehicle.PlateNumber }}{{ .vehicle.PlateNumber }}{{ else }}Vehicle #{{ .vehicle.ID }}{{ end }}</h1>
+        <p>Vehicle details</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:720px">
+
+    <div class="form-field">
+        <label class="form-label">ID</label>
+        <div class="form-readonly">{{ .vehicle.ID }}</div>
+    </div>
+
+    <!-- Classification -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Make</label>
+            <div class="form-readonly">{{ .vehicle.VehicleMakeName }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Model</label>
+            <div class="form-readonly">{{ .vehicle.VehicleModelName }}</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Type</label>
+            <div class="form-readonly">{{ .vehicle.VehicleTypeName }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Color</label>
+            <div class="form-readonly">{{ .vehicle.VehicleColorName }}</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Fuel Type</label>
+            <div class="form-readonly">{{ .vehicle.FuelTypeName }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Status</label>
+            <div class="form-readonly">{{ .vehicle.VehicleStatusName }}</div>
+        </div>
+    </div>
+
+    <!-- Identifiers -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Plate Number</label>
+            <div class="form-readonly">{{ if .vehicle.PlateNumber }}{{ .vehicle.PlateNumber }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">IU Number</label>
+            <div class="form-readonly">{{ if .vehicle.IUNumber }}{{ .vehicle.IUNumber }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Chassis Number</label>
+            <div class="form-readonly">{{ if .vehicle.ChassisNumber }}{{ .vehicle.ChassisNumber }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Engine Number</label>
+            <div class="form-readonly">{{ if .vehicle.EngineNumber }}{{ .vehicle.EngineNumber }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+    </div>
+
+    <!-- Details -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Number of Seats</label>
+            <div class="form-readonly">{{ .vehicle.NumSeats }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Boot Space</label>
+            <div class="form-readonly">{{ if .vehicle.BootSpace }}{{ .vehicle.BootSpace }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Description</label>
+        <div class="form-readonly">{{ if .vehicle.Description }}{{ .vehicle.Description }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <!-- Assignment -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Car Park</label>
+            <div class="form-readonly">{{ .vehicle.CarParkName }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Asset Owner</label>
+            <div class="form-readonly">{{ .vehicle.AssetOwnerName }}</div>
+        </div>
+    </div>
+
+    <!-- Dates -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Last Service Date</label>
+            <div class="form-readonly">{{ if .vehicle.LastServiceDate }}{{ in_timezone .vehicle.LastServiceDate .tz }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Last Cleaned Date</label>
+            <div class="form-readonly">{{ if .vehicle.LastCleanedDate }}{{ in_timezone .vehicle.LastCleanedDate .tz }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Active From</label>
+            <div class="form-readonly">{{ if .vehicle.ActiveFrom }}{{ in_timezone .vehicle.ActiveFrom .tz }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Active To</label>
+            <div class="form-readonly">{{ if .vehicle.ActiveTo }}{{ in_timezone .vehicle.ActiveTo .tz }}{{ else }}&mdash;{{ end }}</div>
+        </div>
+    </div>
+
+    <!-- Operational readings -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px">
+        <div class="form-field">
+            <label class="form-label">Last Service Mileage</label>
+            <div class="form-readonly">{{ if .vehicle.LastServiceMileage }}{{ .vehicle.LastServiceMileage }} km{{ else }}&mdash;{{ end }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Current Mileage</label>
+            <div class="form-readonly">{{ if .vehicle.CurrentMileage }}{{ .vehicle.CurrentMileage }} km{{ else }}&mdash;{{ end }}</div>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Current Fuel Level</label>
+            <div class="form-readonly">{{ if .vehicle.CurrentFuelLevel }}{{ .vehicle.CurrentFuelLevel }}%{{ else }}&mdash;{{ end }}</div>
+        </div>
+    </div>
+
+    <div class="form-meta">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div><strong>Created By:</strong> {{ .vehicle.CreatedBy }}</div>
+            <div><strong>Created:</strong> {{ in_timezone .vehicle.CreatedAt .tz }}</div>
+            {{ if .vehicle.UpdatedBy }}<div><strong>Updated By:</strong> {{ .vehicle.UpdatedBy }}</div>{{ end }}
+            {{ if .vehicle.UpdatedAt }}<div><strong>Updated:</strong> {{ in_timezone .vehicle.UpdatedAt .tz }}</div>{{ end }}
+        </div>
+    </div>
+
+    <div class="form-footer" style="justify-content:flex-end">
+        <button type="button" class="btn"
+            hx-get="/vehicles" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
+    </div>
+</div>
+{{ end }}

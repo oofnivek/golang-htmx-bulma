@@ -1,0 +1,36 @@
+{{ define "vehicles/table_row.html" }}
+<tr id="vehicle-row-{{ .Vehicle.ID }}">
+    <td style="color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:13px">{{ .Vehicle.ID }}</td>
+    <td><span style="font-weight:500">{{ if .Vehicle.PlateNumber }}{{ .Vehicle.PlateNumber }}{{ else }}&mdash;{{ end }}</span></td>
+    <td style="color:var(--ink-2);font-size:13px">{{ .Vehicle.VehicleMakeName }}</td>
+    <td style="color:var(--ink-2);font-size:13px">{{ .Vehicle.VehicleModelName }}</td>
+    <td style="color:var(--ink-2);font-size:13px">{{ .Vehicle.VehicleTypeName }}</td>
+    <td style="color:var(--ink-2);font-size:13px">{{ .Vehicle.VehicleStatusName }}</td>
+    <td style="color:var(--ink-2);font-size:13px">
+        {{ if .Vehicle.UpdatedBy }}{{ .Vehicle.UpdatedBy }}{{ else }}&mdash;{{ end }}
+    </td>
+    <td style="color:var(--ink-2);font-size:13px">
+        {{ if .Vehicle.UpdatedAt }}{{ in_timezone .Vehicle.UpdatedAt .Timezone }}{{ else }}&mdash;{{ end }}
+    </td>
+    <td class="col-act">
+        <div class="row-act">
+            <button class="ra-btn" title="View"
+                hx-get="/vehicles/{{ .Vehicle.ID }}/view"
+                hx-target="body" hx-push-url="true"
+                hx-include="[name='tz']">
+                <i class="fa-regular fa-eye" style="font-size:14px"></i>
+            </button>
+            <button class="ra-btn" title="Edit"
+                hx-get="/vehicles/{{ .Vehicle.ID }}/edit"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-regular fa-pen-to-square" style="font-size:13px"></i>
+            </button>
+            <button class="ra-btn danger" title="Delete"
+                hx-get="/vehicles/{{ .Vehicle.ID }}/delete"
+                hx-target="#modal-container">
+                <i class="fa-regular fa-trash-can" style="font-size:13px"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

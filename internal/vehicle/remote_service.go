@@ -2268,3 +2268,223 @@ func (s *remoteRegionalInfoService) DeleteRegionalInfo(postalCode string) error 
 	}
 	return nil
 }
+
+// remoteVehicleService provides HTTP-based client for VehicleService.
+
+type remoteVehicleService struct {
+	client  *http.Client
+	baseURL string
+}
+
+func NewRemoteVehicleService(baseURL string) VehicleService {
+	return &remoteVehicleService{
+		client:  &http.Client{Timeout: 10 * time.Second},
+		baseURL: strings.TrimRight(baseURL, "/"),
+	}
+}
+
+func (s *remoteVehicleService) ListAll() ([]Vehicle, error) {
+	resp, err := s.client.Get(s.baseURL + "/api/vehicles/all")
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Vehicles []Vehicle `json:"vehicles"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.Vehicles, nil
+}
+
+func (s *remoteVehicleService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]Vehicle, int, error) {
+	q := url.Values{}
+	q.Set("page", strconv.Itoa(page))
+	q.Set("pageSize", strconv.Itoa(pageSize))
+	q.Set("sortBy", sortBy)
+	q.Set("sortOrder", sortOrder)
+	u := fmt.Sprintf("%s/api/vehicles?%s", s.baseURL, q.Encode())
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, 0, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, 0, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Vehicles []Vehicle `json:"vehicles"`
+		Total    int       `json:"total"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, 0, err
+	}
+	return data.Vehicles, data.Total, nil
+}
+
+func (s *remoteVehicleService) FindByID(id int64) (*Vehicle, error) {
+	u := fmt.Sprintf("%s/api/vehicles/%d", s.baseURL, id)
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var v Vehicle
+	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (s *remoteVehicleService) CreateVehicle(
+	vehicleMakeID, vehicleModelID, vehicleTypeID, fuelTypeID, vehicleColorID int64,
+	description, plateNumber, iuNumber, chassisNumber, engineNumber, bootSpace *string,
+	numSeats int,
+	carParkID, assetOwnerID, vehicleStatusID int64,
+	lastServiceDate, lastCleanedDate, activeFrom, activeTo *time.Time,
+	lastServiceMileage, currentMileage, currentFuelLevel *int,
+	user string,
+) (*Vehicle, error) {
+	payload := map[string]interface{}{
+		"vehicle_make_id":      vehicleMakeID,
+		"vehicle_model_id":     vehicleModelID,
+		"vehicle_type_id":      vehicleTypeID,
+		"fuel_type_id":         fuelTypeID,
+		"vehicle_color_id":     vehicleColorID,
+		"description":          description,
+		"plate_number":         plateNumber,
+		"iu_number":            iuNumber,
+		"chassis_number":       chassisNumber,
+		"engine_number":        engineNumber,
+		"num_seats":            numSeats,
+		"boot_space":           bootSpace,
+		"car_park_id":          carParkID,
+		"asset_owner_id":       assetOwnerID,
+		"vehicle_status_id":    vehicleStatusID,
+		"last_service_date":    lastServiceDate,
+		"last_cleaned_date":    lastCleanedDate,
+		"last_service_mileage": lastServiceMileage,
+		"current_mileage":      currentMileage,
+		"current_fuel_level":   currentFuelLevel,
+		"active_from":          activeFrom,
+		"active_to":            activeTo,
+		"user":                 user,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Post(s.baseURL+"/api/vehicles", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var v Vehicle
+	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (s *remoteVehicleService) UpdateVehicle(
+	id int64,
+	vehicleMakeID, vehicleModelID, vehicleTypeID, fuelTypeID, vehicleColorID int64,
+	description, plateNumber, iuNumber, chassisNumber, engineNumber, bootSpace *string,
+	numSeats int,
+	carParkID, assetOwnerID, vehicleStatusID int64,
+	lastServiceDate, lastCleanedDate, activeFrom, activeTo *time.Time,
+	lastServiceMileage, currentMileage, currentFuelLevel *int,
+	user string,
+) (*Vehicle, error) {
+	payload := map[string]interface{}{
+		"vehicle_make_id":      vehicleMakeID,
+		"vehicle_model_id":     vehicleModelID,
+		"vehicle_type_id":      vehicleTypeID,
+		"fuel_type_id":         fuelTypeID,
+		"vehicle_color_id":     vehicleColorID,
+		"description":          description,
+		"plate_number":         plateNumber,
+		"iu_number":            iuNumber,
+		"chassis_number":       chassisNumber,
+		"engine_number":        engineNumber,
+		"num_seats":            numSeats,
+		"boot_space":           bootSpace,
+		"car_park_id":          carParkID,
+		"asset_owner_id":       assetOwnerID,
+		"vehicle_status_id":    vehicleStatusID,
+		"last_service_date":    lastServiceDate,
+		"last_cleaned_date":    lastCleanedDate,
+		"last_service_mileage": lastServiceMileage,
+		"current_mileage":      currentMileage,
+		"current_fuel_level":   currentFuelLevel,
+		"active_from":          activeFrom,
+		"active_to":            activeTo,
+		"user":                 user,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/api/vehicles/%d", s.baseURL, id), bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var v Vehicle
+	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (s *remoteVehicleService) DeleteVehicle(id int64) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/vehicles/%d", s.baseURL, id), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return errors.New(msg)
+		}
+		return fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	return nil
+}
