@@ -1,0 +1,71 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/fuel-cards" hx-target="body" hx-push-url="true" style="cursor:pointer">Fuel Cards</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .card.CardNo }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .card.CardNo }}</h1>
+        <p>Fuel card details</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <div class="form-field">
+        <label class="form-label">ID</label>
+        <div class="form-readonly">{{ .card.ID }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Card No</label>
+        <div class="form-readonly">{{ .card.CardNo }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Fuel Company</label>
+        <div class="form-readonly">{{ if .card.FuelCompanyName }}{{ .card.FuelCompanyName }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">PIN Number</label>
+        <div class="form-readonly">{{ .card.PinNumber }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Vehicle</label>
+        <div class="form-readonly">{{ if .card.PlateNumber }}{{ .card.PlateNumber }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Status</label>
+        <div style="padding-top:4px">
+            {{ if .card.Status }}
+                <span class="pill pill-on"><span class="dot"></span>Active</span>
+            {{ else }}
+                <span class="pill pill-off"><span class="dot"></span>Inactive</span>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="form-meta">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div><strong>Created By:</strong> {{ .card.CreatedBy }}</div>
+            <div><strong>Created:</strong> {{ in_timezone .card.CreatedAt .tz }}</div>
+            {{ if .card.UpdatedBy }}<div><strong>Updated By:</strong> {{ .card.UpdatedBy }}</div>{{ end }}
+            {{ if .card.UpdatedAt }}<div><strong>Updated:</strong> {{ in_timezone .card.UpdatedAt .tz }}</div>{{ end }}
+        </div>
+    </div>
+
+    <div class="form-footer">
+        <button type="button" class="btn"
+            hx-get="/fuel-cards" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
+    </div>
+</div>
+{{ end }}

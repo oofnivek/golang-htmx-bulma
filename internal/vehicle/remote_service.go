@@ -2488,3 +2488,172 @@ func (s *remoteVehicleService) DeleteVehicle(id int64) error {
 	}
 	return nil
 }
+
+// remoteFuelCardService provides HTTP-based client for FuelCardService.
+
+type remoteFuelCardService struct {
+	client  *http.Client
+	baseURL string
+}
+
+func NewRemoteFuelCardService(baseURL string) FuelCardService {
+	return &remoteFuelCardService{
+		client:  &http.Client{Timeout: 10 * time.Second},
+		baseURL: strings.TrimRight(baseURL, "/"),
+	}
+}
+
+func (s *remoteFuelCardService) ListAll() ([]FuelCard, error) {
+	resp, err := s.client.Get(s.baseURL + "/api/fuel-cards/all")
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Cards []FuelCard `json:"cards"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.Cards, nil
+}
+
+func (s *remoteFuelCardService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]FuelCard, int, error) {
+	q := url.Values{}
+	q.Set("page", strconv.Itoa(page))
+	q.Set("pageSize", strconv.Itoa(pageSize))
+	q.Set("sortBy", sortBy)
+	q.Set("sortOrder", sortOrder)
+	u := fmt.Sprintf("%s/api/fuel-cards?%s", s.baseURL, q.Encode())
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, 0, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, 0, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		Cards []FuelCard `json:"cards"`
+		Total int        `json:"total"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, 0, err
+	}
+	return data.Cards, data.Total, nil
+}
+
+func (s *remoteFuelCardService) FindByID(id int64) (*FuelCard, error) {
+	u := fmt.Sprintf("%s/api/fuel-cards/%d", s.baseURL, id)
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var fc FuelCard
+	if err := json.NewDecoder(resp.Body).Decode(&fc); err != nil {
+		return nil, err
+	}
+	return &fc, nil
+}
+
+func (s *remoteFuelCardService) CreateFuelCard(cardNo string, fuelCompanyID int64, pinNumber string, vehicleID *int64, status bool, user string) (*FuelCard, error) {
+	payload := map[string]interface{}{
+		"card_no":         cardNo,
+		"fuel_company_id": fuelCompanyID,
+		"pin_number":      pinNumber,
+		"vehicle_id":      vehicleID,
+		"status":          status,
+		"user":            user,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Post(s.baseURL+"/api/fuel-cards", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var fc FuelCard
+	if err := json.NewDecoder(resp.Body).Decode(&fc); err != nil {
+		return nil, err
+	}
+	return &fc, nil
+}
+
+func (s *remoteFuelCardService) UpdateFuelCard(id int64, cardNo string, fuelCompanyID int64, pinNumber string, vehicleID *int64, status bool, user string) (*FuelCard, error) {
+	payload := map[string]interface{}{
+		"card_no":         cardNo,
+		"fuel_company_id": fuelCompanyID,
+		"pin_number":      pinNumber,
+		"vehicle_id":      vehicleID,
+		"status":          status,
+		"user":            user,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/api/fuel-cards/%d", s.baseURL, id), bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var fc FuelCard
+	if err := json.NewDecoder(resp.Body).Decode(&fc); err != nil {
+		return nil, err
+	}
+	return &fc, nil
+}
+
+func (s *remoteFuelCardService) DeleteFuelCard(id int64) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/fuel-cards/%d", s.baseURL, id), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return errors.New(msg)
+		}
+		return fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	return nil
+}

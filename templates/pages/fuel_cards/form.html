@@ -1,0 +1,78 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/fuel-cards" hx-target="body" hx-push-url="true" style="cursor:pointer">Fuel Cards</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .card }}Update the fuel card details.{{ else }}Add a new fuel card to the fleet.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="card_no">Card No</label>
+            <input id="card_no" class="form-input" type="text" name="card_no"
+                placeholder="e.g. 1234-5678-9012"
+                value="{{ if .card }}{{ .card.CardNo }}{{ end }}"
+                required autofocus>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="fuel_company_id">Fuel Company</label>
+            <select id="fuel_company_id" class="form-input" name="fuel_company_id" required>
+                <option value="0">— Select fuel company —</option>
+                {{ $currentCompanyID := 0 }}
+                {{ if .card }}{{ $currentCompanyID = .card.FuelCompanyID }}{{ end }}
+                {{ range .companies }}
+                <option value="{{ .ID }}" {{ if eq .ID $currentCompanyID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="pin_number">PIN Number</label>
+            <input id="pin_number" class="form-input" type="text" name="pin_number"
+                placeholder="e.g. 1234"
+                value="{{ if .card }}{{ .card.PinNumber }}{{ end }}"
+                required>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="vehicle_id">Vehicle</label>
+            <select id="vehicle_id" class="form-input" name="vehicle_id">
+                <option value="0">— Unassigned —</option>
+                {{ range .vehicles }}
+                <option value="{{ .ID }}" {{ if and $.card $.card.VehicleID (eq .ID $.card.VehicleID) }}selected{{ end }}>
+                    {{ if .PlateNumber }}{{ .PlateNumber }}{{ else }}Vehicle {{ .ID }}{{ end }}
+                </option>
+                {{ end }}
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label class="form-check">
+                <input type="checkbox" name="status" {{ if or (not .card) .card.Status }}checked{{ end }}>
+                <span>Active</span>
+            </label>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/fuel-cards" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}
