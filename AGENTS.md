@@ -227,6 +227,8 @@ Structure rules:
 - Put reusable partials and HTMX fragments in `templates/partials/`.
 - Put CSS, JavaScript, and images in `static/`.
 - Put schema migrations in `migrations/`.
+- Put shared, cross-cutting Go code (used by more than one domain) in `internal/pkg/<name>/`. Examples: `internal/pkg/crypto`, `internal/pkg/status`.
+- **Generic enums**: All shared enumerations (e.g. `status.Active`/`status.Inactive`) must be defined as named `int` types in `internal/pkg/<name>/`. Do not define domain-neutral enums inside a single domain package — if two or more domains need the same values, centralise them in `internal/pkg/`.
 - Keep the structure simple; only add new packages when there is clear complexity that justifies them.
 
 ## Architecture rules

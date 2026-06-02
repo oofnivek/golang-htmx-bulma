@@ -91,6 +91,8 @@ func main() {
 		vAPI          *api.VehicleAPIHandler
 		fuelCardHandler *web.FuelCardHandler
 		fuelCardAPI     *api.FuelCardAPIHandler
+		condoHandler    *web.CondoHandler
+		condoAPI        *api.CondoAPIHandler
 
 		port string = cfg.Port
 	)
@@ -206,6 +208,10 @@ func main() {
 		fuelCardSvc := vehicle.NewFuelCardService(fuelCardRepo)
 		fuelCardAPI = api.NewFuelCardAPIHandler(fuelCardSvc)
 
+		condoRepo := vehicle.NewCondoRepository(vehicleDatabase)
+		condoSvc := vehicle.NewCondoService(condoRepo)
+		condoAPI = api.NewCondoAPIHandler(condoSvc)
+
 		// Set up Web Handlers
 		vHandler = web.NewVehicleHandler(vSvc, vmSvc, vmdlSvc, vtSvc, ftSvc, vcSvc, cpSvc, caoSvc, vsSvc)
 
@@ -276,6 +282,8 @@ func main() {
 
 		var fuelCardSvc vehicle.FuelCardService
 
+		var condoSvc vehicle.CondoService
+
 		vehicleServiceURL := os.Getenv("VEHICLE_SERVICE_URL")
 		var vSvc vehicle.VehicleService
 
@@ -297,6 +305,7 @@ func main() {
 			riSvc = vehicle.NewRemoteRegionalInfoService(vehicleServiceURL)
 			vSvc = vehicle.NewRemoteVehicleService(vehicleServiceURL)
 			fuelCardSvc = vehicle.NewRemoteFuelCardService(vehicleServiceURL)
+			condoSvc = vehicle.NewRemoteCondoService(vehicleServiceURL)
 		} else {
 			log.Println("WARNING: VEHICLE_SERVICE_URL is not set. Falling back to local Vehicle DB access.")
 			vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
@@ -352,6 +361,9 @@ func main() {
 
 			fuelCardRepo := vehicle.NewFuelCardRepository(vehicleDatabase)
 			fuelCardSvc = vehicle.NewFuelCardService(fuelCardRepo)
+
+			condoRepo := vehicle.NewCondoRepository(vehicleDatabase)
+			condoSvc = vehicle.NewCondoService(condoRepo)
 		}
 
 		// Set up Web Handlers
@@ -371,6 +383,7 @@ func main() {
 		riHandler = web.NewRegionalInfoHandler(riSvc, estateSvc)
 		vHandler = web.NewVehicleHandler(vSvc, vmSvc, vmdlSvc, vtSvc, ftSvc, vcSvc, cpSvc, caoSvc, vsSvc)
 		fuelCardHandler = web.NewFuelCardHandler(fuelCardSvc, fcSvc, vSvc)
+		condoHandler = web.NewCondoHandler(condoSvc)
 		roleHandler = web.NewRoleHandler(roleSvc)
 		userHandler = web.NewUserHandler(userSvc, roleSvc)
 		authHandler = web.NewAuthHandler(authSvc)
@@ -463,6 +476,11 @@ func main() {
 		fuelCardHandler = web.NewFuelCardHandler(fuelCardSvc, fcSvc, vSvc)
 		fuelCardAPI = api.NewFuelCardAPIHandler(fuelCardSvc)
 
+		condoRepo := vehicle.NewCondoRepository(vehicleDatabase)
+		condoSvc := vehicle.NewCondoService(condoRepo)
+		condoHandler = web.NewCondoHandler(condoSvc)
+		condoAPI = api.NewCondoAPIHandler(condoSvc)
+
 		// Wire User services/handlers (local implementations)
 		userRepo := user.NewUserRepository(userDatabase)
 		userSvc := user.NewLocalUserService(userRepo)
@@ -518,6 +536,7 @@ func main() {
 		riHandler,
 		vHandler,
 		fuelCardHandler,
+		condoHandler,
 		roleHandler,
 		userHandler,
 		authHandler,
@@ -539,6 +558,7 @@ func main() {
 		riAPI,
 		vAPI,
 		fuelCardAPI,
+		condoAPI,
 		cfg.JWTSigningKey,
 	)
 

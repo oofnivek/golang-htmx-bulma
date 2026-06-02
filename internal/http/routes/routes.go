@@ -27,6 +27,7 @@ func RegisterRoutes(
 	riHandler     *web.RegionalInfoHandler,
 	vHandler      *web.VehicleHandler,
 	fuelCardHandler *web.FuelCardHandler,
+	condoHandler *web.CondoHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -48,6 +49,7 @@ func RegisterRoutes(
 	riAPI     *api.RegionalInfoAPIHandler,
 	vAPI      *api.VehicleAPIHandler,
 	fuelCardAPI *api.FuelCardAPIHandler,
+	condoAPI *api.CondoAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -62,7 +64,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || riHandler != nil || vHandler != nil || fuelCardHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || riHandler != nil || vHandler != nil || fuelCardHandler != nil || condoHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -306,6 +308,21 @@ func RegisterRoutes(
 				}
 			}
 
+			// Condos
+			if condoHandler != nil {
+				condoGroup := protected.Group("/condos")
+				{
+					condoGroup.GET("", condoHandler.List)
+					condoGroup.GET("/new", condoHandler.CreateForm)
+					condoGroup.POST("", condoHandler.Create)
+					condoGroup.GET("/:id/view", condoHandler.View)
+					condoGroup.GET("/:id/edit", condoHandler.EditForm)
+					condoGroup.POST("/:id", condoHandler.Update)
+					condoGroup.DELETE("/:id", condoHandler.Delete)
+					condoGroup.GET("/:id/delete", condoHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -497,6 +514,15 @@ func RegisterRoutes(
 			apiGroup.POST("/fuel-cards", fuelCardAPI.Create)
 			apiGroup.PUT("/fuel-cards/:id", fuelCardAPI.Update)
 			apiGroup.DELETE("/fuel-cards/:id", fuelCardAPI.Delete)
+		}
+
+		if condoAPI != nil {
+			apiGroup.GET("/condos/all", condoAPI.ListAll)
+			apiGroup.GET("/condos", condoAPI.List)
+			apiGroup.GET("/condos/:id", condoAPI.Get)
+			apiGroup.POST("/condos", condoAPI.Create)
+			apiGroup.PUT("/condos/:id", condoAPI.Update)
+			apiGroup.DELETE("/condos/:id", condoAPI.Delete)
 		}
 	}
 }

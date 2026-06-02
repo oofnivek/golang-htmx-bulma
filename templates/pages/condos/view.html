@@ -1,0 +1,71 @@
+{{ define "breadcrumbs" }}
+<span>Car Park Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/condos" hx-target="body" hx-push-url="true" style="cursor:pointer">Condominiums</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .condo.Name }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .condo.Name }}</h1>
+        <p>Condominium details</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <div class="form-field">
+        <label class="form-label">ID</label>
+        <div class="form-readonly">{{ .condo.ID }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Name</label>
+        <div class="form-readonly">{{ .condo.Name }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Status</label>
+        <div style="padding-top:4px">
+            {{ if .condo.Status }}
+                <span class="pill pill-on"><span class="dot"></span>Active</span>
+            {{ else }}
+                <span class="pill pill-off"><span class="dot"></span>Inactive</span>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">MCST Number</label>
+        <div class="form-readonly">{{ if .condo.McstNumber }}{{ .condo.McstNumber }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">MCST Email</label>
+        <div class="form-readonly">{{ if .condo.McstEmail }}{{ .condo.McstEmail }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Address</label>
+        <div class="form-readonly">{{ if .condo.Address }}{{ .condo.Address }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <div class="form-meta">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div><strong>Created By:</strong> {{ .condo.CreatedBy }}</div>
+            <div><strong>Created:</strong> {{ in_timezone .condo.CreatedAt .tz }}</div>
+            {{ if .condo.UpdatedBy }}<div><strong>Updated By:</strong> {{ .condo.UpdatedBy }}</div>{{ end }}
+            {{ if .condo.UpdatedAt }}<div><strong>Updated:</strong> {{ in_timezone .condo.UpdatedAt .tz }}</div>{{ end }}
+        </div>
+    </div>
+
+    <div class="form-footer" style="justify-content:flex-end">
+        <button type="button" class="btn"
+            hx-get="/condos" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
+    </div>
+</div>
+{{ end }}

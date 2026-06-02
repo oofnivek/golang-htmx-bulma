@@ -1,0 +1,68 @@
+{{ define "breadcrumbs" }}
+<span>Car Park Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/condos" hx-target="body" hx-push-url="true" style="cursor:pointer">Condominiums</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .condo }}Update the condominium details.{{ else }}Add a new condominium.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" class="form-input" type="text" name="name"
+                placeholder="e.g. Punggol Crest"
+                value="{{ if .condo }}{{ .condo.Name }}{{ end }}"
+                required autofocus>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="status">Status</label>
+            <select id="status" class="form-input" name="status" required>
+                <option value="1" {{ if or (not .condo) (.condo.Status) }}selected{{ end }}>Active</option>
+                <option value="0" {{ if and .condo (not .condo.Status) }}selected{{ end }}>Inactive</option>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="mcst_number">MCST Number</label>
+            <input id="mcst_number" class="form-input" type="text" name="mcst_number"
+                placeholder="e.g. 1234"
+                value="{{ if .condo }}{{ .condo.McstNumber }}{{ end }}">
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="mcst_email">MCST Email</label>
+            <input id="mcst_email" class="form-input" type="email" name="mcst_email"
+                placeholder="e.g. mcst@example.com"
+                value="{{ if .condo }}{{ .condo.McstEmail }}{{ end }}">
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="address">Address</label>
+            <input id="address" class="form-input" type="text" name="address"
+                placeholder="e.g. 1 Punggol Drive, Singapore 828629"
+                value="{{ if .condo }}{{ .condo.Address }}{{ end }}">
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/condos" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}
