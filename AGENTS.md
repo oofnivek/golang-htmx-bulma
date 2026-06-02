@@ -14,6 +14,19 @@ DDL for all tables is in `schema/`, organized by database name:
 - `schema/vehicles/` — tables in the `vehicles` database
 - `schema/fms_users/` — tables in the `fms_users` database
 
+## IMPORTANT: Ask before assuming
+
+Before starting any feature or task, if the request is ambiguous or missing details, **stop and ask**. Do not guess or fill in assumptions silently. Specifically, ask when:
+
+- The target table or domain is not clear (e.g. "add condo feature" — which database? which fields matter?).
+- The task spans multiple layers and the scope is unclear (e.g. "build layers 1–3" — which entity?).
+- A field's type, nullability, or business meaning is uncertain.
+- The correct canonical example to follow is not obvious.
+- UI or UX behaviour is not specified (e.g. dropdown vs free-text, which fields are required).
+- The feature involves FK relationships that need lookup data from another table.
+
+One focused question up front is cheaper than rework. Ask it.
+
 ## Core principles
 - Prefer server-rendered HTML over heavy frontend JavaScript.
 - Use HTMX for progressive enhancement, partial updates, and simple interactivity.
