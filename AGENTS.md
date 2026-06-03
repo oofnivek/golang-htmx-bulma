@@ -54,7 +54,7 @@ Each AI thread has a finite context window. Split the 11 layers across sessions 
 | 4 | 9–10 | List templates (index + table row), then detail templates (form + view) |
 | 5 | 11 | Sidebar nav link |
 
-After each session, write a concise `handover.md` (or update the existing one) capturing: what was done, any non-obvious decisions (field names, missing audit columns, dropdown keys, URL slugs), and exactly which layers remain.
+After each session, write a concise `HANDOVER.md` (or update the existing one) capturing: what was done, any non-obvious decisions (field names, missing audit columns, dropdown keys, URL slugs), and exactly which layers remain.
 
 ### Layer 1 — Domain model  
 File: `internal/<domain>/<thing>.go`

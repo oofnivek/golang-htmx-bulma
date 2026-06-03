@@ -1,38 +1,38 @@
 {{ define "breadcrumbs" }}
 <span>Condominium Management</span>
 <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
-<span hx-get="/condo-car-parks" hx-target="body" hx-push-url="true" style="cursor:pointer">Condominium Car Parks</span>
+<span hx-get="/condo-postal-codes" hx-target="body" hx-push-url="true" style="cursor:pointer">Condominium Postal Codes</span>
 <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
-<b>{{ .condoCarPark.CondoName }} / {{ .condoCarPark.CarParkName }}</b>
+<b>{{ .condoPostalCode.PostalCode }}</b>
 {{ end }}
 
 {{ define "content" }}
 <div class="ph">
     <div>
-        <h1>{{ .condoCarPark.CondoName }} / {{ .condoCarPark.CarParkName }}</h1>
-        <p>Condominium car park link details</p>
+        <h1>{{ .condoPostalCode.PostalCode }}</h1>
+        <p>Condominium postal code details</p>
     </div>
 </div>
 
 <div class="form-card" style="max-width:480px">
     <div class="form-field">
         <label class="form-label">ID</label>
-        <div class="form-readonly">{{ .condoCarPark.ID }}</div>
+        <div class="form-readonly">{{ .condoPostalCode.ID }}</div>
     </div>
 
     <div class="form-field">
         <label class="form-label">Condominium</label>
-        <div class="form-readonly">{{ if .condoCarPark.CondoName }}{{ .condoCarPark.CondoName }}{{ else }}&mdash;{{ end }}</div>
+        <div class="form-readonly">{{ if .condoPostalCode.CondoName }}{{ .condoPostalCode.CondoName }}{{ else }}&mdash;{{ end }}</div>
     </div>
 
     <div class="form-field">
-        <label class="form-label">Car Park</label>
-        <div class="form-readonly">{{ if .condoCarPark.CarParkName }}{{ .condoCarPark.CarParkName }}{{ else }}&mdash;{{ end }}</div>
+        <label class="form-label">Postal Code</label>
+        <div class="form-readonly">{{ .condoPostalCode.PostalCode }}</div>
     </div>
 
     <div class="form-footer" style="justify-content:flex-end">
         <button type="button" class="btn"
-            hx-get="/condo-car-parks" hx-target="body" hx-push-url="true">
+            hx-get="/condo-postal-codes" hx-target="body" hx-push-url="true">
             <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
             Back to List
         </button>

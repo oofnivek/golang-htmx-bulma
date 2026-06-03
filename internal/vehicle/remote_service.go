@@ -2989,3 +2989,164 @@ func (s *remoteCondoCarParkService) DeleteCondoCarPark(id int64) error {
 	}
 	return nil
 }
+
+// remoteCondoPostalCodeService provides HTTP-based client for CondoPostalCodeService.
+
+type remoteCondoPostalCodeService struct {
+	client  *http.Client
+	baseURL string
+}
+
+func NewRemoteCondoPostalCodeService(baseURL string) CondoPostalCodeService {
+	return &remoteCondoPostalCodeService{
+		client:  &http.Client{Timeout: 10 * time.Second},
+		baseURL: strings.TrimRight(baseURL, "/"),
+	}
+}
+
+func (s *remoteCondoPostalCodeService) ListAll() ([]CondoPostalCode, error) {
+	resp, err := s.client.Get(s.baseURL + "/api/condo-postal-codes/all")
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		CondoPostalCodes []CondoPostalCode `json:"condo_postal_codes"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.CondoPostalCodes, nil
+}
+
+func (s *remoteCondoPostalCodeService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]CondoPostalCode, int, error) {
+	q := url.Values{}
+	q.Set("page", strconv.Itoa(page))
+	q.Set("pageSize", strconv.Itoa(pageSize))
+	q.Set("sortBy", sortBy)
+	q.Set("sortOrder", sortOrder)
+	u := fmt.Sprintf("%s/api/condo-postal-codes?%s", s.baseURL, q.Encode())
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, 0, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, 0, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		CondoPostalCodes []CondoPostalCode `json:"condo_postal_codes"`
+		Total            int               `json:"total"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, 0, err
+	}
+	return data.CondoPostalCodes, data.Total, nil
+}
+
+func (s *remoteCondoPostalCodeService) FindByID(id int64) (*CondoPostalCode, error) {
+	u := fmt.Sprintf("%s/api/condo-postal-codes/%d", s.baseURL, id)
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var cpc CondoPostalCode
+	if err := json.NewDecoder(resp.Body).Decode(&cpc); err != nil {
+		return nil, err
+	}
+	return &cpc, nil
+}
+
+func (s *remoteCondoPostalCodeService) CreateCondoPostalCode(condoID int64, postalCode string) (*CondoPostalCode, error) {
+	payload := map[string]interface{}{
+		"condo_id":    condoID,
+		"postal_code": postalCode,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Post(s.baseURL+"/api/condo-postal-codes", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var cpc CondoPostalCode
+	if err := json.NewDecoder(resp.Body).Decode(&cpc); err != nil {
+		return nil, err
+	}
+	return &cpc, nil
+}
+
+func (s *remoteCondoPostalCodeService) UpdateCondoPostalCode(id, condoID int64, postalCode string) (*CondoPostalCode, error) {
+	payload := map[string]interface{}{
+		"condo_id":    condoID,
+		"postal_code": postalCode,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/api/condo-postal-codes/%d", s.baseURL, id), bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var cpc CondoPostalCode
+	if err := json.NewDecoder(resp.Body).Decode(&cpc); err != nil {
+		return nil, err
+	}
+	return &cpc, nil
+}
+
+func (s *remoteCondoPostalCodeService) DeleteCondoPostalCode(id int64) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/condo-postal-codes/%d", s.baseURL, id), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return errors.New(msg)
+		}
+		return fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	return nil
+}

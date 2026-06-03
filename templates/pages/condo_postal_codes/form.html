@@ -1,7 +1,7 @@
 {{ define "breadcrumbs" }}
 <span>Condominium Management</span>
 <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
-<span hx-get="/condo-car-parks" hx-target="body" hx-push-url="true" style="cursor:pointer">Condominium Car Parks</span>
+<span hx-get="/condo-postal-codes" hx-target="body" hx-push-url="true" style="cursor:pointer">Condominium Postal Codes</span>
 <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
 <b>{{ .title }}</b>
 {{ end }}
@@ -10,7 +10,7 @@
 <div class="ph">
     <div>
         <h1>{{ .title }}</h1>
-        <p>{{ if .condoCarPark }}Update the condominium car park link.{{ else }}Add a new condominium car park link.{{ end }}</p>
+        <p>{{ if .condoPostalCode }}Update the condominium postal code.{{ else }}Add a new condominium postal code.{{ end }}</p>
     </div>
 </div>
 
@@ -21,7 +21,7 @@
             <select id="condo_id" class="form-input" name="condo_id" autofocus>
                 <option value="0">— Select condominium —</option>
                 {{ $currentCondoID := 0 }}
-                {{ if .condoCarPark }}{{ $currentCondoID = .condoCarPark.CondoID }}{{ end }}
+                {{ if .condoPostalCode }}{{ $currentCondoID = .condoPostalCode.CondoID }}{{ end }}
                 {{ range .condos }}
                 <option value="{{ .ID }}" {{ if eq .ID $currentCondoID }}selected{{ end }}>{{ .Name }}</option>
                 {{ end }}
@@ -29,15 +29,10 @@
         </div>
 
         <div class="form-field">
-            <label class="form-label" for="car_park_id">Car Park</label>
-            <select id="car_park_id" class="form-input" name="car_park_id">
-                <option value="0">— Select car park —</option>
-                {{ $currentParkID := 0 }}
-                {{ if .condoCarPark }}{{ $currentParkID = .condoCarPark.CarParkID }}{{ end }}
-                {{ range .parks }}
-                <option value="{{ .ID }}" {{ if eq .ID $currentParkID }}selected{{ end }}>{{ .Name }}</option>
-                {{ end }}
-            </select>
+            <label class="form-label" for="postal_code">Postal Code</label>
+            <input id="postal_code" class="form-input" type="text" name="postal_code"
+                value="{{ if .condoPostalCode }}{{ .condoPostalCode.PostalCode }}{{ end }}"
+                placeholder="e.g. 123456">
         </div>
 
         <div class="form-footer">
@@ -46,7 +41,7 @@
                 Save
             </button>
             <button type="button" class="btn"
-                hx-get="/condo-car-parks" hx-target="body" hx-push-url="true">
+                hx-get="/condo-postal-codes" hx-target="body" hx-push-url="true">
                 Cancel
             </button>
         </div>
