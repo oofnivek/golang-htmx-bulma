@@ -1,7 +1,7 @@
 {{ define "breadcrumbs" }}
 <span>Car Park Management</span>
 <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
-<span hx-get="/condo-car-parks" hx-target="body" hx-push-url="true" style="cursor:pointer">Condo Car Parks</span>
+<span hx-get="/condo-car-parks" hx-target="body" hx-push-url="true" style="cursor:pointer">Condominium Car Parks</span>
 <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
 <b>{{ .title }}</b>
 {{ end }}
@@ -10,7 +10,7 @@
 <div class="ph">
     <div>
         <h1>{{ .title }}</h1>
-        <p>{{ if .condoCarPark }}Update the condo car park link.{{ else }}Add a new condo car park link.{{ end }}</p>
+        <p>{{ if .condoCarPark }}Update the condominium car park link.{{ else }}Add a new condominium car park link.{{ end }}</p>
     </div>
 </div>
 

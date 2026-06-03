@@ -1,7 +1,7 @@
 {{ define "breadcrumbs" }}
 <span>Car Park Management</span>
 <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
-<span hx-get="/condo-car-parks" hx-target="body" hx-push-url="true" style="cursor:pointer">Condo Car Parks</span>
+<span hx-get="/condo-car-parks" hx-target="body" hx-push-url="true" style="cursor:pointer">Condominium Car Parks</span>
 <i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
 <b>{{ .condoCarPark.CondoName }} / {{ .condoCarPark.CarParkName }}</b>
 {{ end }}
@@ -10,7 +10,7 @@
 <div class="ph">
     <div>
         <h1>{{ .condoCarPark.CondoName }} / {{ .condoCarPark.CarParkName }}</h1>
-        <p>Condo car park link details</p>
+        <p>Condominium car park link details</p>
     </div>
 </div>
 
