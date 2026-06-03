@@ -1,0 +1,55 @@
+{{ define "breadcrumbs" }}
+<span>Car Park Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/condo-car-parks" hx-target="body" hx-push-url="true" style="cursor:pointer">Condo Car Parks</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .condoCarPark }}Update the condo car park link.{{ else }}Add a new condo car park link.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:480px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="condo_id">Condominium</label>
+            <select id="condo_id" class="form-input" name="condo_id" autofocus>
+                <option value="0">— Select condominium —</option>
+                {{ $currentCondoID := 0 }}
+                {{ if .condoCarPark }}{{ $currentCondoID = .condoCarPark.CondoID }}{{ end }}
+                {{ range .condos }}
+                <option value="{{ .ID }}" {{ if eq .ID $currentCondoID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="car_park_id">Car Park</label>
+            <select id="car_park_id" class="form-input" name="car_park_id">
+                <option value="0">— Select car park —</option>
+                {{ $currentParkID := 0 }}
+                {{ if .condoCarPark }}{{ $currentParkID = .condoCarPark.CarParkID }}{{ end }}
+                {{ range .parks }}
+                <option value="{{ .ID }}" {{ if eq .ID $currentParkID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/condo-car-parks" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}

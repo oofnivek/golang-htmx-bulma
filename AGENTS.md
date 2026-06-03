@@ -42,6 +42,20 @@ Use this checklist when adding a new CRUD feature. Work in layer order — each 
 > **Canonical examples**: simple table (no joins) → `internal/vehicle/estate*`; FK joins + form dropdown → `internal/vehicle/car_park_lot*`.  
 > **Get table DDL**: `/opt/homebrew/opt/mysql-client@8.0/bin/mysql -uroot -ppassword -h127.0.0.1 -P3306 vehicles -e 'SHOW CREATE TABLE <name>\G'` (credentials from `.env` `VEHICLE_DB_DSN`).
 
+### Recommended session groupings
+
+Each AI thread has a finite context window. Split the 11 layers across sessions to avoid running out:
+
+| Session | Layers | Work summary |
+|---|---|---|
+| 1 | 1–3 | Domain model, repository, service — 3 new files |
+| 2 | 4–6 | Remote service, web handler, API handler — 1 appended + 2 new files |
+| 3 | 7–8 | Routes, main wiring — 2 modified files |
+| 4 | 9–10 | List templates (index + table row), then detail templates (form + view) |
+| 5 | 11 | Sidebar nav link |
+
+After each session, write a concise `handover.md` (or update the existing one) capturing: what was done, any non-obvious decisions (field names, missing audit columns, dropdown keys, URL slugs), and exactly which layers remain.
+
 ### Layer 1 — Domain model  
 File: `internal/<domain>/<thing>.go`
 ```go
@@ -185,23 +199,31 @@ thingHandler = web.NewThingHandler(thingSvc)
 ```
 Pass `thingHandler` and `thingAPI` to `routes.RegisterRoutes(...)`.
 
-### Layer 9 — Templates
+### Layer 9 — Templates (list view)
 
 | File | Purpose |
 |---|---|
 | `templates/pages/things/index.html` | Paginated table, sort headers, rows per page, timezone selector, pagination nav |
-| `templates/pages/things/form.html` | Create/edit form; `autofocus` on first field; Save + Cancel footer buttons |
-| `templates/pages/things/view.html` | Read-only mirror of form; only "Back to List" footer button |
 | `templates/partials/things/table_row.html` | `<tr id="thing-row-{{ .ID }}">` with icon-only action buttons |
 
 Template conventions recap:
 - Index: `hx-target="body" hx-push-url="true"` on sort links, page links, and selectors.
 - Table row: `{{ define "things/table_row.html" }}` — called with `{{ template "things/table_row.html" . }}`.
 - Action button order: all three buttons — view (`ra-btn`, eye), edit (`ra-btn`, pencil), delete (`ra-btn danger`, trash) — must always be present in the Actions column, in that order. Wrap in a `row-act` div.
-- Form footer: Save button (`btn btn-primary`, `fa-floppy-disk`) **left of** Cancel button (`btn`). Wrap in a `form-footer` div.
 - Delete modal target: `hx-target="#modal-container"`.
 
-### Layer 10 — Sidebar nav  
+### Layer 10 — Templates (detail views)
+
+| File | Purpose |
+|---|---|
+| `templates/pages/things/form.html` | Create/edit form; `autofocus` on first field; Save + Cancel footer buttons |
+| `templates/pages/things/view.html` | Read-only mirror of form; only "Back to List" footer button |
+
+Template conventions recap:
+- Form footer: Save button (`btn btn-primary`, `fa-floppy-disk`) **left of** Cancel button (`btn`). Wrap in a `form-footer` div.
+- View page: all inputs `readonly` or `disabled`; footer has only "Back to List" (`btn`, right-aligned).
+
+### Layer 11 — Sidebar nav  
 File: `templates/layouts/base.html` — add an `<a href="/things" class="sb-item">` link with the appropriate FontAwesome icon inside a `<span class="sb-ico">` under the correct `<div class="sb-section">` section.
 
 ---

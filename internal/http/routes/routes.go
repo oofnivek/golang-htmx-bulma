@@ -28,6 +28,7 @@ func RegisterRoutes(
 	vHandler      *web.VehicleHandler,
 	fuelCardHandler *web.FuelCardHandler,
 	condoHandler *web.CondoHandler,
+	condoCarParkHandler *web.CondoCarParkHandler,
 	roleHandler *web.RoleHandler,
 	userHandler *web.UserHandler,
 	authHandler *web.AuthHandler,
@@ -50,6 +51,7 @@ func RegisterRoutes(
 	vAPI      *api.VehicleAPIHandler,
 	fuelCardAPI *api.FuelCardAPIHandler,
 	condoAPI *api.CondoAPIHandler,
+	condoCarParkAPI *api.CondoCarParkAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -64,7 +66,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || riHandler != nil || vHandler != nil || fuelCardHandler != nil || condoHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || riHandler != nil || vHandler != nil || fuelCardHandler != nil || condoHandler != nil || condoCarParkHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -323,6 +325,21 @@ func RegisterRoutes(
 				}
 			}
 
+			// Condo Car Parks
+			if condoCarParkHandler != nil {
+				ccpGroup := protected.Group("/condo-car-parks")
+				{
+					ccpGroup.GET("", condoCarParkHandler.List)
+					ccpGroup.GET("/new", condoCarParkHandler.CreateForm)
+					ccpGroup.POST("", condoCarParkHandler.Create)
+					ccpGroup.GET("/:id/view", condoCarParkHandler.View)
+					ccpGroup.GET("/:id/edit", condoCarParkHandler.EditForm)
+					ccpGroup.POST("/:id", condoCarParkHandler.Update)
+					ccpGroup.DELETE("/:id", condoCarParkHandler.Delete)
+					ccpGroup.GET("/:id/delete", condoCarParkHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -523,6 +540,15 @@ func RegisterRoutes(
 			apiGroup.POST("/condos", condoAPI.Create)
 			apiGroup.PUT("/condos/:id", condoAPI.Update)
 			apiGroup.DELETE("/condos/:id", condoAPI.Delete)
+		}
+
+		if condoCarParkAPI != nil {
+			apiGroup.GET("/condo-car-parks/all", condoCarParkAPI.ListAll)
+			apiGroup.GET("/condo-car-parks", condoCarParkAPI.List)
+			apiGroup.GET("/condo-car-parks/:id", condoCarParkAPI.Get)
+			apiGroup.POST("/condo-car-parks", condoCarParkAPI.Create)
+			apiGroup.PUT("/condo-car-parks/:id", condoCarParkAPI.Update)
+			apiGroup.DELETE("/condo-car-parks/:id", condoCarParkAPI.Delete)
 		}
 	}
 }
