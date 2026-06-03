@@ -1,0 +1,47 @@
+{{ define "breadcrumbs" }}
+<span>Condominium Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/condo-acknowledgements" hx-target="body" hx-push-url="true" style="cursor:pointer">Condominium Acknowledgements</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>User #{{ .condoAcknowledgement.UserID }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>User #{{ .condoAcknowledgement.UserID }}</h1>
+        <p>Condominium acknowledgement details</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:480px">
+    <div class="form-field">
+        <label class="form-label">User ID</label>
+        <div class="form-readonly">{{ .condoAcknowledgement.UserID }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Created At</label>
+        <div class="form-readonly">{{ in_timezone .condoAcknowledgement.CreatedAt .tz }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Deleted At</label>
+        <div class="form-readonly">
+            {{ if .condoAcknowledgement.DeletedAt }}
+                {{ in_timezone .condoAcknowledgement.DeletedAt .tz }}
+            {{ else }}
+                &mdash;
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="form-footer" style="justify-content:flex-end">
+        <button type="button" class="btn"
+            hx-get="/condo-acknowledgements" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
+    </div>
+</div>
+{{ end }}

@@ -97,6 +97,8 @@ func main() {
 		condoCarParkAPI     *api.CondoCarParkAPIHandler
 		condoPostalCodeHandler *web.CondoPostalCodeHandler
 		condoPostalCodeAPI     *api.CondoPostalCodeAPIHandler
+		condoAcknowledgementHandler *web.CondoAcknowledgementHandler
+		condoAcknowledgementAPI     *api.CondoAcknowledgementAPIHandler
 
 		port string = cfg.Port
 	)
@@ -224,6 +226,10 @@ func main() {
 		condoPostalCodeSvc := vehicle.NewCondoPostalCodeService(condoPostalCodeRepo)
 		condoPostalCodeAPI = api.NewCondoPostalCodeAPIHandler(condoPostalCodeSvc)
 
+		condoAcknowledgementRepo := vehicle.NewCondoAcknowledgementRepository(vehicleDatabase)
+		condoAcknowledgementSvc := vehicle.NewCondoAcknowledgementService(condoAcknowledgementRepo)
+		condoAcknowledgementAPI = api.NewCondoAcknowledgementAPIHandler(condoAcknowledgementSvc)
+
 		// Set up Web Handlers
 		vHandler = web.NewVehicleHandler(vSvc, vmSvc, vmdlSvc, vtSvc, ftSvc, vcSvc, cpSvc, caoSvc, vsSvc)
 
@@ -300,6 +306,8 @@ func main() {
 
 		var condoPostalCodeSvc vehicle.CondoPostalCodeService
 
+		var condoAcknowledgementSvc vehicle.CondoAcknowledgementService
+
 		vehicleServiceURL := os.Getenv("VEHICLE_SERVICE_URL")
 		var vSvc vehicle.VehicleService
 
@@ -324,6 +332,7 @@ func main() {
 			condoSvc = vehicle.NewRemoteCondoService(vehicleServiceURL)
 			condoCarParkSvc = vehicle.NewRemoteCondoCarParkService(vehicleServiceURL)
 			condoPostalCodeSvc = vehicle.NewRemoteCondoPostalCodeService(vehicleServiceURL)
+			condoAcknowledgementSvc = vehicle.NewRemoteCondoAcknowledgementService(vehicleServiceURL)
 		} else {
 			log.Println("WARNING: VEHICLE_SERVICE_URL is not set. Falling back to local Vehicle DB access.")
 			vehicleDatabase, err := db.InitDB(cfg.VehicleDBDSN)
@@ -388,6 +397,9 @@ func main() {
 
 			condoPostalCodeRepo := vehicle.NewCondoPostalCodeRepository(vehicleDatabase)
 			condoPostalCodeSvc = vehicle.NewCondoPostalCodeService(condoPostalCodeRepo)
+
+			condoAcknowledgementRepo := vehicle.NewCondoAcknowledgementRepository(vehicleDatabase)
+			condoAcknowledgementSvc = vehicle.NewCondoAcknowledgementService(condoAcknowledgementRepo)
 		}
 
 		// Set up Web Handlers
@@ -410,6 +422,7 @@ func main() {
 		condoHandler = web.NewCondoHandler(condoSvc)
 		condoCarParkHandler = web.NewCondoCarParkHandler(condoCarParkSvc, condoSvc, cpSvc)
 		condoPostalCodeHandler = web.NewCondoPostalCodeHandler(condoPostalCodeSvc, condoSvc)
+		condoAcknowledgementHandler = web.NewCondoAcknowledgementHandler(condoAcknowledgementSvc)
 		roleHandler = web.NewRoleHandler(roleSvc)
 		userHandler = web.NewUserHandler(userSvc, roleSvc)
 		authHandler = web.NewAuthHandler(authSvc)
@@ -517,6 +530,11 @@ func main() {
 		condoPostalCodeHandler = web.NewCondoPostalCodeHandler(condoPostalCodeSvc, condoSvc)
 		condoPostalCodeAPI = api.NewCondoPostalCodeAPIHandler(condoPostalCodeSvc)
 
+		condoAcknowledgementRepo := vehicle.NewCondoAcknowledgementRepository(vehicleDatabase)
+		condoAcknowledgementSvc := vehicle.NewCondoAcknowledgementService(condoAcknowledgementRepo)
+		condoAcknowledgementHandler = web.NewCondoAcknowledgementHandler(condoAcknowledgementSvc)
+		condoAcknowledgementAPI = api.NewCondoAcknowledgementAPIHandler(condoAcknowledgementSvc)
+
 		// Wire User services/handlers (local implementations)
 		userRepo := user.NewUserRepository(userDatabase)
 		userSvc := user.NewLocalUserService(userRepo)
@@ -599,6 +617,8 @@ func main() {
 		condoCarParkAPI,
 		condoPostalCodeHandler,
 		condoPostalCodeAPI,
+		condoAcknowledgementHandler,
+		condoAcknowledgementAPI,
 		cfg.JWTSigningKey,
 	)
 

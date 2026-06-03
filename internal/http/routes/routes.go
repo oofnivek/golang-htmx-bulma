@@ -54,6 +54,8 @@ func RegisterRoutes(
 	condoCarParkAPI *api.CondoCarParkAPIHandler,
 	condoPostalCodeHandler *web.CondoPostalCodeHandler,
 	condoPostalCodeAPI *api.CondoPostalCodeAPIHandler,
+	condoAcknowledgementHandler *web.CondoAcknowledgementHandler,
+	condoAcknowledgementAPI *api.CondoAcknowledgementAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -68,7 +70,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || riHandler != nil || vHandler != nil || fuelCardHandler != nil || condoHandler != nil || condoCarParkHandler != nil || condoPostalCodeHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || riHandler != nil || vHandler != nil || fuelCardHandler != nil || condoHandler != nil || condoCarParkHandler != nil || condoPostalCodeHandler != nil || condoAcknowledgementHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -357,6 +359,19 @@ func RegisterRoutes(
 				}
 			}
 
+			// Condo Acknowledgements
+			if condoAcknowledgementHandler != nil {
+				caGroup := protected.Group("/condo-acknowledgements")
+				{
+					caGroup.GET("", condoAcknowledgementHandler.List)
+					caGroup.GET("/new", condoAcknowledgementHandler.CreateForm)
+					caGroup.POST("", condoAcknowledgementHandler.Create)
+					caGroup.GET("/:id/view", condoAcknowledgementHandler.View)
+					caGroup.DELETE("/:id", condoAcknowledgementHandler.Delete)
+					caGroup.GET("/:id/delete", condoAcknowledgementHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -575,6 +590,14 @@ func RegisterRoutes(
 			apiGroup.POST("/condo-postal-codes", condoPostalCodeAPI.Create)
 			apiGroup.PUT("/condo-postal-codes/:id", condoPostalCodeAPI.Update)
 			apiGroup.DELETE("/condo-postal-codes/:id", condoPostalCodeAPI.Delete)
+		}
+
+		if condoAcknowledgementAPI != nil {
+			apiGroup.GET("/condo-acknowledgements/all", condoAcknowledgementAPI.ListAll)
+			apiGroup.GET("/condo-acknowledgements", condoAcknowledgementAPI.List)
+			apiGroup.GET("/condo-acknowledgements/:id", condoAcknowledgementAPI.Get)
+			apiGroup.POST("/condo-acknowledgements", condoAcknowledgementAPI.Create)
+			apiGroup.DELETE("/condo-acknowledgements/:id", condoAcknowledgementAPI.Delete)
 		}
 	}
 }

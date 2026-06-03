@@ -1,0 +1,185 @@
+{{ define "breadcrumbs" }}
+<span>Condominium Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>Condominium Acknowledgements</b>
+{{ end }}
+
+{{ define "content" }}
+<!-- Page header -->
+<div class="ph">
+    <div>
+        <h1>Condominium Acknowledgements</h1>
+        <p>Manage condominium acknowledgements &middot; {{ .total }} total</p>
+    </div>
+    <div class="ph-actions">
+        <a href="/condo-acknowledgements/new" class="btn btn-primary">
+            <i class="fa-solid fa-plus" style="font-size:12px"></i>
+            Add new
+        </a>
+    </div>
+</div>
+
+<!-- Hidden sort state -->
+<input type="hidden" name="sortBy" value="{{ .sortBy }}">
+<input type="hidden" name="sortOrder" value="{{ .sortOrder }}">
+
+<!-- Table card -->
+<div class="card">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <span style="font-size:13px;color:var(--ink-3)">{{ .total }} acknowledgement{{ if ne .total 1 }}s{{ end }}</span>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>
+                        <span class="sort"
+                            hx-get="/condo-acknowledgements?sortBy=user_id&sortOrder={{ if and (eq .sortBy "user_id") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            User ID
+                            {{ if eq .sortBy "user_id" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/condo-acknowledgements?sortBy=created_at&sortOrder={{ if and (eq .sortBy "created_at") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Created At
+                            {{ if eq .sortBy "created_at" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ $tz := .timezone }}
+                {{ range .condoAcknowledgements }}
+                    {{ template "condo_acknowledgements/table_row.html" (dict "Record" . "Timezone" $tz) }}
+                {{ end }}
+                {{ if eq (len .condoAcknowledgements) 0 }}
+                <tr>
+                    <td colspan="3" style="padding:48px 16px;text-align:center;color:var(--ink-3)">
+                        No condominium acknowledgements found.
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination footer -->
+    <div class="pag">
+        <div class="pag-left">
+            <span>
+                Showing <b style="color:var(--ink)">{{ .start }}&ndash;{{ .end }}</b>
+                of <b style="color:var(--ink)">{{ .total }}</b>
+            </span>
+
+            <span style="display:inline-flex;align-items:center;gap:6px">
+                Rows
+                <select class="pag-select" name="pageSize"
+                    hx-get="/condo-acknowledgements"
+                    hx-include="[name='tz'],[name='sortBy'],[name='sortOrder']"
+                    hx-target="body"
+                    hx-push-url="true">
+                    {{ $currentSize := .pageSize }}
+                    {{ range .pageSizeOptions }}
+                        <option value="{{ . }}" {{ if eq . $currentSize }}selected{{ end }}>{{ . }}</option>
+                    {{ end }}
+                </select>
+            </span>
+
+            <span style="display:inline-flex;align-items:center;gap:6px">
+                <i class="fa-solid fa-globe" style="font-size:12px;opacity:.6"></i>
+                Timezone
+                <select class="pag-select" name="tz"
+                    hx-get="/condo-acknowledgements"
+                    hx-include="[name='pageSize'],[name='sortBy'],[name='sortOrder']"
+                    hx-target="body"
+                    hx-push-url="true"
+                    id="tz-select">
+                    {{ $currentTz := .timezone }}
+                    {{ range .timezones }}
+                        <option value="{{ . }}" {{ if eq . $currentTz }}selected{{ end }}>{{ . }}</option>
+                    {{ end }}
+                </select>
+            </span>
+        </div>
+
+        <div class="pg-ctrls">
+            {{ if gt .currentPage 1 }}
+            <button class="pag-btn" title="First page"
+                hx-get="/condo-acknowledgements?page=1&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angles-left" style="font-size:11px"></i>
+            </button>
+            <button class="pag-btn" title="Previous page"
+                hx-get="/condo-acknowledgements?page={{ sub .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angle-left" style="font-size:11px"></i>
+            </button>
+            {{ else }}
+            <button class="pag-btn" disabled><i class="fa-solid fa-angles-left" style="font-size:11px"></i></button>
+            <button class="pag-btn" disabled><i class="fa-solid fa-angle-left" style="font-size:11px"></i></button>
+            {{ end }}
+
+            {{ $current := .currentPage }}
+            {{ $tz := .timezone }}
+            {{ $size := .pageSize }}
+            {{ $sortBy := .sortBy }}
+            {{ $sortOrder := .sortOrder }}
+            {{ range $p := .pageWindow }}
+            {{ if eq $p -1 }}
+            <span class="pag-ellipsis">…</span>
+            {{ else }}
+            <button class="pag-btn{{ if eq $p $current }} on{{ end }}"
+                hx-get="/condo-acknowledgements?page={{ $p }}&tz={{ $tz }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}"
+                hx-target="body" hx-push-url="true">{{ $p }}</button>
+            {{ end }}
+            {{ end }}
+
+            {{ if lt .currentPage .totalPages }}
+            <button class="pag-btn" title="Next page"
+                hx-get="/condo-acknowledgements?page={{ add .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angle-right" style="font-size:11px"></i>
+            </button>
+            <button class="pag-btn" title="Last page"
+                hx-get="/condo-acknowledgements?page={{ .totalPages }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angles-right" style="font-size:11px"></i>
+            </button>
+            {{ else }}
+            <button class="pag-btn" disabled><i class="fa-solid fa-angle-right" style="font-size:11px"></i></button>
+            <button class="pag-btn" disabled><i class="fa-solid fa-angles-right" style="font-size:11px"></i></button>
+            {{ end }}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Auto-detect browser timezone on first visit
+    var urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('tz')) {
+        var browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        var sel = document.getElementById('tz-select');
+        if (sel) {
+            for (var i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].value === browserTz) {
+                    window.location.search = '?tz=' + browserTz;
+                    break;
+                }
+            }
+        }
+    }
+</script>
+{{ end }}

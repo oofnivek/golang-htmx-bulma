@@ -1,0 +1,21 @@
+{{ define "condo_acknowledgements/table_row.html" }}
+<tr id="condo-acknowledgement-row-{{ .Record.UserID }}">
+    <td style="color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:13px">{{ .Record.UserID }}</td>
+    <td style="color:var(--ink-2);font-size:13px">{{ in_timezone .Record.CreatedAt .Timezone }}</td>
+    <td class="col-act">
+        <div class="row-act">
+            <button class="ra-btn" title="View"
+                hx-get="/condo-acknowledgements/{{ .Record.UserID }}/view"
+                hx-target="body" hx-push-url="true"
+                hx-include="[name='tz']">
+                <i class="fa-regular fa-eye" style="font-size:14px"></i>
+            </button>
+            <button class="ra-btn danger" title="Delete"
+                hx-get="/condo-acknowledgements/{{ .Record.UserID }}/delete"
+                hx-target="#modal-container">
+                <i class="fa-regular fa-trash-can" style="font-size:13px"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

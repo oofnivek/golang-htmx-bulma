@@ -3150,3 +3150,127 @@ func (s *remoteCondoPostalCodeService) DeleteCondoPostalCode(id int64) error {
 	}
 	return nil
 }
+
+// remoteCondoAcknowledgementService provides HTTP-based client for CondoAcknowledgementService.
+
+type remoteCondoAcknowledgementService struct {
+	client  *http.Client
+	baseURL string
+}
+
+func NewRemoteCondoAcknowledgementService(baseURL string) CondoAcknowledgementService {
+	return &remoteCondoAcknowledgementService{
+		client:  &http.Client{Timeout: 10 * time.Second},
+		baseURL: strings.TrimRight(baseURL, "/"),
+	}
+}
+
+func (s *remoteCondoAcknowledgementService) ListAll() ([]CondoAcknowledgement, error) {
+	resp, err := s.client.Get(s.baseURL + "/api/condo-acknowledgements/all")
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		CondoAcknowledgements []CondoAcknowledgement `json:"condo_acknowledgements"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.CondoAcknowledgements, nil
+}
+
+func (s *remoteCondoAcknowledgementService) ListPaged(page, pageSize int, sortBy, sortOrder string) ([]CondoAcknowledgement, int, error) {
+	q := url.Values{}
+	q.Set("page", strconv.Itoa(page))
+	q.Set("pageSize", strconv.Itoa(pageSize))
+	q.Set("sortBy", sortBy)
+	q.Set("sortOrder", sortOrder)
+	u := fmt.Sprintf("%s/api/condo-acknowledgements?%s", s.baseURL, q.Encode())
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, 0, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, 0, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var data struct {
+		CondoAcknowledgements []CondoAcknowledgement `json:"condo_acknowledgements"`
+		Total                 int                    `json:"total"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, 0, err
+	}
+	return data.CondoAcknowledgements, data.Total, nil
+}
+
+func (s *remoteCondoAcknowledgementService) FindByID(id int64) (*CondoAcknowledgement, error) {
+	u := fmt.Sprintf("%s/api/condo-acknowledgements/%d", s.baseURL, id)
+	resp, err := s.client.Get(u)
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var a CondoAcknowledgement
+	if err := json.NewDecoder(resp.Body).Decode(&a); err != nil {
+		return nil, err
+	}
+	return &a, nil
+}
+
+func (s *remoteCondoAcknowledgementService) CreateCondoAcknowledgement(userID int64) (*CondoAcknowledgement, error) {
+	payload := map[string]interface{}{"user_id": userID}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Post(s.baseURL+"/api/condo-acknowledgements", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return nil, errors.New(msg)
+		}
+		return nil, fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	var a CondoAcknowledgement
+	if err := json.NewDecoder(resp.Body).Decode(&a); err != nil {
+		return nil, err
+	}
+	return &a, nil
+}
+
+func (s *remoteCondoAcknowledgementService) DeleteCondoAcknowledgement(id int64) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/condo-acknowledgements/%d", s.baseURL, id), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("remote service call failed: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		var errData map[string]string
+		json.NewDecoder(resp.Body).Decode(&errData)
+		if msg, ok := errData["error"]; ok {
+			return errors.New(msg)
+		}
+		return fmt.Errorf("remote service returned status: %d", resp.StatusCode)
+	}
+	return nil
+}
