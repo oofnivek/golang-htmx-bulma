@@ -49,7 +49,7 @@ func (h *CondoCarParkHandler) List(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "pages/condo_car_parks/index.html", gin.H{
-		"title":           "Condo Car Parks",
+		"title":           "Condominium Car Parks",
 		"condoCarParks":   records,
 		"timezone":        tz,
 		"timezones":       Timezones,
@@ -82,7 +82,7 @@ func (h *CondoCarParkHandler) CreateForm(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "pages/condo_car_parks/form.html", gin.H{
-		"title":  "Add Condo Car Park",
+		"title":  "Add Condominium Car Park",
 		"action": "/condo-car-parks",
 		"condos": condos,
 		"parks":  parks,
@@ -133,7 +133,7 @@ func (h *CondoCarParkHandler) EditForm(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "pages/condo_car_parks/form.html", gin.H{
-		"title":        "Edit Condo Car Park",
+		"title":        "Edit Condominium Car Park",
 		"action":       "/condo-car-parks/" + idStr,
 		"condoCarPark": record,
 		"condos":       condos,
@@ -186,7 +186,7 @@ func (h *CondoCarParkHandler) View(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "pages/condo_car_parks/view.html", gin.H{
-		"title":        "View Condo Car Park",
+		"title":        "View Condominium Car Park",
 		"condoCarPark": record,
 	})
 }
