@@ -1,0 +1,61 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/vehicle-global-settings" hx-target="body" hx-push-url="true" style="cursor:pointer">Vehicle Service Settings</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .title }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .title }}</h1>
+        <p>{{ if .setting }}Update the service setting.{{ else }}Add a new vehicle service setting.{{ end }}</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <form hx-post="{{ .action }}" hx-target="body" hx-push-url="true">
+        <div class="form-field">
+            <label class="form-label" for="key">Key</label>
+            <input id="key" class="form-input" type="text" name="key"
+                placeholder="e.g. max_vehicles_per_owner"
+                value="{{ if .setting }}{{ .setting.Key }}{{ end }}"
+                required autofocus>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="value">Value</label>
+            <input id="value" class="form-input" type="text" name="value"
+                placeholder="e.g. 10"
+                value="{{ if .setting }}{{ .setting.Value }}{{ end }}"
+                required>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="remark">Remark</label>
+            <input id="remark" class="form-input" type="text" name="remark"
+                placeholder="Optional description"
+                value="{{ if .setting }}{{ if .setting.Remark }}{{ .setting.Remark }}{{ end }}{{ end }}">
+        </div>
+
+        <div class="form-field">
+            <label class="form-label" for="country_code">Country Code</label>
+            <input id="country_code" class="form-input" type="text" name="country_code"
+                placeholder="e.g. SG"
+                value="{{ if .setting }}{{ if .setting.CountryCode }}{{ .setting.CountryCode }}{{ end }}{{ end }}">
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk" style="font-size:13px"></i>
+                Save
+            </button>
+            <button type="button" class="btn"
+                hx-get="/vehicle-global-settings" hx-target="body" hx-push-url="true">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+{{ end }}

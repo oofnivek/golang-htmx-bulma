@@ -1,0 +1,215 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>Vehicle Service Settings</b>
+{{ end }}
+
+{{ define "content" }}
+<!-- Page header -->
+<div class="ph">
+    <div>
+        <h1>Vehicle Service Settings</h1>
+        <p>Manage global settings for the vehicle service &middot; {{ .total }} total</p>
+    </div>
+    <div class="ph-actions">
+        <a href="/vehicle-global-settings/new" class="btn btn-primary">
+            <i class="fa-solid fa-plus" style="font-size:12px"></i>
+            Add new setting
+        </a>
+    </div>
+</div>
+
+<!-- Hidden sort state (referenced by hx-include on the pagination selects) -->
+<input type="hidden" name="sortBy" value="{{ .sortBy }}">
+<input type="hidden" name="sortOrder" value="{{ .sortOrder }}">
+
+<!-- Table card -->
+<div class="card">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <span style="font-size:13px;color:var(--ink-3)">{{ .total }} setting{{ if ne .total 1 }}s{{ end }}</span>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>
+                        <span class="sort"
+                            hx-get="/vehicle-global-settings?sortBy=id&sortOrder={{ if and (eq .sortBy "id") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            ID
+                            {{ if eq .sortBy "id" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/vehicle-global-settings?sortBy=key&sortOrder={{ if and (eq .sortBy "key") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Key
+                            {{ if eq .sortBy "key" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/vehicle-global-settings?sortBy=value&sortOrder={{ if and (eq .sortBy "value") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Value
+                            {{ if eq .sortBy "value" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/vehicle-global-settings?sortBy=country_code&sortOrder={{ if and (eq .sortBy "country_code") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Country Code
+                            {{ if eq .sortBy "country_code" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>
+                        <span class="sort"
+                            hx-get="/vehicle-global-settings?sortBy=updated_at&sortOrder={{ if and (eq .sortBy "updated_at") (eq .sortOrder "asc") }}desc{{ else }}asc{{ end }}&tz={{ .timezone }}&pageSize={{ .pageSize }}"
+                            hx-target="body" hx-push-url="true">
+                            Updated At
+                            {{ if eq .sortBy "updated_at" }}
+                                <i class="fa-solid fa-chevron-{{ if eq .sortOrder "asc" }}up{{ else }}down{{ end }}" style="font-size:10px"></i>
+                            {{ end }}
+                        </span>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ $tz := .timezone }}
+                {{ range .settings }}
+                    {{ template "vehicle_global_settings/table_row.html" (dict "Setting" . "Timezone" $tz) }}
+                {{ end }}
+                {{ if eq (len .settings) 0 }}
+                <tr>
+                    <td colspan="6" style="padding:48px 16px;text-align:center;color:var(--ink-3)">
+                        No settings found.
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination footer -->
+    <div class="pag">
+        <div class="pag-left">
+            <span>
+                Showing <b style="color:var(--ink)">{{ .start }}&ndash;{{ .end }}</b>
+                of <b style="color:var(--ink)">{{ .total }}</b>
+            </span>
+
+            <span style="display:inline-flex;align-items:center;gap:6px">
+                Rows
+                <select class="pag-select" name="pageSize"
+                    hx-get="/vehicle-global-settings"
+                    hx-include="[name='tz'],[name='sortBy'],[name='sortOrder']"
+                    hx-target="body"
+                    hx-push-url="true">
+                    {{ $currentSize := .pageSize }}
+                    {{ range .pageSizeOptions }}
+                        <option value="{{ . }}" {{ if eq . $currentSize }}selected{{ end }}>{{ . }}</option>
+                    {{ end }}
+                </select>
+            </span>
+
+            <span style="display:inline-flex;align-items:center;gap:6px">
+                <i class="fa-solid fa-globe" style="font-size:12px;opacity:.6"></i>
+                Timezone
+                <select class="pag-select" name="tz"
+                    hx-get="/vehicle-global-settings"
+                    hx-include="[name='pageSize'],[name='sortBy'],[name='sortOrder']"
+                    hx-target="body"
+                    hx-push-url="true"
+                    id="tz-select">
+                    {{ $currentTz := .timezone }}
+                    {{ range .timezones }}
+                        <option value="{{ . }}" {{ if eq . $currentTz }}selected{{ end }}>{{ . }}</option>
+                    {{ end }}
+                </select>
+            </span>
+        </div>
+
+        <div class="pg-ctrls">
+            {{ if gt .currentPage 1 }}
+            <button class="pag-btn" title="First page"
+                hx-get="/vehicle-global-settings?page=1&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angles-left" style="font-size:11px"></i>
+            </button>
+            <button class="pag-btn" title="Previous page"
+                hx-get="/vehicle-global-settings?page={{ sub .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angle-left" style="font-size:11px"></i>
+            </button>
+            {{ else }}
+            <button class="pag-btn" disabled><i class="fa-solid fa-angles-left" style="font-size:11px"></i></button>
+            <button class="pag-btn" disabled><i class="fa-solid fa-angle-left" style="font-size:11px"></i></button>
+            {{ end }}
+
+            {{ $current := .currentPage }}
+            {{ $tz := .timezone }}
+            {{ $size := .pageSize }}
+            {{ $sortBy := .sortBy }}
+            {{ $sortOrder := .sortOrder }}
+            {{ range $p := .pageWindow }}
+            {{ if eq $p -1 }}
+            <span class="pag-ellipsis">…</span>
+            {{ else }}
+            <button class="pag-btn{{ if eq $p $current }} on{{ end }}"
+                hx-get="/vehicle-global-settings?page={{ $p }}&tz={{ $tz }}&pageSize={{ $size }}&sortBy={{ $sortBy }}&sortOrder={{ $sortOrder }}"
+                hx-target="body" hx-push-url="true">{{ $p }}</button>
+            {{ end }}
+            {{ end }}
+
+            {{ if lt .currentPage .totalPages }}
+            <button class="pag-btn" title="Next page"
+                hx-get="/vehicle-global-settings?page={{ add .currentPage 1 }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angle-right" style="font-size:11px"></i>
+            </button>
+            <button class="pag-btn" title="Last page"
+                hx-get="/vehicle-global-settings?page={{ .totalPages }}&tz={{ .timezone }}&pageSize={{ .pageSize }}&sortBy={{ .sortBy }}&sortOrder={{ .sortOrder }}"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-solid fa-angles-right" style="font-size:11px"></i>
+            </button>
+            {{ else }}
+            <button class="pag-btn" disabled><i class="fa-solid fa-angle-right" style="font-size:11px"></i></button>
+            <button class="pag-btn" disabled><i class="fa-solid fa-angles-right" style="font-size:11px"></i></button>
+            {{ end }}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Auto-detect browser timezone on first visit
+    var urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('tz')) {
+        var browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        var sel = document.getElementById('tz-select');
+        if (sel) {
+            for (var i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].value === browserTz) {
+                    window.location.search = '?tz=' + browserTz;
+                    break;
+                }
+            }
+        }
+    }
+</script>
+{{ end }}

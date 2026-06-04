@@ -1,0 +1,33 @@
+{{ define "vehicle_global_settings/table_row.html" }}
+<tr id="vehicle-global-setting-row-{{ .Setting.ID }}">
+    <td style="color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:13px">{{ .Setting.ID }}</td>
+    <td><span style="font-weight:500">{{ .Setting.Key }}</span></td>
+    <td style="color:var(--ink-2);font-size:13px">{{ .Setting.Value }}</td>
+    <td style="color:var(--ink-2);font-size:13px">
+        {{ if .Setting.CountryCode }}{{ .Setting.CountryCode }}{{ else }}&mdash;{{ end }}
+    </td>
+    <td style="color:var(--ink-2);font-size:13px">
+        {{ if .Setting.UpdatedAt }}{{ in_timezone .Setting.UpdatedAt .Timezone }}{{ else }}&mdash;{{ end }}
+    </td>
+    <td class="col-act">
+        <div class="row-act">
+            <button class="ra-btn" title="View"
+                hx-get="/vehicle-global-settings/{{ .Setting.ID }}/view"
+                hx-target="body" hx-push-url="true"
+                hx-include="[name='tz']">
+                <i class="fa-regular fa-eye" style="font-size:14px"></i>
+            </button>
+            <button class="ra-btn" title="Edit"
+                hx-get="/vehicle-global-settings/{{ .Setting.ID }}/edit"
+                hx-target="body" hx-push-url="true">
+                <i class="fa-regular fa-pen-to-square" style="font-size:13px"></i>
+            </button>
+            <button class="ra-btn danger" title="Delete"
+                hx-get="/vehicle-global-settings/{{ .Setting.ID }}/delete"
+                hx-target="#modal-container">
+                <i class="fa-regular fa-trash-can" style="font-size:13px"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+{{ end }}

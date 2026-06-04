@@ -19,7 +19,7 @@ type User struct {
 	UpdatedAt    time.Time `json:"updated_at_utc"`
 	RoleID       string    `json:"role_id"`
 
-	PasswordHash string `json:"-"`
+	PasswordHash *string `json:"-"`
 	Password     string `json:"-"`
 	ConfirmPass  string `json:"-"`
 

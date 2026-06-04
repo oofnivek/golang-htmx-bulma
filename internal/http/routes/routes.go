@@ -56,6 +56,8 @@ func RegisterRoutes(
 	condoPostalCodeAPI *api.CondoPostalCodeAPIHandler,
 	condoAcknowledgementHandler *web.CondoAcknowledgementHandler,
 	condoAcknowledgementAPI *api.CondoAcknowledgementAPIHandler,
+	vgsHandler *web.VehicleGlobalSettingHandler,
+	vgsAPI *api.VehicleGlobalSettingAPIHandler,
 	signingKey string,
 ) {
 	// Static files
@@ -70,7 +72,7 @@ func RegisterRoutes(
 	}
 
 	// Protected Web Routes
-	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || riHandler != nil || vHandler != nil || fuelCardHandler != nil || condoHandler != nil || condoCarParkHandler != nil || condoPostalCodeHandler != nil || condoAcknowledgementHandler != nil || roleHandler != nil || userHandler != nil {
+	if vcHandler != nil || vmHandler != nil || vtHandler != nil || vsHandler != nil || ftHandler != nil || vmdlHandler != nil || vfHandler != nil || fcHandler != nil || caoHandler != nil || cpoHandler != nil || cpHandler != nil || cplHandler != nil || estateHandler != nil || riHandler != nil || vHandler != nil || fuelCardHandler != nil || condoHandler != nil || condoCarParkHandler != nil || condoPostalCodeHandler != nil || condoAcknowledgementHandler != nil || vgsHandler != nil || roleHandler != nil || userHandler != nil {
 		protected := r.Group("/")
 		protected.Use(middleware.AuthMiddleware(signingKey))
 		{
@@ -372,6 +374,21 @@ func RegisterRoutes(
 				}
 			}
 
+			// Vehicle Global Settings
+			if vgsHandler != nil {
+				vgsGroup := protected.Group("/vehicle-global-settings")
+				{
+					vgsGroup.GET("", vgsHandler.List)
+					vgsGroup.GET("/new", vgsHandler.CreateForm)
+					vgsGroup.POST("", vgsHandler.Create)
+					vgsGroup.GET("/:id/view", vgsHandler.View)
+					vgsGroup.GET("/:id/edit", vgsHandler.EditForm)
+					vgsGroup.POST("/:id", vgsHandler.Update)
+					vgsGroup.DELETE("/:id", vgsHandler.Delete)
+					vgsGroup.GET("/:id/delete", vgsHandler.DeleteConfirm)
+				}
+			}
+
 			// Roles
 			if roleHandler != nil {
 				roleGroup := protected.Group("/roles")
@@ -598,6 +615,15 @@ func RegisterRoutes(
 			apiGroup.GET("/condo-acknowledgements/:id", condoAcknowledgementAPI.Get)
 			apiGroup.POST("/condo-acknowledgements", condoAcknowledgementAPI.Create)
 			apiGroup.DELETE("/condo-acknowledgements/:id", condoAcknowledgementAPI.Delete)
+		}
+
+		if vgsAPI != nil {
+			apiGroup.GET("/vehicle-global-settings/all", vgsAPI.ListAll)
+			apiGroup.GET("/vehicle-global-settings", vgsAPI.List)
+			apiGroup.GET("/vehicle-global-settings/:id", vgsAPI.Get)
+			apiGroup.POST("/vehicle-global-settings", vgsAPI.Create)
+			apiGroup.PUT("/vehicle-global-settings/:id", vgsAPI.Update)
+			apiGroup.DELETE("/vehicle-global-settings/:id", vgsAPI.Delete)
 		}
 	}
 }

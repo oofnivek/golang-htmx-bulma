@@ -70,7 +70,7 @@ func (s *localUserService) CreateUser(u *User) error {
 	if err != nil {
 		return err
 	}
-	u.PasswordHash = hash
+	u.PasswordHash = &hash
 
 	now := time.Now().UTC()
 	u.CreatedAt = now
@@ -88,7 +88,7 @@ func (s *localUserService) UpdateUser(u *User) error {
 		if err != nil {
 			return err
 		}
-		u.PasswordHash = hash
+		u.PasswordHash = &hash
 	}
 
 	u.UpdatedAt = time.Now().UTC()
@@ -216,7 +216,11 @@ func (s *localAuthService) Login(email, password string) (string, *User, error) 
 		return "", nil, errors.New("account is disabled")
 	}
 
-	verificationResult := crypto.VerifyUserPassword(email, user.PasswordHash, password)
+	passwordHash := ""
+	if user.PasswordHash != nil {
+		passwordHash = *user.PasswordHash
+	}
+	verificationResult := crypto.VerifyUserPassword(email, passwordHash, password)
 	if verificationResult == crypto.PasswordVerificationFailed {
 		slog.Warn("Login failed: incorrect password", "email", email)
 		return "", nil, errors.New("invalid email or password")

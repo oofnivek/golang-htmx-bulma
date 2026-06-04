@@ -1,0 +1,60 @@
+{{ define "breadcrumbs" }}
+<span>Vehicle Management</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<span hx-get="/vehicle-global-settings" hx-target="body" hx-push-url="true" style="cursor:pointer">Vehicle Service Settings</span>
+<i class="fa-solid fa-chevron-right" style="font-size:10px;opacity:.5"></i>
+<b>{{ .setting.Key }}</b>
+{{ end }}
+
+{{ define "content" }}
+<div class="ph">
+    <div>
+        <h1>{{ .setting.Key }}</h1>
+        <p>Vehicle service setting details</p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:560px">
+    <div class="form-field">
+        <label class="form-label">ID</label>
+        <div class="form-readonly">{{ .setting.ID }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Key</label>
+        <div class="form-readonly">{{ .setting.Key }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Value</label>
+        <div class="form-readonly">{{ .setting.Value }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Remark</label>
+        <div class="form-readonly">{{ if .setting.Remark }}{{ .setting.Remark }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <div class="form-field">
+        <label class="form-label">Country Code</label>
+        <div class="form-readonly">{{ if .setting.CountryCode }}{{ .setting.CountryCode }}{{ else }}&mdash;{{ end }}</div>
+    </div>
+
+    <div class="form-meta">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+            <div><strong>Created By:</strong> {{ .setting.CreatedBy }}</div>
+            <div><strong>Created:</strong> {{ in_timezone .setting.CreatedAt .tz }}</div>
+            {{ if .setting.UpdatedBy }}<div><strong>Updated By:</strong> {{ .setting.UpdatedBy }}</div>{{ end }}
+            {{ if .setting.UpdatedAt }}<div><strong>Updated:</strong> {{ in_timezone .setting.UpdatedAt .tz }}</div>{{ end }}
+        </div>
+    </div>
+
+    <div class="form-footer">
+        <button type="button" class="btn"
+            hx-get="/vehicle-global-settings" hx-target="body" hx-push-url="true">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            Back to List
+        </button>
+    </div>
+</div>
+{{ end }}

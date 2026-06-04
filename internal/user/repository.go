@@ -138,7 +138,7 @@ func (r *mysqlUserRepository) Create(u *User) error {
 
 func (r *mysqlUserRepository) Update(u *User) error {
 	var err error
-	if u.PasswordHash != "" {
+	if u.PasswordHash != nil && *u.PasswordHash != "" {
 		query := `
 			UPDATE users SET first_name = ?, last_name = ?, mobile = ?, designation = ?, department = ?, is_enabled = ?, updated_at_utc = ?, role_id = ?, password_hash = ?
 			WHERE email = ?`
